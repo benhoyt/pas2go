@@ -120,7 +120,7 @@ func (p *parser) labelledStmt(allowLabel bool) Stmt {
 		case ASSIGN:
 			p.next()
 			value := p.expr()
-			return &AssignStmt{&Variable{ident}, value}
+			return &AssignStmt{&VarExpr{ident}, value}
 		case COLON:
 			if !allowLabel {
 				panic(p.error("unexpected label"))
@@ -185,10 +185,10 @@ func (p *parser) labelledStmt(allowLabel bool) Stmt {
 		return &ForStmt{ident, initial, down, final, stmt}
 	case WITH:
 		p.next()
-		vars := []*Variable{p.variable()}
+		vars := []*VarExpr{p.varExpr()}
 		for p.tok == COMMA {
 			p.next()
-			vars = append(vars, p.variable())
+			vars = append(vars, p.varExpr())
 		}
 		p.expect(DO)
 		stmt := p.stmt()
@@ -207,20 +207,93 @@ func (p *parser) argList() []Expr {
 	return args
 }
 
-func (p *parser) variable() *Variable {
+func (p *parser) varExpr() *VarExpr {
+	// TODO: flesh this out
 	ident := p.val
 	p.expect(IDENT)
-	return &Variable{ident}
+	return &VarExpr{ident}
 }
 
+// expr: simpleExpr (relationalOp expr)?
 func (p *parser) expr() Expr {
-	val := p.val
-	p.expect(NUM)
-	i, err := strconv.Atoi(val)
-	if err != nil {
-		panic(p.error("expected integer"))
+	return p.binaryExpr(p.simpleExpr, p.expr, EQUALS, NOT_EQUALS, LESS, LTE, GREATER, GTE, IN)
+}
+
+// simpleExpr: term (additiveOp simpleExpr)?
+func (p *parser) simpleExpr() Expr {
+	return p.binaryExpr(p.term, p.simpleExpr, PLUS, MINUS, OR)
+}
+
+// term: signedFactor (multiplicativeOp term)?
+func (p *parser) term() Expr {
+	return p.binaryExpr(p.signedFactor, p.term, STAR, SLASH, DIV, MOD, AND)
+}
+
+// signedFactor: (PLUS | MINUS)? factor
+func (p *parser) signedFactor() Expr {
+	if p.tok == PLUS || p.tok == MINUS {
+		op := p.tok
+		p.next()
+		return &UnaryExpr{op, p.factor()}
 	}
-	return &IntegerExpr{i}
+	return p.factor()
+}
+
+// factor: var | LPAREN expr RPAREN | function | constant | NOT factor | TRUE | FALSE
+// TODO: handle constantChr
+func (p *parser) factor() Expr {
+	switch p.tok {
+	case LPAREN:
+		p.next()
+		expr := p.expr() // TODO: need special AST type to signal parenthesized expr?
+		p.expect(RPAREN)
+		return expr
+	case NUM:
+		// TODO
+		val := p.val
+		i, err := strconv.Atoi(val)
+		if err != nil {
+			panic(p.error("expected integer"))
+		}
+		p.next()
+		return &ConstExpr{i}
+	case STR:
+		s := p.val
+		p.next()
+		return &ConstExpr{s}
+	case NOT:
+		p.next()
+		return &UnaryExpr{NOT, p.factor()}
+	case TRUE, FALSE:
+		boolVal := p.tok == TRUE
+		p.next()
+		return &ConstExpr{boolVal}
+	case IDENT, AT:
+		varExpr := p.varExpr()
+		switch p.tok {
+		case LPAREN:
+			// TODO: assert varExpr is simple identifier
+			p.next()
+			args := p.argList()
+			p.expect(RPAREN)
+			return &FuncExpr{varExpr.Name, args}
+		default:
+			return varExpr
+		}
+	default:
+		panic(p.error("expected factor"))
+	}
+}
+
+func (p *parser) binaryExpr(left, right func() Expr, ops ...Token) Expr {
+	expr := left()
+	for p.matches(ops...) {
+		op := p.tok
+		p.next()
+		rightExpr := right()
+		expr = &BinaryExpr{expr, op, rightExpr}
+	}
+	return expr
 }
 
 // Parse next token into p.tok (and set p.pos and p.val).
@@ -237,6 +310,17 @@ func (p *parser) expect(tok Token) {
 		panic(p.error("expected %s instead of %s", tok, p.tok))
 	}
 	p.next()
+}
+
+// Return true iff current token matches one of the given operators,
+// but don't parse next token.
+func (p *parser) matches(operators ...Token) bool {
+	for _, operator := range operators {
+		if p.tok == operator {
+			return true
+		}
+	}
+	return false
 }
 
 // Format given string and args with Sprintf and return *ParseError

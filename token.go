@@ -48,6 +48,7 @@ const (
 	DOWNTO
 	ELSE
 	END
+	FALSE
 	FILE
 	FOR
 	FUNCTION
@@ -72,6 +73,7 @@ const (
 	STRING
 	THEN
 	TO
+	TRUE
 	TYPE
 	UNIT
 	UNTIL
@@ -100,6 +102,7 @@ var keywordTokens = map[string]Token{
 	"DOWNTO":         DOWNTO,
 	"ELSE":           ELSE,
 	"END":            END,
+	"FALSE":          FALSE,
 	"FILE":           FILE,
 	"FOR":            FOR,
 	"FUNCTION":       FUNCTION,
@@ -124,6 +127,7 @@ var keywordTokens = map[string]Token{
 	"STRING":         STRING,
 	"THEN":           THEN,
 	"TO":             TO,
+	"TRUE":           TRUE,
 	"TYPE":           TYPE,
 	"UNIT":           UNIT,
 	"UNTIL":          UNTIL,
@@ -177,6 +181,7 @@ var tokenNames = map[Token]string{
 	DOWNTO:         "DOWNTO",
 	ELSE:           "ELSE",
 	END:            "END",
+	FALSE:          "FALSE",
 	FILE:           "FILE",
 	FOR:            "FOR",
 	FUNCTION:       "FUNCTION",
@@ -201,6 +206,7 @@ var tokenNames = map[Token]string{
 	STRING:         "STRING",
 	THEN:           "THEN",
 	TO:             "TO",
+	TRUE:           "TRUE",
 	TYPE:           "TYPE",
 	UNIT:           "UNIT",
 	UNTIL:          "UNTIL",

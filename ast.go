@@ -103,7 +103,7 @@ func (s *WhileStmt) stmt()    {}
 func (s *WithStmt) stmt()     {}
 
 type AssignStmt struct {
-	Var   *Variable
+	Var   *VarExpr
 	Value Expr
 }
 
@@ -199,14 +199,18 @@ type ProcStmt struct {
 	Args []Expr
 }
 
+func formatArgList(args []Expr) string {
+	strs := make([]string, len(args))
+	for i, arg := range args {
+		strs[i] = arg.String()
+	}
+	return "(" + strings.Join(strs, ", ") + ")"
+}
+
 func (s *ProcStmt) String() string {
 	str := s.Proc
 	if s.Args != nil {
-		strs := make([]string, len(s.Args))
-		for i, arg := range s.Args {
-			strs[i] = arg.String()
-		}
-		str += "(" + strings.Join(strs, ", ") + ")"
+		str += formatArgList(s.Args)
 	}
 	return str
 }
@@ -230,7 +234,7 @@ func (s *WhileStmt) String() string {
 }
 
 type WithStmt struct {
-	Vars []*Variable
+	Vars []*VarExpr
 	Stmt Stmt
 }
 
@@ -249,22 +253,62 @@ type Expr interface {
 	String() string
 }
 
-func (e *IntegerExpr) expr() {}
+func (e *BinaryExpr) expr() {}
+func (e *ConstExpr) expr()  {}
+func (e *FuncExpr) expr()   {}
+func (e *UnaryExpr) expr()  {}
+func (e *VarExpr) expr()    {}
 
-type IntegerExpr struct {
-	Value int
+type BinaryExpr struct {
+	Left  Expr
+	Op    Token
+	Right Expr
 }
 
-func (e *IntegerExpr) String() string {
-	return fmt.Sprintf("%d", e.Value)
+func (e *BinaryExpr) String() string {
+	// TODO: handle precedence
+	return fmt.Sprintf("(%s %s %s)", e.Left, e.Op, e.Right)
 }
 
-// Other constructs
+type ConstExpr struct {
+	Value interface{}
+}
 
-type Variable struct {
+func (e *ConstExpr) String() string {
+	switch e.Value.(type) {
+	case string:
+		return fmt.Sprintf("'%s'", e.Value) // TODO: proper quoting
+	default:
+		return fmt.Sprintf("%v", e.Value)
+	}
+}
+
+type FuncExpr struct {
+	Func string
+	Args []Expr
+}
+
+func (e *FuncExpr) String() string {
+	return e.Func + formatArgList(e.Args)
+}
+
+type UnaryExpr struct {
+	Op   Token
+	Expr Expr
+}
+
+func (e *UnaryExpr) String() string {
+	c := e.Op.String()[0]
+	if c >= 'A' && c <= 'Z' {
+		fmt.Sprintf("%s %s", e.Op, e.Expr)
+	}
+	return fmt.Sprintf("%s%s", e.Op, e.Expr)
+}
+
+type VarExpr struct {
 	Name string
 }
 
-func (v *Variable) String() string {
+func (v *VarExpr) String() string {
 	return v.Name
 }
