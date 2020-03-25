@@ -9,15 +9,21 @@ import (
 
 type Program struct {
 	Name  string
+	Uses  []string
 	Decls []DeclPart
 	Stmt  *CompoundStmt
 }
 
 func (p *Program) String() string {
-	s := fmt.Sprintf(`program %s;
+	usesStr := ""
+	if p.Uses != nil {
+		usesStr = "uses " + strings.Join(p.Uses, ", ") + ";\n"
+	}
 
+	s := fmt.Sprintf(`program %s;
+%s
 %s.
-`, p.Name, p.Stmt)
+`, p.Name, usesStr, p.Stmt)
 	return s
 }
 
@@ -26,9 +32,9 @@ type DeclPart interface {
 }
 
 func (p *ConstDecls) declPart() {}
-func (p *Function) declPart()   {}
+func (p *FuncDef) declPart()    {}
 func (p *LabelDecls) declPart() {}
-func (p *Procedure) declPart()  {}
+func (p *ProcDef) declPart()    {}
 func (p *TypeDefs) declPart()   {}
 func (p *VarDecls) declPart()   {}
 
@@ -41,7 +47,7 @@ type ConstDecl struct {
 	Value Expr
 }
 
-type Function struct {
+type FuncDef struct {
 	Name       string
 	Params     []ParamGroup
 	ReturnType string // TODO: Type
@@ -58,7 +64,7 @@ type LabelDecls struct {
 	Labels []string
 }
 
-type Procedure struct {
+type ProcDef struct {
 	Name   string
 	Params []ParamGroup
 	//TODO:	Block Block

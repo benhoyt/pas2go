@@ -58,6 +58,19 @@ func (p *parser) program() *Program {
 	p.expect(IDENT)
 	p.expect(SEMICOLON)
 
+	if p.tok == USES {
+		p.next()
+		uses := []string{p.val}
+		p.expect(IDENT)
+		for p.tok == COMMA {
+			p.next()
+			uses = append(uses, p.val)
+			p.expect(IDENT)
+		}
+		p.expect(SEMICOLON)
+		program.Uses = uses
+	}
+
 	program.Stmt = p.compoundStmt()
 	p.expect(DOT)
 	p.expect(EOF)
