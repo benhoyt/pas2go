@@ -5,6 +5,7 @@ package main
 import (
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 // ParseError (actually *ParseError) is the type of error returned by
@@ -60,22 +61,96 @@ func (p *parser) program() *Program {
 
 	if p.tok == USES {
 		p.next()
-		uses := []string{p.val}
-		p.expect(IDENT)
-		for p.tok == COMMA {
-			p.next()
-			uses = append(uses, p.val)
-			p.expect(IDENT)
-		}
+		program.Uses = p.identList()
 		p.expect(SEMICOLON)
-		program.Uses = uses
 	}
+
+	var decls []DeclPart
+	for p.matches(CONST, FUNCTION, LABEL, PROCEDURE, TYPE, VAR) {
+		decls = append(decls, p.declPart())
+	}
+	program.Decls = decls
 
 	program.Stmt = p.compoundStmt()
 	p.expect(DOT)
 	p.expect(EOF)
 
 	return program
+}
+
+func (p *parser) identList() []string {
+	idents := []string{p.val}
+	p.expect(IDENT)
+	for p.tok == COMMA {
+		p.next()
+		idents = append(idents, p.val)
+		p.expect(IDENT)
+	}
+	return idents
+}
+
+func (p *parser) declPart() DeclPart {
+	switch p.tok {
+	case PROCEDURE:
+		p.next()
+		name := p.val
+		p.expect(IDENT)
+		params := p.optionalParamList()
+		p.expect(SEMICOLON)
+		stmt := p.compoundStmt()
+		p.expect(SEMICOLON)
+		return &ProcDecl{name, params, stmt}
+	case FUNCTION:
+		p.next()
+		name := p.val
+		p.expect(IDENT)
+		params := p.optionalParamList()
+		p.expect(COLON)
+		result := p.typeIdent()
+		p.expect(SEMICOLON)
+		stmt := p.compoundStmt()
+		p.expect(SEMICOLON)
+		return &FuncDecl{name, params, result, stmt}
+	default:
+		panic(p.error("TODO declPart"))
+	}
+}
+
+func (p *parser) optionalParamList() []*ParamGroup {
+	var groups []*ParamGroup
+	if p.tok == LPAREN {
+		p.next()
+		groups = append(groups, p.paramGroup())
+		for p.tok == SEMICOLON {
+			p.next()
+			groups = append(groups, p.paramGroup())
+		}
+		p.expect(RPAREN)
+	}
+	return groups
+}
+
+func (p *parser) paramGroup() *ParamGroup {
+	prefix := ILLEGAL
+	if p.matches(VAR, FUNCTION, PROCEDURE) {
+		prefix = p.tok
+		p.next()
+	}
+	names := p.identList()
+	p.expect(COLON)
+	typ := p.typeIdent()
+	return &ParamGroup{prefix, names, typ}
+}
+
+func (p *parser) typeIdent() string {
+	if p.matches(CHAR, BOOLEAN, INTEGER, REAL, STRING) {
+		tok := p.tok
+		p.next()
+		return strings.ToLower(tok.String())
+	}
+	ident := p.val
+	p.expect(IDENT)
+	return ident
 }
 
 func (p *parser) compoundStmt() *CompoundStmt {

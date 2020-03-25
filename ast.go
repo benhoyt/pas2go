@@ -17,29 +17,36 @@ type Program struct {
 func (p *Program) String() string {
 	usesStr := ""
 	if p.Uses != nil {
-		usesStr = "uses " + strings.Join(p.Uses, ", ") + ";\n"
+		usesStr = "\nuses " + strings.Join(p.Uses, ", ") + ";"
 	}
 
-	s := fmt.Sprintf(`program %s;
-%s
-%s.
-`, p.Name, usesStr, p.Stmt)
-	return s
+	declStrs := make([]string, len(p.Decls))
+	for i, decl := range p.Decls {
+		declStrs[i] = decl.String() + "\n\n"
+	}
+
+	return fmt.Sprintf("program %s;%s\n\n%s%s.\n",
+		p.Name, usesStr, strings.Join(declStrs, ""), p.Stmt)
 }
 
 type DeclPart interface {
 	declPart()
+	String() string
 }
 
 func (p *ConstDecls) declPart() {}
-func (p *FuncDef) declPart()    {}
+func (p *FuncDecl) declPart()   {}
 func (p *LabelDecls) declPart() {}
-func (p *ProcDef) declPart()    {}
+func (p *ProcDecl) declPart()   {}
 func (p *TypeDefs) declPart()   {}
 func (p *VarDecls) declPart()   {}
 
 type ConstDecls struct {
-	Decls []ConstDecl
+	Decls []*ConstDecl
+}
+
+func (d *ConstDecls) String() string {
+	return "TODO"
 }
 
 type ConstDecl struct {
@@ -47,31 +54,67 @@ type ConstDecl struct {
 	Value Expr
 }
 
-type FuncDef struct {
-	Name       string
-	Params     []ParamGroup
-	ReturnType string // TODO: Type
-	//TODO:	Block Block
+type FuncDecl struct {
+	Name   string
+	Params []*ParamGroup
+	Result string
+	Stmt   *CompoundStmt
+}
+
+func (d *FuncDecl) String() string {
+	return fmt.Sprintf("procedure %s%s: %s;\n%s;", d.Name, formatParams(d.Params), d.Result, d.Stmt)
 }
 
 type ParamGroup struct {
-	IsVar bool
-	Names []string
-	Type  string
+	Prefix Token
+	Names  []string
+	Type   string
+}
+
+func (g *ParamGroup) String() string {
+	prefix := ""
+	if g.Prefix != ILLEGAL {
+		prefix = strings.ToLower(g.Prefix.String()) + " "
+	}
+	return fmt.Sprintf("%s%s: %s", prefix, strings.Join(g.Names, ", "), g.Type)
 }
 
 type LabelDecls struct {
 	Labels []string
 }
 
-type ProcDef struct {
+func (d *LabelDecls) String() string {
+	return "TODO"
+}
+
+type ProcDecl struct {
 	Name   string
-	Params []ParamGroup
-	//TODO:	Block Block
+	Params []*ParamGroup
+	Stmt   *CompoundStmt
+}
+
+func formatParams(params []*ParamGroup) string {
+	str := ""
+	if params != nil {
+		strs := make([]string, len(params))
+		for i, group := range params {
+			strs[i] = group.String()
+		}
+		str = "(" + strings.Join(strs, "; ") + ")"
+	}
+	return str
+}
+
+func (d *ProcDecl) String() string {
+	return fmt.Sprintf("procedure %s%s;\n%s;", d.Name, formatParams(d.Params), d.Stmt)
 }
 
 type TypeDefs struct {
 	Defs []TypeDef
+}
+
+func (d *TypeDefs) String() string {
+	return "TODO"
 }
 
 type TypeDef struct {
@@ -81,6 +124,10 @@ type TypeDef struct {
 
 type VarDecls struct {
 	Decls []VarDecl
+}
+
+func (d *VarDecls) String() string {
+	return "TODO"
 }
 
 type VarDecl struct {

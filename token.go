@@ -41,6 +41,7 @@ const (
 	AND
 	ARRAY
 	BEGIN
+	BOOLEAN
 	CASE
 	CONST
 	DIV
@@ -57,6 +58,7 @@ const (
 	IMPLEMENTATION
 	IN
 	INLINE
+	INTEGER
 	INTERFACE
 	LABEL
 	MOD
@@ -66,6 +68,7 @@ const (
 	OR
 	PROCEDURE
 	PROGRAM
+	REAL
 	RECORD
 	REPEAT
 	SHL
@@ -95,6 +98,7 @@ var keywordTokens = map[string]Token{
 	"AND":            AND,
 	"ARRAY":          ARRAY,
 	"BEGIN":          BEGIN,
+	"BOOLEAN":        BOOLEAN,
 	"CASE":           CASE,
 	"CONST":          CONST,
 	"DIV":            DIV,
@@ -111,6 +115,7 @@ var keywordTokens = map[string]Token{
 	"IMPLEMENTATION": IMPLEMENTATION,
 	"IN":             IN,
 	"INLINE":         INLINE,
+	"INTEGER":        INTEGER,
 	"INTERFACE":      INTERFACE,
 	"LABEL":          LABEL,
 	"MOD":            MOD,
@@ -120,6 +125,7 @@ var keywordTokens = map[string]Token{
 	"OR":             OR,
 	"PROCEDURE":      PROCEDURE,
 	"PROGRAM":        PROGRAM,
+	"REAL":           REAL,
 	"RECORD":         RECORD,
 	"REPEAT":         REPEAT,
 	"SHL":            SHL,
@@ -174,6 +180,7 @@ var tokenNames = map[Token]string{
 	AND:            "AND",
 	ARRAY:          "ARRAY",
 	BEGIN:          "BEGIN",
+	BOOLEAN:        "BOOLEAN",
 	CASE:           "CASE",
 	CONST:          "CONST",
 	DIV:            "DIV",
@@ -190,6 +197,7 @@ var tokenNames = map[Token]string{
 	IMPLEMENTATION: "IMPLEMENTATION",
 	IN:             "IN",
 	INLINE:         "INLINE",
+	INTEGER:        "INTEGER",
 	INTERFACE:      "INTERFACE",
 	LABEL:          "LABEL",
 	MOD:            "MOD",
@@ -199,6 +207,7 @@ var tokenNames = map[Token]string{
 	OR:             "OR",
 	PROCEDURE:      "PROCEDURE",
 	PROGRAM:        "PROGRAM",
+	REAL:           "REAL",
 	RECORD:         "RECORD",
 	REPEAT:         "REPEAT",
 	SHL:            "SHL",
