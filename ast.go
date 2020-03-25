@@ -291,7 +291,7 @@ type BinaryExpr struct {
 }
 
 func (e *BinaryExpr) String() string {
-	return fmt.Sprintf("%s %s %s", e.Left, e.Op, e.Right) // TODO: handle precedence
+	return fmt.Sprintf("%s %s %s", e.Left, strings.ToLower(e.Op.String()), e.Right) // TODO: handle precedence
 }
 
 type ConstExpr struct {
@@ -299,11 +299,11 @@ type ConstExpr struct {
 }
 
 func (e *ConstExpr) String() string {
-	switch e.Value.(type) {
+	switch value := e.Value.(type) {
 	case string:
-		return fmt.Sprintf("'%s'", e.Value) // TODO: proper quoting
+		return fmt.Sprintf("'%s'", strings.ReplaceAll(value, "'", "'#39'"))
 	default:
-		return fmt.Sprintf("%v", e.Value)
+		return fmt.Sprintf("%v", value)
 	}
 }
 
@@ -322,9 +322,9 @@ type UnaryExpr struct {
 }
 
 func (e *UnaryExpr) String() string {
-	c := e.Op.String()[0]
-	if c >= 'A' && c <= 'Z' {
-		fmt.Sprintf("%s %s", e.Op, e.Expr)
+	opStr := e.Op.String()
+	if opStr[0] >= 'A' && opStr[0] <= 'Z' {
+		return fmt.Sprintf("%s %s", strings.ToLower(opStr), e.Expr)
 	}
 	return fmt.Sprintf("%s%s", e.Op, e.Expr)
 }

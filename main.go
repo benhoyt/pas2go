@@ -18,17 +18,17 @@ func main() {
 		os.Exit(1)
 	}
 
-	lexer := NewLexer(src)
-	for {
-		pos, tok, val := lexer.Scan()
-		if tok == EOF {
-			break
-		}
-		fmt.Printf("%d:%d %s %q\n", pos.Line, pos.Column, tok, val)
-		if tok == ILLEGAL {
-			break
-		}
-	}
+	// lexer := NewLexer(src)
+	// for {
+	// 	pos, tok, val := lexer.Scan()
+	// 	if tok == EOF {
+	// 		break
+	// 	}
+	// 	fmt.Printf("%d:%d %s %q\n", pos.Line, pos.Column, tok, val)
+	// 	if tok == ILLEGAL {
+	// 		break
+	// 	}
+	// }
 
 	program, err := ParseProgram(src)
 	if err != nil {
@@ -39,7 +39,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "%s\n", errMsg)
 		os.Exit(1)
 	}
-	fmt.Printf("----------------------\n")
+	//	fmt.Printf("----------------------\n")
 	fmt.Print(program)
 }
 
