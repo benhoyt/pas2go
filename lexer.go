@@ -44,8 +44,8 @@ func NewLexer(src []byte) *Lexer {
 // Scan scans the next token and returns its position (line/column),
 // token value (one of the uppercased token constants), and the
 // string value of the token. For most tokens, the token value is
-// empty. For IDENT, NUMBER, and STRING tokens, it's the token's
-// value. For an ILLEGAL token, it's the error message.
+// empty. For IDENT, NUM, and STR tokens, it's the token's value.
+// For an ILLEGAL token, it's the error message.
 func (l *Lexer) Scan() (Position, Token, string) {
 	// Skip whitespace and comments
 	for l.ch == ' ' || l.ch == '\t' || l.ch == '\r' || l.ch == '\n' || l.ch == '{' {
@@ -89,21 +89,27 @@ func (l *Lexer) Scan() (Position, Token, string) {
 	case '@':
 		tok = AT
 	case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
+		// integer: ('0' .. '9')+
+		// real: ('0' .. '9')+ (('.' ('0' .. '9')+ (EXPONENT)?)? | EXPONENT)
+		// exponent: ('e' | 'E') ('+' | '-')? ('0' .. '9')+
 		start := l.offset - 2
 		for l.ch >= '0' && l.ch <= '9' {
 			l.next()
 		}
 		if l.ch == '.' {
 			l.next()
-		}
-		for l.ch >= '0' && l.ch <= '9' {
-			l.next()
+			gotDigit := false
+			for l.ch >= '0' && l.ch <= '9' {
+				l.next()
+				gotDigit = true
+			}
+			if !gotDigit {
+				return l.pos, ILLEGAL, "expected digits after '.'"
+			}
 		}
 		if l.ch == 'e' || l.ch == 'E' {
 			l.next()
-			gotSign := false
 			if l.ch == '+' || l.ch == '-' {
-				gotSign = true
 				l.next()
 			}
 			gotDigit := false
@@ -111,9 +117,8 @@ func (l *Lexer) Scan() (Position, Token, string) {
 				l.next()
 				gotDigit = true
 			}
-			// "1e" is allowed, but not "1e+"
-			if gotSign && !gotDigit {
-				return l.pos, ILLEGAL, "expected digits"
+			if !gotDigit {
+				return l.pos, ILLEGAL, "expected digits after 'e'"
 			}
 		}
 		tok = NUM

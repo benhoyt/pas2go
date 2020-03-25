@@ -95,8 +95,8 @@ func (p *parser) labelledStmt(allowLabel bool) Stmt {
 			value := p.expr()
 			return &AssignStmt{varExpr, value}
 		case COLON:
-			if varExpr.HasAt || varExpr.Suffixes != nil {
-				panic(p.error("invalid label name"))
+			if !varExpr.IsNameOnly() {
+				panic(p.error("label must be a simple identifier"))
 			}
 			if !allowLabel {
 				panic(p.error("unexpected label"))
@@ -105,8 +105,8 @@ func (p *parser) labelledStmt(allowLabel bool) Stmt {
 			stmt := p.labelledStmt(false)
 			return &LabelledStmt{varExpr.Name, stmt}
 		case LPAREN:
-			if varExpr.HasAt || varExpr.Suffixes != nil {
-				panic(p.error("invalid procedure name"))
+			if !varExpr.IsNameOnly() {
+				panic(p.error("procedure name must be a simple identifier"))
 			}
 			p.next()
 			args := p.argList()
@@ -284,17 +284,20 @@ func (p *parser) factor() Expr {
 	switch p.tok {
 	case LPAREN:
 		p.next()
-		expr := p.expr() // TODO: need special AST type to signal parenthesized expr?
+		expr := p.expr()
 		p.expect(RPAREN)
 		return expr
 	case NUM:
-		// TODO
 		val := p.val
+		p.next()
 		i, err := strconv.Atoi(val)
 		if err != nil {
-			panic(p.error("expected integer"))
+			f, err := strconv.ParseFloat(val, 64)
+			if err != nil {
+				panic(p.error("invalid number: %s", err))
+			}
+			return &ConstExpr{f}
 		}
-		p.next()
 		return &ConstExpr{i}
 	case STR:
 		s := p.val
@@ -303,15 +306,19 @@ func (p *parser) factor() Expr {
 	case NOT:
 		p.next()
 		return &UnaryExpr{NOT, p.factor()}
-	case TRUE, FALSE:
-		boolVal := p.tok == TRUE
+	case TRUE:
 		p.next()
-		return &ConstExpr{boolVal}
+		return &ConstExpr{true}
+	case FALSE:
+		p.next()
+		return &ConstExpr{false}
 	case IDENT, AT:
 		varExpr := p.varExpr()
 		switch p.tok {
 		case LPAREN:
-			// TODO: assert varExpr is simple identifier
+			if !varExpr.IsNameOnly() {
+				panic(p.error("function name must be a simple identifier"))
+			}
 			p.next()
 			args := p.argList()
 			p.expect(RPAREN)

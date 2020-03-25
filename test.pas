@@ -23,6 +23,5 @@ begin
         65: x := 1
     end;
 
-    foo: ClrScr;
-    bar(1, 2, 3);
+    x := foo(1, 3.4, 0.01);
 end.

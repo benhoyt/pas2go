@@ -335,6 +335,10 @@ type VarExpr struct {
 	Suffixes []VarSuffix
 }
 
+func (v *VarExpr) IsNameOnly() bool {
+	return !v.HasAt && v.Suffixes == nil
+}
+
 func (v *VarExpr) String() string {
 	parts := []string{}
 	if v.HasAt {
