@@ -46,23 +46,45 @@ type ConstDecls struct {
 }
 
 func (d *ConstDecls) String() string {
-	return "TODO"
+	strs := make([]string, len(d.Decls))
+	for i, decl := range d.Decls {
+		strs[i] = "    " + decl.String() + ";"
+	}
+	return "const\n" + strings.Join(strs, "\n")
 }
 
 type ConstDecl struct {
 	Name  string
-	Value Expr
+	Value *ConstExpr
+}
+
+func (d *ConstDecl) String() string {
+	return fmt.Sprintf("%s = %s", d.Name, d.Value)
 }
 
 type FuncDecl struct {
 	Name   string
 	Params []*ParamGroup
 	Result string
+	Decls  []DeclPart
 	Stmt   *CompoundStmt
 }
 
+func formatDecls(decls []DeclPart) string {
+	declsStr := ""
+	if decls != nil {
+		strs := make([]string, len(decls))
+		for i, decl := range decls {
+			strs[i] = decl.String() + "\n"
+		}
+		declsStr = strings.Join(strs, "")
+	}
+	return declsStr
+}
+
 func (d *FuncDecl) String() string {
-	return fmt.Sprintf("procedure %s%s: %s;\n%s;", d.Name, formatParams(d.Params), d.Result, d.Stmt)
+	return fmt.Sprintf("function %s%s: %s;\n%s%s;",
+		d.Name, formatParams(d.Params), d.Result, formatDecls(d.Decls), d.Stmt)
 }
 
 type ParamGroup struct {
@@ -84,12 +106,13 @@ type LabelDecls struct {
 }
 
 func (d *LabelDecls) String() string {
-	return "TODO"
+	return "label " + strings.Join(d.Labels, ", ") + ";"
 }
 
 type ProcDecl struct {
 	Name   string
 	Params []*ParamGroup
+	Decls  []DeclPart
 	Stmt   *CompoundStmt
 }
 
@@ -106,15 +129,20 @@ func formatParams(params []*ParamGroup) string {
 }
 
 func (d *ProcDecl) String() string {
-	return fmt.Sprintf("procedure %s%s;\n%s;", d.Name, formatParams(d.Params), d.Stmt)
+	return fmt.Sprintf("procedure %s%s;\n%s%s;",
+		d.Name, formatParams(d.Params), formatDecls(d.Decls), d.Stmt)
 }
 
 type TypeDefs struct {
-	Defs []TypeDef
+	Defs []*TypeDef
 }
 
 func (d *TypeDefs) String() string {
-	return "TODO"
+	strs := make([]string, len(d.Defs))
+	for i, def := range d.Defs {
+		strs[i] = "    " + def.String() + ";"
+	}
+	return "type\n" + strings.Join(strs, "\n")
 }
 
 type TypeDef struct {
@@ -122,17 +150,29 @@ type TypeDef struct {
 	Type string // TODO: Type
 }
 
+func (d *TypeDef) String() string {
+	return fmt.Sprintf("%s = %s", d.Name, d.Type)
+}
+
 type VarDecls struct {
-	Decls []VarDecl
+	Decls []*VarDecl
 }
 
 func (d *VarDecls) String() string {
-	return "TODO"
+	strs := make([]string, len(d.Decls))
+	for i, decl := range d.Decls {
+		strs[i] = "    " + decl.String() + ";"
+	}
+	return "var\n" + strings.Join(strs, "\n")
 }
 
 type VarDecl struct {
 	Names []string
 	Type  string // TODO: Type
+}
+
+func (d *VarDecl) String() string {
+	return fmt.Sprintf("%s: %s", strings.Join(d.Names, ", "), d.Type)
 }
 
 // Statements

@@ -65,17 +65,21 @@ func (p *parser) program() *Program {
 		p.expect(SEMICOLON)
 	}
 
-	var decls []DeclPart
-	for p.matches(CONST, FUNCTION, LABEL, PROCEDURE, TYPE, VAR) {
-		decls = append(decls, p.declPart())
-	}
-	program.Decls = decls
+	program.Decls = p.declParts(CONST, FUNCTION, LABEL, PROCEDURE, TYPE, VAR)
 
 	program.Stmt = p.compoundStmt()
 	p.expect(DOT)
 	p.expect(EOF)
 
 	return program
+}
+
+func (p *parser) declParts(tokens ...Token) []DeclPart {
+	var decls []DeclPart
+	for p.matches(tokens...) {
+		decls = append(decls, p.declPart())
+	}
+	return decls
 }
 
 func (p *parser) identList() []string {
@@ -91,15 +95,65 @@ func (p *parser) identList() []string {
 
 func (p *parser) declPart() DeclPart {
 	switch p.tok {
+	case LABEL:
+		p.next()
+		names := p.identList()
+		p.expect(SEMICOLON)
+		return &LabelDecls{names}
+	case CONST:
+		p.next()
+		decls := []*ConstDecl{}
+		for p.tok == IDENT {
+			name := p.val
+			p.expect(IDENT)
+			p.expect(EQUALS)
+			value := p.constant()
+			p.expect(SEMICOLON)
+			decls = append(decls, &ConstDecl{name, value})
+		}
+		if len(decls) == 0 {
+			panic(p.error("expected const declaration"))
+		}
+		return &ConstDecls{decls}
+	case TYPE:
+		p.next()
+		defs := []*TypeDef{}
+		for p.tok == IDENT {
+			name := p.val
+			p.expect(IDENT)
+			p.expect(EQUALS)
+			typ := p.typeIdent() // TODO: should be (type | functionType | procedureType) -- much bigger grammar
+			p.expect(SEMICOLON)
+			defs = append(defs, &TypeDef{name, typ})
+		}
+		if len(defs) == 0 {
+			panic(p.error("expected type definition"))
+		}
+		return &TypeDefs{defs}
+	case VAR:
+		p.next()
+		decls := []*VarDecl{}
+		for p.tok == IDENT {
+			names := p.identList()
+			p.expect(COLON)
+			typ := p.typeIdent() // TODO: should be 'type' -- much bigger grammar
+			p.expect(SEMICOLON)
+			decls = append(decls, &VarDecl{names, typ})
+		}
+		if len(decls) == 0 {
+			panic(p.error("expected var declaration"))
+		}
+		return &VarDecls{decls}
 	case PROCEDURE:
 		p.next()
 		name := p.val
 		p.expect(IDENT)
 		params := p.optionalParamList()
 		p.expect(SEMICOLON)
+		decls := p.declParts(CONST, LABEL, TYPE, VAR)
 		stmt := p.compoundStmt()
 		p.expect(SEMICOLON)
-		return &ProcDecl{name, params, stmt}
+		return &ProcDecl{name, params, decls, stmt}
 	case FUNCTION:
 		p.next()
 		name := p.val
@@ -108,9 +162,10 @@ func (p *parser) declPart() DeclPart {
 		p.expect(COLON)
 		result := p.typeIdent()
 		p.expect(SEMICOLON)
+		decls := p.declParts(CONST, LABEL, TYPE, VAR)
 		stmt := p.compoundStmt()
 		p.expect(SEMICOLON)
-		return &FuncDecl{name, params, result, stmt}
+		return &FuncDecl{name, params, result, decls, stmt}
 	default:
 		panic(p.error("TODO declPart"))
 	}
@@ -287,13 +342,29 @@ func (p *parser) labelledStmt(allowLabel bool) Stmt {
 }
 
 func (p *parser) caseElement() *CaseElement {
-	consts := []Expr{p.expr()} // should be p.constant()
+	consts := []Expr{p.constant()}
 	for p.tok == COMMA {
 		p.next()
-		consts = append(consts, p.expr())
+		consts = append(consts, p.constant())
 	}
 	p.expect(COLON)
 	return &CaseElement{consts, p.stmt()}
+}
+
+func (p *parser) constant() *ConstExpr {
+	// TODO: should be:
+	// : unsignedNumber
+	// | sign unsignedNumber
+	// | identifier
+	// | sign identifier
+	// | string
+	// | constantChr
+	// ;
+	expr := p.factor()
+	if constExpr, ok := expr.(*ConstExpr); ok {
+		return constExpr
+	}
+	panic(p.error("expected constant"))
 }
 
 func (p *parser) argList() []Expr {
