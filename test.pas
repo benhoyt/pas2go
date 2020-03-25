@@ -17,25 +17,12 @@ begin
         Writeln(1);
     end;
 
-    @x := 1234;
+    x := (1 + 2) * (3 + 4);
 
-    Thingy:
-    xyz := 42;
-
-    goto Thingy;
-
-    begin
-        inside := 42;
-        ClrScr;
+    case ToUpper(3) of
+        65: x := 1
     end;
 
-    while 42 do begin Clrscr; end;
-
-    repeat
-        this;
-        that;
-        otherThing;
-    until 1;
-
-    with FooBar do begin ClrScr; end;
+    foo: ClrScr;
+    bar(1, 2, 3);
 end.

@@ -111,11 +111,36 @@ func (s *AssignStmt) String() string {
 	return fmt.Sprintf("%s := %s", s.Var, s.Value)
 }
 
-type CaseStmt struct { // TODO
+type CaseStmt struct {
+	Selector Expr
+	Cases    []*CaseElement
+	Else     []Stmt
 }
 
 func (s *CaseStmt) String() string {
-	return "case TODO"
+	caseStrs := make([]string, len(s.Cases))
+	for i, c := range s.Cases {
+		caseStrs[i] = "    " + c.String() + ";\n" // TODO: indentation
+	}
+	elseStr := ""
+	if s.Else != nil {
+		elseStr = "else\n" + indentStmts(s.Else)
+	}
+	return fmt.Sprintf("case %s of\n%s%send",
+		s.Selector, strings.Join(caseStrs, ""), elseStr)
+}
+
+type CaseElement struct {
+	Consts []Expr // TODO: should be []Constant
+	Stmt   Stmt
+}
+
+func (e *CaseElement) String() string {
+	constStrs := make([]string, len(e.Consts))
+	for i, c := range e.Consts {
+		constStrs[i] = c.String()
+	}
+	return fmt.Sprintf("%s: %s", strings.Join(constStrs, ", "), e.Stmt)
 }
 
 type CompoundStmt struct {
@@ -266,8 +291,7 @@ type BinaryExpr struct {
 }
 
 func (e *BinaryExpr) String() string {
-	// TODO: handle precedence
-	return fmt.Sprintf("(%s %s %s)", e.Left, e.Op, e.Right)
+	return fmt.Sprintf("%s %s %s", e.Left, e.Op, e.Right) // TODO: handle precedence
 }
 
 type ConstExpr struct {
@@ -306,9 +330,54 @@ func (e *UnaryExpr) String() string {
 }
 
 type VarExpr struct {
-	Name string
+	HasAt    bool
+	Name     string
+	Suffixes []VarSuffix
 }
 
 func (v *VarExpr) String() string {
-	return v.Name
+	parts := []string{}
+	if v.HasAt {
+		parts = append(parts, "@")
+	}
+	parts = append(parts, v.Name)
+	for _, part := range v.Suffixes {
+		parts = append(parts, part.String())
+	}
+	return strings.Join(parts, "")
+}
+
+type VarSuffix interface {
+	varSuffix()
+	String() string
+}
+
+func (s *IndexSuffix) varSuffix()   {}
+func (s *DotSuffix) varSuffix()     {}
+func (s *PointerSuffix) varSuffix() {}
+
+type IndexSuffix struct {
+	Indexes []Expr
+}
+
+func (s *IndexSuffix) String() string {
+	strs := make([]string, len(s.Indexes))
+	for i, index := range s.Indexes {
+		strs[i] = index.String()
+	}
+	return "[" + strings.Join(strs, ", ") + "]"
+}
+
+type DotSuffix struct {
+	Field string
+}
+
+func (s *DotSuffix) String() string {
+	return "." + s.Field
+}
+
+type PointerSuffix struct{}
+
+func (s *PointerSuffix) String() string {
+	return "^"
 }

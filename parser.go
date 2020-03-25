@@ -67,19 +67,15 @@ func (p *parser) program() *Program {
 
 func (p *parser) compoundStmt() *CompoundStmt {
 	p.expect(BEGIN)
-	stmts := p.stmts(END)
+	stmts := p.stmts()
 	p.expect(END)
 	return &CompoundStmt{stmts}
 }
 
-func (p *parser) stmts(end Token) []Stmt {
-	var stmts []Stmt
-	expectSemi := false
-	for p.tok != end {
-		if expectSemi {
-			p.expect(SEMICOLON)
-		}
-		expectSemi = true
+func (p *parser) stmts() []Stmt {
+	stmts := []Stmt{p.stmt()}
+	for p.tok == SEMICOLON {
+		p.next()
 		stmts = append(stmts, p.stmt())
 	}
 	return stmts
@@ -90,51 +86,34 @@ func (p *parser) stmt() Stmt {
 }
 
 func (p *parser) labelledStmt(allowLabel bool) Stmt {
-	// label: IDENT COLON unlabelledStmt
-	// assignment: variable ASSIGN expr
-	//   (AT identifier | identifier)
-	//   (LBRACK expression (COMMA expression)* RBRACK |
-	//    LBRACK2 expression (COMMA expression)* RBRACK2 |
-	//    DOT identifier |
-	//    POINTER)*
-	// call: IDENT LPAREN paramList RPAREN
-	// GOTO
-	// BEGIN
-	// IF
-	// CASE
-	// WHILE
-	// REPEAT
-	// FOR
-	// WITH
-	// empty
 	switch p.tok {
 	case IDENT, AT:
-		// TODO: or use p.variable() as "covering grammar" and type switch
-		// TODO: hasAt := p.tok == AT
-		if p.tok == AT {
-			p.next()
-		}
-		ident := p.val
-		p.expect(IDENT)
+		varExpr := p.varExpr()
 		switch p.tok {
 		case ASSIGN:
 			p.next()
 			value := p.expr()
-			return &AssignStmt{&VarExpr{ident}, value}
+			return &AssignStmt{varExpr, value}
 		case COLON:
+			if varExpr.HasAt || varExpr.Suffixes != nil {
+				panic(p.error("invalid label name"))
+			}
 			if !allowLabel {
 				panic(p.error("unexpected label"))
 			}
 			p.next()
 			stmt := p.labelledStmt(false)
-			return &LabelledStmt{ident, stmt}
+			return &LabelledStmt{varExpr.Name, stmt}
 		case LPAREN:
+			if varExpr.HasAt || varExpr.Suffixes != nil {
+				panic(p.error("invalid procedure name"))
+			}
 			p.next()
 			args := p.argList()
 			p.expect(RPAREN)
-			return &ProcStmt{ident, args}
+			return &ProcStmt{varExpr.Name, args}
 		default:
-			return &ProcStmt{ident, nil}
+			return &ProcStmt{varExpr.Name, nil}
 		}
 	case GOTO:
 		p.next()
@@ -155,7 +134,28 @@ func (p *parser) labelledStmt(allowLabel bool) Stmt {
 		}
 		return &IfStmt{cond, then, elseStmt}
 	case CASE:
-		return &CaseStmt{} // TODO
+		p.next()
+		selector := p.expr()
+		p.expect(OF)
+		cases := []*CaseElement{p.caseElement()}
+		var elseStmts []Stmt
+		// Grammar quirkiness here, but this seems to mimic Turbo Pascal
+		for p.tok == SEMICOLON || p.tok == ELSE {
+			if p.tok == SEMICOLON {
+				p.next()
+			}
+			if p.tok == END {
+				break
+			}
+			if p.tok == ELSE {
+				p.next()
+				elseStmts = p.stmts()
+				break
+			}
+			cases = append(cases, p.caseElement())
+		}
+		p.expect(END)
+		return &CaseStmt{selector, cases, elseStmts}
 	case WHILE:
 		p.next()
 		cond := p.expr()
@@ -164,7 +164,7 @@ func (p *parser) labelledStmt(allowLabel bool) Stmt {
 		return &WhileStmt{cond, stmt}
 	case REPEAT:
 		p.next()
-		stmts := p.stmts(UNTIL)
+		stmts := p.stmts()
 		p.next()
 		cond := p.expr()
 		return &RepeatStmt{stmts, cond}
@@ -198,6 +198,16 @@ func (p *parser) labelledStmt(allowLabel bool) Stmt {
 	}
 }
 
+func (p *parser) caseElement() *CaseElement {
+	consts := []Expr{p.expr()} // should be p.constant()
+	for p.tok == COMMA {
+		p.next()
+		consts = append(consts, p.expr())
+	}
+	p.expect(COLON)
+	return &CaseElement{consts, p.stmt()}
+}
+
 func (p *parser) argList() []Expr {
 	args := []Expr{p.expr()}
 	for p.tok == COMMA {
@@ -207,11 +217,40 @@ func (p *parser) argList() []Expr {
 	return args
 }
 
+// variable: (AT identifier | identifier) (LBRACKET expression (COMMA expression)* RBRACKET | DOT identifier | POINTER)*
 func (p *parser) varExpr() *VarExpr {
-	// TODO: flesh this out
+	hasAt := false
+	if p.tok == AT {
+		p.next()
+		hasAt = true
+	}
 	ident := p.val
 	p.expect(IDENT)
-	return &VarExpr{ident}
+	var parts []VarSuffix
+	for p.tok == LBRACKET || p.tok == DOT || p.tok == POINTER {
+		var part VarSuffix
+		switch p.tok {
+		case LBRACKET:
+			p.next()
+			indexes := []Expr{p.expr()}
+			for p.tok == COMMA {
+				p.next()
+				indexes = append(indexes, p.expr())
+			}
+			p.expect(RBRACKET)
+			part = &IndexSuffix{indexes}
+		case DOT:
+			p.next()
+			field := p.val
+			p.expect(IDENT)
+			part = &DotSuffix{field}
+		case POINTER:
+			p.next()
+			part = &PointerSuffix{}
+		}
+		parts = append(parts, part)
+	}
+	return &VarExpr{hasAt, ident, parts}
 }
 
 // expr: simpleExpr (relationalOp expr)?
