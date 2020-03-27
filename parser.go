@@ -5,7 +5,6 @@ package main
 import (
 	"fmt"
 	"strconv"
-	"strings"
 )
 
 // ParseError (actually *ParseError) is the type of error returned by
@@ -146,10 +145,15 @@ func (p *parser) declPart(allowBodies bool) DeclPart {
 		for p.tok == IDENT {
 			name := p.val
 			p.expect(IDENT)
+			var typ TypeSpec
+			if p.tok == COLON {
+				p.next()
+				typ = p.typeSpec()
+			}
 			p.expect(EQUALS)
 			value := p.constant()
 			p.expect(SEMICOLON)
-			decls = append(decls, &ConstDecl{name, value})
+			decls = append(decls, &ConstDecl{name, typ, value})
 		}
 		if len(decls) == 0 {
 			panic(p.error("expected const declaration"))
@@ -162,9 +166,9 @@ func (p *parser) declPart(allowBodies bool) DeclPart {
 			name := p.val
 			p.expect(IDENT)
 			p.expect(EQUALS)
-			typ := p.typeIdent() // TODO: should be (type | functionType | procedureType) -- much bigger grammar
+			spec := p.typeSpecWithFuncProc()
 			p.expect(SEMICOLON)
-			defs = append(defs, &TypeDef{name, typ})
+			defs = append(defs, &TypeDef{name, spec})
 		}
 		if len(defs) == 0 {
 			panic(p.error("expected type definition"))
@@ -176,7 +180,7 @@ func (p *parser) declPart(allowBodies bool) DeclPart {
 		for p.tok == IDENT {
 			names := p.identList()
 			p.expect(COLON)
-			typ := p.typeIdent() // TODO: should be 'type' -- much bigger grammar
+			typ := p.typeSpec()
 			p.expect(SEMICOLON)
 			decls = append(decls, &VarDecl{names, typ})
 		}
@@ -249,15 +253,82 @@ func (p *parser) paramGroup() *ParamGroup {
 	return &ParamGroup{prefix, names, typ}
 }
 
-func (p *parser) typeIdent() string {
+func (p *parser) typeIdent() *TypeIdent {
 	if p.matches(CHAR, BOOLEAN, INTEGER, REAL, STRING) {
 		tok := p.tok
 		p.next()
-		return strings.ToLower(tok.String())
+		return &TypeIdent{"", tok}
 	}
-	ident := p.val
+	name := p.val
 	p.expect(IDENT)
-	return ident
+	return &TypeIdent{name, ILLEGAL}
+}
+
+// typeSpec: type | functionType | procedureType
+func (p *parser) typeSpecWithFuncProc() TypeSpec {
+	switch p.tok {
+	case PROCEDURE:
+		p.next()
+		params := p.optionalParamList()
+		return &ProcSpec{params}
+	case FUNCTION:
+		p.next()
+		params := p.optionalParamList()
+		p.expect(COLON)
+		result := p.typeIdent()
+		return &FuncSpec{params, result}
+	default:
+		return p.typeSpec()
+	}
+}
+
+func (p *parser) typeSpec() TypeSpec {
+	switch p.tok {
+	case LPAREN:
+		p.next()
+		names := p.identList()
+		p.expect(RPAREN)
+		return &ScalarSpec{names}
+	case STRING:
+		p.next()
+		if p.tok != LBRACKET {
+			return &IdentSpec{&TypeIdent{"", STRING}}
+		}
+		p.expect(LBRACKET)
+		size, err := strconv.Atoi(p.val)
+		if err != nil {
+			panic(p.error("expected integer"))
+		}
+		p.expect(NUM)
+		p.expect(RBRACKET)
+		return &StringSpec{size}
+	case POINTER:
+		p.next()
+		typ := p.typeIdent()
+		return &PointerSpec{typ}
+	case ARRAY:
+		p.next()
+		p.expect(LBRACKET)
+		min := p.expr() // much looser grammar than needed here
+		p.expect(DOT_DOT)
+		max := p.expr()
+		p.expect(RBRACKET)
+		p.expect(OF)
+		ofType := p.typeSpec()
+		return &ArraySpec{min, max, ofType}
+	// TODO: case RECORD:
+	case FILE:
+		p.next()
+		var ofType TypeSpec
+		if p.tok == OF {
+			p.next()
+			ofType = p.typeSpec()
+		}
+		return &FileSpec{ofType}
+	default:
+		ident := p.typeIdent()
+		return &IdentSpec{ident}
+	}
 }
 
 func (p *parser) compoundStmt() *CompoundStmt {
@@ -394,10 +465,10 @@ func (p *parser) labelledStmt(allowLabel bool) Stmt {
 }
 
 func (p *parser) caseElement() *CaseElement {
-	consts := []Expr{p.constant()}
+	consts := []Expr{p.factor()} // TODO: tighten up?
 	for p.tok == COMMA {
 		p.next()
-		consts = append(consts, p.constant())
+		consts = append(consts, p.factor()) // TODO: tighten up?
 	}
 	p.expect(COLON)
 	return &CaseElement{consts, p.stmt()}

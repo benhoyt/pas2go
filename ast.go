@@ -98,6 +98,7 @@ func (d *ConstDecls) String() string {
 
 type ConstDecl struct {
 	Name  string
+	Type  TypeSpec
 	Value *ConstExpr
 }
 
@@ -108,7 +109,7 @@ func (d *ConstDecl) String() string {
 type FuncDecl struct {
 	Name   string
 	Params []*ParamGroup
-	Result string
+	Result *TypeIdent
 	Decls  []DeclPart
 	Stmt   *CompoundStmt
 }
@@ -122,10 +123,22 @@ func (d *FuncDecl) String() string {
 		d.Name, formatParams(d.Params), d.Result, formatDecls(d.Decls), stmtStr)
 }
 
+type TypeIdent struct {
+	Name    string
+	Builtin Token
+}
+
+func (t *TypeIdent) String() string {
+	if t.Name == "" {
+		return t.Builtin.String()
+	}
+	return t.Name
+}
+
 type ParamGroup struct {
-	Prefix Token
+	Prefix Token // ILLEGAL (meaning no prefix), VAR, FUNCTION, PROCEDURE
 	Names  []string
-	Type   string
+	Type   *TypeIdent
 }
 
 func (g *ParamGroup) String() string {
@@ -186,11 +199,114 @@ func (d *TypeDefs) String() string {
 
 type TypeDef struct {
 	Name string
-	Type string // TODO: Type
+	Type TypeSpec
 }
 
 func (d *TypeDef) String() string {
 	return fmt.Sprintf("%s = %s", d.Name, d.Type)
+}
+
+type TypeSpec interface {
+	typeSpec()
+	String() string
+}
+
+func (s *FuncSpec) typeSpec()    {}
+func (s *ProcSpec) typeSpec()    {}
+func (s *ScalarSpec) typeSpec()  {}
+func (s *IdentSpec) typeSpec()   {}
+func (s *StringSpec) typeSpec()  {}
+func (s *ArraySpec) typeSpec()   {}
+func (s *RecordSpec) typeSpec()  {}
+func (s *FileSpec) typeSpec()    {}
+func (s *PointerSpec) typeSpec() {}
+
+type FuncSpec struct {
+	Params []*ParamGroup
+	Result *TypeIdent
+}
+
+func (s *FuncSpec) String() string {
+	return fmt.Sprintf("%s: %s", formatParams(s.Params), s.Result)
+}
+
+type ProcSpec struct {
+	Params []*ParamGroup
+}
+
+func (s *ProcSpec) String() string {
+	return formatParams(s.Params)
+}
+
+type ScalarSpec struct {
+	Names []string
+}
+
+func (s *ScalarSpec) String() string {
+	return "(" + strings.Join(s.Names, ", ") + ")"
+}
+
+type IdentSpec struct {
+	*TypeIdent
+}
+
+type StringSpec struct {
+	Size int
+}
+
+func (s *StringSpec) String() string {
+	return fmt.Sprintf("string[%d]", s.Size)
+}
+
+type ArraySpec struct {
+	Min Expr
+	Max Expr
+	Of  TypeSpec
+}
+
+func (s *ArraySpec) String() string {
+	return fmt.Sprintf("array[%s .. %s] of %s", s.Min, s.Max, s.Of)
+}
+
+type RecordSpec struct {
+	Sections []RecordSection
+}
+
+func (s *RecordSpec) String() string {
+	strs := []string{"record\n"}
+	for _, section := range s.Sections {
+		strs = append(strs, "    "+section.String()+";\n")
+	}
+	strs = append(strs, "end")
+	return strings.Join(strs, "")
+}
+
+type RecordSection struct {
+	Names []string
+	Type  TypeSpec
+}
+
+func (s *RecordSection) String() string {
+	return fmt.Sprintf("%s: %s", strings.Join(s.Names, ", "), s.Type)
+}
+
+type FileSpec struct {
+	Of TypeSpec
+}
+
+func (s *FileSpec) String() string {
+	if s.Of != nil {
+		return fmt.Sprintf("file of %s", s.Of)
+	}
+	return "file"
+}
+
+type PointerSpec struct {
+	Type *TypeIdent
+}
+
+func (s *PointerSpec) String() string {
+	return "^" + s.Type.String()
 }
 
 type VarDecls struct {
@@ -207,7 +323,7 @@ func (d *VarDecls) String() string {
 
 type VarDecl struct {
 	Names []string
-	Type  string // TODO: Type
+	Type  TypeSpec
 }
 
 func (d *VarDecl) String() string {
@@ -454,7 +570,7 @@ func escapeString(s string) string {
 	out = append(out, '\'')
 	for i := 0; i < len(s); i++ {
 		c := s[i]
-		if c < 32 || c==39 || c > 126 {
+		if c < 32 || c == 39 || c > 126 {
 			out = append(out, []byte(fmt.Sprintf("'#%d'", c))...)
 		} else {
 			out = append(out, c)
