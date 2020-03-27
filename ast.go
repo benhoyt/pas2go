@@ -378,7 +378,7 @@ type RepeatStmt struct {
 }
 
 func (s *RepeatStmt) String() string {
-	return fmt.Sprintf("begin\n%suntil %s", indentStmts(s.Stmts), s.Cond)
+	return fmt.Sprintf("repeat\n%suntil %s", indentStmts(s.Stmts), s.Cond)
 }
 
 type WhileStmt struct {
