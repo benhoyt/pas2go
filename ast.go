@@ -435,8 +435,7 @@ type ConstExpr struct {
 func (e *ConstExpr) String() string {
 	switch value := e.Value.(type) {
 	case string:
-		// TODO: proper escaping, eg non-ascii chars (see OOP.PAS)
-		return fmt.Sprintf("'%s'", strings.ReplaceAll(value, "'", "'#39'"))
+		return escapeString(value)
 	case nil:
 		return "nil"
 	default:
@@ -445,6 +444,27 @@ func (e *ConstExpr) String() string {
 		}
 		return fmt.Sprintf("%v", value)
 	}
+}
+
+func escapeString(s string) string {
+	if s == "" {
+		return "''"
+	}
+	out := make([]byte, 0, len(s))
+	out = append(out, '\'')
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		if c < 32 || c==39 || c > 126 {
+			out = append(out, []byte(fmt.Sprintf("'#%d'", c))...)
+		} else {
+			out = append(out, c)
+		}
+	}
+	out = append(out, '\'')
+	t := string(out)
+	t = strings.TrimPrefix(t, "''")
+	t = strings.TrimSuffix(t, "''")
+	return t
 }
 
 type FuncExpr struct {
