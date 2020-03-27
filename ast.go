@@ -130,7 +130,7 @@ type TypeIdent struct {
 
 func (t *TypeIdent) String() string {
 	if t.Name == "" {
-		return t.Builtin.String()
+		return strings.ToLower(t.Builtin.String())
 	}
 	return t.Name
 }
@@ -269,7 +269,7 @@ func (s *ArraySpec) String() string {
 }
 
 type RecordSpec struct {
-	Sections []RecordSection
+	Sections []*RecordSection
 }
 
 func (s *RecordSpec) String() string {

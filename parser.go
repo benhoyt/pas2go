@@ -316,7 +316,14 @@ func (p *parser) typeSpec() TypeSpec {
 		p.expect(OF)
 		ofType := p.typeSpec()
 		return &ArraySpec{min, max, ofType}
-	// TODO: case RECORD:
+	case RECORD:
+		p.next()
+		sections := []*RecordSection{p.recordSection()}
+		for p.tok != END && p.tok != EOF {
+			sections = append(sections, p.recordSection())
+		}
+		p.expect(END)
+		return &RecordSpec{sections}
 	case FILE:
 		p.next()
 		var ofType TypeSpec
@@ -329,6 +336,14 @@ func (p *parser) typeSpec() TypeSpec {
 		ident := p.typeIdent()
 		return &IdentSpec{ident}
 	}
+}
+
+func (p *parser) recordSection() *RecordSection {
+	names := p.identList()
+	p.expect(COLON)
+	typ := p.typeSpec()
+	p.expect(SEMICOLON)
+	return &RecordSection{names, typ}
 }
 
 func (p *parser) compoundStmt() *CompoundStmt {
