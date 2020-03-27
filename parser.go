@@ -360,7 +360,7 @@ func (p *parser) labelledStmt(allowLabel bool) Stmt {
 	case REPEAT:
 		p.next()
 		stmts := p.stmts()
-		p.next()
+		p.expect(UNTIL)
 		cond := p.expr()
 		return &RepeatStmt{stmts, cond}
 	case FOR:
@@ -476,7 +476,7 @@ func (p *parser) simpleExpr() Expr {
 
 // term: signedFactor (multiplicativeOp term)?
 func (p *parser) term() Expr {
-	return p.binaryExpr(p.signedFactor, p.term, STAR, SLASH, DIV, MOD, AND)
+	return p.binaryExpr(p.signedFactor, p.term, STAR, SLASH, DIV, MOD, AND, SHL, SHR)
 }
 
 // signedFactor: (PLUS | MINUS)? factor
@@ -531,6 +531,9 @@ func (p *parser) factor() Expr {
 	case FALSE:
 		p.next()
 		return &ConstExpr{false, false}
+	case NIL:
+		p.next()
+		return &ConstExpr{nil, false}
 	case IDENT, AT:
 		varExpr := p.varExpr()
 		switch p.tok {
@@ -541,7 +544,12 @@ func (p *parser) factor() Expr {
 			p.next()
 			args := p.argList()
 			p.expect(RPAREN)
-			return &FuncExpr{varExpr.Name, args}
+			var expr Expr = &FuncExpr{varExpr.Name, args}
+			if p.tok == POINTER {
+				p.next()
+				expr = &PointerExpr{expr}
+			}
+			return expr
 		default:
 			return varExpr
 		}

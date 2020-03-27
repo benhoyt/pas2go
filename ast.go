@@ -410,11 +410,12 @@ type Expr interface {
 	String() string
 }
 
-func (e *BinaryExpr) expr() {}
-func (e *ConstExpr) expr()  {}
-func (e *FuncExpr) expr()   {}
-func (e *UnaryExpr) expr()  {}
-func (e *VarExpr) expr()    {}
+func (e *BinaryExpr) expr()  {}
+func (e *ConstExpr) expr()   {}
+func (e *FuncExpr) expr()    {}
+func (e *PointerExpr) expr() {}
+func (e *UnaryExpr) expr()   {}
+func (e *VarExpr) expr()     {}
 
 type BinaryExpr struct {
 	Left  Expr
@@ -434,7 +435,10 @@ type ConstExpr struct {
 func (e *ConstExpr) String() string {
 	switch value := e.Value.(type) {
 	case string:
+		// TODO: proper escaping, eg non-ascii chars (see OOP.PAS)
 		return fmt.Sprintf("'%s'", strings.ReplaceAll(value, "'", "'#39'"))
+	case nil:
+		return "nil"
 	default:
 		if e.IsHex {
 			return fmt.Sprintf("$%02X", value)
@@ -450,6 +454,14 @@ type FuncExpr struct {
 
 func (e *FuncExpr) String() string {
 	return e.Func + formatArgList(e.Args)
+}
+
+type PointerExpr struct {
+	Expr Expr
+}
+
+func (e *PointerExpr) String() string {
+	return e.Expr.String() + "^"
 }
 
 type UnaryExpr struct {
