@@ -7,6 +7,14 @@ import (
 	"strings"
 )
 
+type File interface {
+	file()
+	String() string
+}
+
+func (f *Program) file() {}
+func (f *Unit) file()    {}
+
 type Program struct {
 	Name  string
 	Uses  []string
@@ -15,18 +23,53 @@ type Program struct {
 }
 
 func (p *Program) String() string {
-	usesStr := ""
-	if p.Uses != nil {
-		usesStr = "\nuses " + strings.Join(p.Uses, ", ") + ";"
-	}
+	return fmt.Sprintf(`program %s;%s
 
-	declStrs := make([]string, len(p.Decls))
-	for i, decl := range p.Decls {
-		declStrs[i] = decl.String() + "\n\n"
-	}
+%s%s.
+`,
+		p.Name, formatUses(p.Uses), formatDecls(p.Decls), p.Stmt)
+}
 
-	return fmt.Sprintf("program %s;%s\n\n%s%s.\n",
-		p.Name, usesStr, strings.Join(declStrs, ""), p.Stmt)
+func formatUses(uses []string) string {
+	str := ""
+	if uses != nil {
+		str = "\nuses " + strings.Join(uses, ", ") + ";"
+	}
+	return str
+}
+
+func formatDecls(decls []DeclPart) string {
+	declsStr := ""
+	if decls != nil {
+		strs := make([]string, len(decls))
+		for i, decl := range decls {
+			strs[i] = decl.String() + "\n"
+		}
+		declsStr = strings.Join(strs, "")
+	}
+	return declsStr
+}
+
+type Unit struct {
+	Name               string
+	InterfaceUses      []string
+	Interface          []DeclPart
+	ImplementationUses []string
+	Implementation     []DeclPart
+	Init               *CompoundStmt
+}
+
+func (u *Unit) String() string {
+	return fmt.Sprintf(`unit %s;
+
+interface%s
+	%s
+
+implementation%s
+    %s%s.
+`,
+		u.Name, formatUses(u.InterfaceUses), formatDecls(u.Interface),
+		formatUses(u.ImplementationUses), formatDecls(u.Implementation), u.Init)
 }
 
 type DeclPart interface {
@@ -70,21 +113,13 @@ type FuncDecl struct {
 	Stmt   *CompoundStmt
 }
 
-func formatDecls(decls []DeclPart) string {
-	declsStr := ""
-	if decls != nil {
-		strs := make([]string, len(decls))
-		for i, decl := range decls {
-			strs[i] = decl.String() + "\n"
-		}
-		declsStr = strings.Join(strs, "")
-	}
-	return declsStr
-}
-
 func (d *FuncDecl) String() string {
-	return fmt.Sprintf("function %s%s: %s;\n%s%s;",
-		d.Name, formatParams(d.Params), d.Result, formatDecls(d.Decls), d.Stmt)
+	stmtStr := ""
+	if d.Stmt != nil {
+		stmtStr = d.Stmt.String() + ";\n"
+	}
+	return fmt.Sprintf("function %s%s: %s;\n%s%s",
+		d.Name, formatParams(d.Params), d.Result, formatDecls(d.Decls), stmtStr)
 }
 
 type ParamGroup struct {
@@ -129,8 +164,12 @@ func formatParams(params []*ParamGroup) string {
 }
 
 func (d *ProcDecl) String() string {
-	return fmt.Sprintf("procedure %s%s;\n%s%s;",
-		d.Name, formatParams(d.Params), formatDecls(d.Decls), d.Stmt)
+	stmtStr := ""
+	if d.Stmt != nil {
+		stmtStr = d.Stmt.String() + ";\n"
+	}
+	return fmt.Sprintf("procedure %s%s;\n%s%s",
+		d.Name, formatParams(d.Params), formatDecls(d.Decls), stmtStr)
 }
 
 type TypeDefs struct {
@@ -389,6 +428,7 @@ func (e *BinaryExpr) String() string {
 
 type ConstExpr struct {
 	Value interface{}
+	IsHex bool
 }
 
 func (e *ConstExpr) String() string {
@@ -396,6 +436,9 @@ func (e *ConstExpr) String() string {
 	case string:
 		return fmt.Sprintf("'%s'", strings.ReplaceAll(value, "'", "'#39'"))
 	default:
+		if e.IsHex {
+			return fmt.Sprintf("$%02X", value)
+		}
 		return fmt.Sprintf("%v", value)
 	}
 }

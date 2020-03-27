@@ -30,7 +30,7 @@ func main() {
 	// 	}
 	// }
 
-	program, err := ParseProgram(src)
+	file, err := Parse(src)
 	if err != nil {
 		errMsg := fmt.Sprintf("%s", err)
 		if err, ok := err.(*ParseError); ok {
@@ -40,7 +40,7 @@ func main() {
 		os.Exit(1)
 	}
 	//	fmt.Printf("----------------------\n")
-	fmt.Print(program)
+	fmt.Print(file)
 }
 
 func showSourceLine(src []byte, pos Position, dividerLen int) {

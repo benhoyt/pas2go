@@ -23,9 +23,9 @@ func (e *ParseError) Error() string {
 	return fmt.Sprintf("parse error at %d:%d: %s", e.Position.Line, e.Position.Column, e.Message)
 }
 
-// ParseProgram parses a single program, returning the *Program
-// abstract syntax tree or a *ParseError on error.
-func ParseProgram(src []byte) (prog *Program, err error) {
+// Parse parses a single source file (program or unit), returning the
+// File instance or a *ParseError on error.
+func Parse(src []byte) (file File, err error) {
 	defer func() {
 		// The parser uses panic with a *ParseError to signal parsing
 		// errors internally, and they're caught here. This
@@ -39,7 +39,7 @@ func ParseProgram(src []byte) (prog *Program, err error) {
 	lexer := NewLexer(src)
 	p := parser{lexer: lexer}
 	p.next() // initialize p.tok
-	return p.program(), nil
+	return p.file(), nil
 }
 
 // Parser state
@@ -51,6 +51,17 @@ type parser struct {
 	val   string   // string value of last token (or "")
 }
 
+func (p *parser) file() File {
+	switch p.tok {
+	case PROGRAM:
+		return p.program()
+	case UNIT:
+		return p.unit()
+	default:
+		panic(p.error("expected program or unit"))
+	}
+}
+
 func (p *parser) program() *Program {
 	program := &Program{}
 
@@ -59,13 +70,9 @@ func (p *parser) program() *Program {
 	p.expect(IDENT)
 	p.expect(SEMICOLON)
 
-	if p.tok == USES {
-		p.next()
-		program.Uses = p.identList()
-		p.expect(SEMICOLON)
-	}
+	program.Uses = p.optionalUses()
 
-	program.Decls = p.declParts(CONST, FUNCTION, LABEL, PROCEDURE, TYPE, VAR)
+	program.Decls = p.declParts(true, CONST, FUNCTION, LABEL, PROCEDURE, TYPE, VAR)
 
 	program.Stmt = p.compoundStmt()
 	p.expect(DOT)
@@ -74,10 +81,43 @@ func (p *parser) program() *Program {
 	return program
 }
 
-func (p *parser) declParts(tokens ...Token) []DeclPart {
+func (p *parser) unit() *Unit {
+	unit := &Unit{}
+
+	p.expect(UNIT)
+	unit.Name = p.val
+	p.expect(IDENT)
+	p.expect(SEMICOLON)
+
+	p.expect(INTERFACE)
+	unit.InterfaceUses = p.optionalUses()
+	unit.Interface = p.declParts(false, CONST, FUNCTION, PROCEDURE, TYPE, VAR)
+
+	p.expect(IMPLEMENTATION)
+	unit.ImplementationUses = p.optionalUses()
+	unit.Implementation = p.declParts(true, CONST, FUNCTION, LABEL, PROCEDURE, TYPE, VAR)
+
+	unit.Init = p.compoundStmt()
+	p.expect(DOT)
+	p.expect(EOF)
+
+	return unit
+}
+
+func (p *parser) optionalUses() []string {
+	var usesList []string
+	if p.tok == USES {
+		p.next()
+		usesList = p.identList()
+		p.expect(SEMICOLON)
+	}
+	return usesList
+}
+
+func (p *parser) declParts(allowBodies bool, tokens ...Token) []DeclPart {
 	var decls []DeclPart
 	for p.matches(tokens...) {
-		decls = append(decls, p.declPart())
+		decls = append(decls, p.declPart(allowBodies))
 	}
 	return decls
 }
@@ -93,7 +133,7 @@ func (p *parser) identList() []string {
 	return idents
 }
 
-func (p *parser) declPart() DeclPart {
+func (p *parser) declPart(allowBodies bool) DeclPart {
 	switch p.tok {
 	case LABEL:
 		p.next()
@@ -150,9 +190,15 @@ func (p *parser) declPart() DeclPart {
 		p.expect(IDENT)
 		params := p.optionalParamList()
 		p.expect(SEMICOLON)
-		decls := p.declParts(CONST, LABEL, TYPE, VAR)
-		stmt := p.compoundStmt()
-		p.expect(SEMICOLON)
+
+		var decls []DeclPart
+		var stmt *CompoundStmt
+		if allowBodies {
+			decls = p.declParts(allowBodies, CONST, FUNCTION, LABEL, PROCEDURE, TYPE, VAR)
+			stmt = p.compoundStmt()
+			p.expect(SEMICOLON)
+		}
+
 		return &ProcDecl{name, params, decls, stmt}
 	case FUNCTION:
 		p.next()
@@ -162,12 +208,18 @@ func (p *parser) declPart() DeclPart {
 		p.expect(COLON)
 		result := p.typeIdent()
 		p.expect(SEMICOLON)
-		decls := p.declParts(CONST, LABEL, TYPE, VAR)
-		stmt := p.compoundStmt()
-		p.expect(SEMICOLON)
+
+		var decls []DeclPart
+		var stmt *CompoundStmt
+		if allowBodies {
+			decls = p.declParts(allowBodies, CONST, FUNCTION, LABEL, PROCEDURE, TYPE, VAR)
+			stmt = p.compoundStmt()
+			p.expect(SEMICOLON)
+		}
+
 		return &FuncDecl{name, params, result, decls, stmt}
 	default:
-		panic(p.error("TODO declPart"))
+		panic(p.error("expected declaration instead of %s", p.tok))
 	}
 }
 
@@ -455,22 +507,30 @@ func (p *parser) factor() Expr {
 			if err != nil {
 				panic(p.error("invalid number: %s", err))
 			}
-			return &ConstExpr{f}
+			return &ConstExpr{f, false}
 		}
-		return &ConstExpr{i}
+		return &ConstExpr{i, false}
+	case HEX:
+		val := p.val
+		p.next()
+		i, err := strconv.ParseInt(val, 16, 64)
+		if err != nil {
+			panic(p.error("invalid hex number: %s", err))
+		}
+		return &ConstExpr{int(i), true}
 	case STR:
 		s := p.val
 		p.next()
-		return &ConstExpr{s}
+		return &ConstExpr{s, false}
 	case NOT:
 		p.next()
 		return &UnaryExpr{NOT, p.factor()}
 	case TRUE:
 		p.next()
-		return &ConstExpr{true}
+		return &ConstExpr{true, false}
 	case FALSE:
 		p.next()
-		return &ConstExpr{false}
+		return &ConstExpr{false, false}
 	case IDENT, AT:
 		varExpr := p.varExpr()
 		switch p.tok {
