@@ -99,7 +99,7 @@ func (d *ConstDecls) String() string {
 type ConstDecl struct {
 	Name  string
 	Type  TypeSpec
-	Value *ConstExpr
+	Value Expr
 }
 
 func (d *ConstDecl) String() string {
@@ -526,12 +526,14 @@ type Expr interface {
 	String() string
 }
 
-func (e *BinaryExpr) expr()  {}
-func (e *ConstExpr) expr()   {}
-func (e *FuncExpr) expr()    {}
-func (e *PointerExpr) expr() {}
-func (e *UnaryExpr) expr()   {}
-func (e *VarExpr) expr()     {}
+func (e *BinaryExpr) expr()     {}
+func (e *ConstExpr) expr()      {}
+func (e *ConstArrayExpr) expr() {}
+func (e *FuncExpr) expr()       {}
+func (e *PointerExpr) expr()    {}
+func (e *SetExpr) expr()        {}
+func (e *UnaryExpr) expr()      {}
+func (e *VarExpr) expr()        {}
 
 type BinaryExpr struct {
 	Left  Expr
@@ -583,6 +585,18 @@ func escapeString(s string) string {
 	return t
 }
 
+type ConstArrayExpr struct {
+	Values []Expr
+}
+
+func (e *ConstArrayExpr) String() string {
+	strs := make([]string, len(e.Values))
+	for i, v := range e.Values {
+		strs[i] = v.String()
+	}
+	return "(" + strings.Join(strs, ", ") + ")"
+}
+
 type FuncExpr struct {
 	Func string
 	Args []Expr
@@ -598,6 +612,18 @@ type PointerExpr struct {
 
 func (e *PointerExpr) String() string {
 	return e.Expr.String() + "^"
+}
+
+type SetExpr struct {
+	Values []Expr
+}
+
+func (e *SetExpr) String() string {
+	strs := make([]string, len(e.Values))
+	for i, v := range e.Values {
+		strs[i] = v.String()
+	}
+	return "[" + strings.Join(strs, ", ") + "]"
 }
 
 type UnaryExpr struct {

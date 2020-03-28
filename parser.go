@@ -1,5 +1,14 @@
 // Turbo Pascal recursive descent parser
 
+/*
+TODO:
+- allow: Str(expr:width, s)
+- allow lexer to handle: array[0..7]
+- allow: Integer(x), Boolean(x) etc
+- allow: x in ['0' .. '9']
+- allow: Char(labelPtr^) := #39;
+*/
+
 package main
 
 import (
@@ -151,7 +160,7 @@ func (p *parser) declPart(allowBodies bool) DeclPart {
 				typ = p.typeSpec()
 			}
 			p.expect(EQUALS)
-			value := p.constant()
+			value := p.constantOrArray()
 			p.expect(SEMICOLON)
 			decls = append(decls, &ConstDecl{name, typ, value})
 		}
@@ -386,9 +395,6 @@ func (p *parser) labelledStmt(allowLabel bool) Stmt {
 			stmt := p.labelledStmt(false)
 			return &LabelledStmt{varExpr.Name, stmt}
 		case LPAREN:
-			if !varExpr.IsNameOnly() {
-				panic(p.error("procedure name must be a simple identifier"))
-			}
 			p.next()
 			args := p.argList()
 			p.expect(RPAREN)
@@ -489,20 +495,24 @@ func (p *parser) caseElement() *CaseElement {
 	return &CaseElement{consts, p.stmt()}
 }
 
-func (p *parser) constant() *ConstExpr {
-	// TODO: should be:
-	// : unsignedNumber
-	// | sign unsignedNumber
-	// | identifier
-	// | sign identifier
-	// | string
-	// | constantChr
-	// ;
-	expr := p.factor()
-	if constExpr, ok := expr.(*ConstExpr); ok {
-		return constExpr
+func (p *parser) constant() Expr {
+	return p.signedFactor() // TODO: tighten up?
+}
+
+func (p *parser) constantOrArray() Expr {
+	switch p.tok {
+	case LPAREN:
+		p.next()
+		consts := []Expr{p.constant()}
+		for p.tok == COMMA {
+			p.next()
+			consts = append(consts, p.constant())
+		}
+		p.expect(RPAREN)
+		return &ConstArrayExpr{consts}
+	default:
+		return p.constant()
 	}
-	panic(p.error("expected constant"))
 }
 
 func (p *parser) argList() []Expr {
@@ -557,7 +567,7 @@ func (p *parser) expr() Expr {
 
 // simpleExpr: term (additiveOp simpleExpr)?
 func (p *parser) simpleExpr() Expr {
-	return p.binaryExpr(p.term, p.simpleExpr, PLUS, MINUS, OR)
+	return p.binaryExpr(p.term, p.simpleExpr, PLUS, MINUS, OR, XOR)
 }
 
 // term: signedFactor (multiplicativeOp term)?
@@ -576,7 +586,6 @@ func (p *parser) signedFactor() Expr {
 }
 
 // factor: var | LPAREN expr RPAREN | function | constant | NOT factor | TRUE | FALSE
-// TODO: handle constantChr
 func (p *parser) factor() Expr {
 	switch p.tok {
 	case LPAREN:
@@ -584,6 +593,15 @@ func (p *parser) factor() Expr {
 		expr := p.expr()
 		p.expect(RPAREN)
 		return expr
+	case LBRACKET:
+		p.next()
+		consts := []Expr{p.constant()}
+		for p.tok == COMMA {
+			p.next()
+			consts = append(consts, p.constant())
+		}
+		p.expect(RBRACKET)
+		return &SetExpr{consts}
 	case NUM:
 		val := p.val
 		p.next()
@@ -624,9 +642,6 @@ func (p *parser) factor() Expr {
 		varExpr := p.varExpr()
 		switch p.tok {
 		case LPAREN:
-			if !varExpr.IsNameOnly() {
-				panic(p.error("function name must be a simple identifier"))
-			}
 			p.next()
 			args := p.argList()
 			p.expect(RPAREN)

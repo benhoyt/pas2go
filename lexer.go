@@ -54,7 +54,6 @@ func (l *Lexer) Scan() (Position, Token, string) {
 			for l.ch != '}' && l.ch != 0 {
 				l.next()
 			}
-			l.next()
 		}
 		l.next()
 	}
