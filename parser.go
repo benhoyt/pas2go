@@ -6,6 +6,7 @@ TODO:
 - allow lexer to handle: array[0..7]
 - allow: Integer(x), Boolean(x) etc
 - allow: x in ['0' .. '9']
+- allow case: '0' .. '9':
 - allow: Char(labelPtr^) := #39;
 */
 
@@ -160,7 +161,7 @@ func (p *parser) declPart(allowBodies bool) DeclPart {
 				typ = p.typeSpec()
 			}
 			p.expect(EQUALS)
-			value := p.constantOrArray()
+			value := p.constDeclValue()
 			p.expect(SEMICOLON)
 			decls = append(decls, &ConstDecl{name, typ, value})
 		}
@@ -499,17 +500,38 @@ func (p *parser) constant() Expr {
 	return p.signedFactor() // TODO: tighten up?
 }
 
-func (p *parser) constantOrArray() Expr {
+func (p *parser) constDeclValue() Expr {
 	switch p.tok {
 	case LPAREN:
 		p.next()
-		consts := []Expr{p.constant()}
-		for p.tok == COMMA {
-			p.next()
-			consts = append(consts, p.constant())
+		first := p.constant()
+		if p.tok == COLON { // record constant
+			varExpr, ok := first.(*VarExpr)
+			if !ok || !varExpr.IsNameOnly() {
+				panic(p.error("expected record field: 'name: value'"))
+			}
+			p.expect(COLON)
+			value := p.expr()
+			fields := []*ConstField{&ConstField{varExpr.Name, value}}
+			for p.tok == SEMICOLON {
+				p.next()
+				name := p.val
+				p.expect(IDENT)
+				p.expect(COLON)
+				value = p.expr()
+				fields = append(fields, &ConstField{name, value})
+			}
+			p.expect(RPAREN)
+			return &ConstRecordExpr{fields}
+		} else { // array constant
+			consts := []Expr{first}
+			for p.tok == COMMA {
+				p.next()
+				consts = append(consts, p.constant())
+			}
+			p.expect(RPAREN)
+			return &ConstArrayExpr{consts}
 		}
-		p.expect(RPAREN)
-		return &ConstArrayExpr{consts}
 	default:
 		return p.constant()
 	}

@@ -103,7 +103,11 @@ type ConstDecl struct {
 }
 
 func (d *ConstDecl) String() string {
-	return fmt.Sprintf("%s = %s", d.Name, d.Value)
+	typeStr := ""
+	if d.Type != nil {
+		typeStr = fmt.Sprintf(": %s", d.Type)
+	}
+	return fmt.Sprintf("%s%s = %s", d.Name, typeStr, d.Value)
 }
 
 type FuncDecl struct {
@@ -526,14 +530,15 @@ type Expr interface {
 	String() string
 }
 
-func (e *BinaryExpr) expr()     {}
-func (e *ConstExpr) expr()      {}
-func (e *ConstArrayExpr) expr() {}
-func (e *FuncExpr) expr()       {}
-func (e *PointerExpr) expr()    {}
-func (e *SetExpr) expr()        {}
-func (e *UnaryExpr) expr()      {}
-func (e *VarExpr) expr()        {}
+func (e *BinaryExpr) expr()      {}
+func (e *ConstExpr) expr()       {}
+func (e *ConstArrayExpr) expr()  {}
+func (e *ConstRecordExpr) expr() {}
+func (e *FuncExpr) expr()        {}
+func (e *PointerExpr) expr()     {}
+func (e *SetExpr) expr()         {}
+func (e *UnaryExpr) expr()       {}
+func (e *VarExpr) expr()         {}
 
 type BinaryExpr struct {
 	Left  Expr
@@ -564,6 +569,7 @@ func (e *ConstExpr) String() string {
 	}
 }
 
+// TODO: avoid #249''#208''#210
 func escapeString(s string) string {
 	if s == "" {
 		return "''"
@@ -595,6 +601,27 @@ func (e *ConstArrayExpr) String() string {
 		strs[i] = v.String()
 	}
 	return "(" + strings.Join(strs, ", ") + ")"
+}
+
+type ConstRecordExpr struct {
+	Fields []*ConstField
+}
+
+func (e *ConstRecordExpr) String() string {
+	strs := make([]string, len(e.Fields))
+	for i, f := range e.Fields {
+		strs[i] = f.String()
+	}
+	return "(" + strings.Join(strs, "; ") + ")"
+}
+
+type ConstField struct {
+	Name  string
+	Value Expr
+}
+
+func (f *ConstField) String() string {
+	return fmt.Sprintf("%s: %s", f.Name, f.Value)
 }
 
 type FuncExpr struct {
