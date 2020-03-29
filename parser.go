@@ -379,15 +379,25 @@ func (p *parser) stmt() Stmt {
 
 func (p *parser) labelledStmt(allowLabel bool) Stmt {
 	switch p.tok {
-	case IDENT, AT:
+	case IDENT, AT, CHAR, BOOLEAN, INTEGER, REAL, STRING:
+		var convType Token
+		if p.matches(CHAR, BOOLEAN, INTEGER, REAL, STRING) {
+			convType = p.tok
+			p.next()
+			p.expect(LPAREN)
+		}
 		varExpr := p.varExpr()
+		if convType != ILLEGAL {
+			p.expect(RPAREN)
+		}
+
 		switch p.tok {
 		case ASSIGN:
 			p.next()
 			value := p.expr()
-			return &AssignStmt{varExpr, value}
+			return &AssignStmt{convType, varExpr, value}
 		case COLON:
-			if !varExpr.IsNameOnly() {
+			if !varExpr.IsNameOnly() || convType != ILLEGAL {
 				panic(p.error("label must be a simple identifier"))
 			}
 			if !allowLabel {
@@ -397,6 +407,9 @@ func (p *parser) labelledStmt(allowLabel bool) Stmt {
 			stmt := p.labelledStmt(false)
 			return &LabelledStmt{varExpr.Name, stmt}
 		case LPAREN:
+			if convType != ILLEGAL {
+				panic(p.error("can't have type conversion in procedure call"))
+			}
 			p.next()
 			var args []Expr
 			if strings.ToLower(varExpr.Name) == "str" {

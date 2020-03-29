@@ -355,11 +355,17 @@ func (s *WhileStmt) stmt()    {}
 func (s *WithStmt) stmt()     {}
 
 type AssignStmt struct {
-	Var   *VarExpr
-	Value Expr
+	TypeConv Token
+	Var      *VarExpr
+	Value    Expr
 }
 
 func (s *AssignStmt) String() string {
+	if s.TypeConv != ILLEGAL {
+		typeStr := s.TypeConv.String()
+		typeStr = string(typeStr[0]) + strings.ToLower(typeStr[1:])
+		return fmt.Sprintf("%s(%s) := %s", typeStr, s.Var, s.Value)
+	}
 	return fmt.Sprintf("%s := %s", s.Var, s.Value)
 }
 
