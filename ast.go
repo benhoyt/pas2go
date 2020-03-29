@@ -23,9 +23,10 @@ type Program struct {
 }
 
 func (p *Program) String() string {
-	return fmt.Sprintf(`program %s;%s
-
-%s%s.
+	return fmt.Sprintf(`program %s;
+%s
+%s
+%s.
 `,
 		p.Name, formatUses(p.Uses), formatDecls(p.Decls), p.Stmt)
 }
@@ -33,7 +34,7 @@ func (p *Program) String() string {
 func formatUses(uses []string) string {
 	str := ""
 	if uses != nil {
-		str = "\nuses " + strings.Join(uses, ", ") + ";"
+		str = "uses " + strings.Join(uses, ", ") + ";\n"
 	}
 	return str
 }
@@ -43,9 +44,9 @@ func formatDecls(decls []DeclPart) string {
 	if decls != nil {
 		strs := make([]string, len(decls))
 		for i, decl := range decls {
-			strs[i] = decl.String() + "\n"
+			strs[i] = decl.String()
 		}
-		declsStr = strings.Join(strs, "")
+		declsStr = strings.Join(strs, "\n")
 	}
 	return declsStr
 }
@@ -62,14 +63,25 @@ type Unit struct {
 func (u *Unit) String() string {
 	return fmt.Sprintf(`unit %s;
 
-interface%s
-	%s
+interface
+%s
+%s
 
-implementation%s
-    %s%s.
+implementation
+%s
+%s
+%s.
 `,
-		u.Name, formatUses(u.InterfaceUses), formatDecls(u.Interface),
+		u.Name, indent(formatUses(u.InterfaceUses)), indent(formatDecls(u.Interface)),
 		formatUses(u.ImplementationUses), formatDecls(u.Implementation), u.Init)
+}
+
+func indent(s string) string {
+	strs := strings.Split(s, "\n")
+	for i, s := range strs {
+		strs[i] = "\t" + s
+	}
+	return strings.Join(strs, "\n")
 }
 
 type DeclPart interface {
@@ -91,7 +103,7 @@ type ConstDecls struct {
 func (d *ConstDecls) String() string {
 	strs := make([]string, len(d.Decls))
 	for i, decl := range d.Decls {
-		strs[i] = "    " + decl.String() + ";"
+		strs[i] = indent(decl.String() + ";")
 	}
 	return "const\n" + strings.Join(strs, "\n")
 }
@@ -119,12 +131,16 @@ type FuncDecl struct {
 }
 
 func (d *FuncDecl) String() string {
+	declsStr := ""
+	if d.Decls != nil {
+		declsStr = "\n" + indent(formatDecls(d.Decls))
+	}
 	stmtStr := ""
 	if d.Stmt != nil {
-		stmtStr = d.Stmt.String() + ";\n"
+		stmtStr = "\n" + indent(d.Stmt.String()) + ";\n"
 	}
-	return fmt.Sprintf("function %s%s: %s;\n%s%s",
-		d.Name, formatParams(d.Params), d.Result, formatDecls(d.Decls), stmtStr)
+	return fmt.Sprintf("function %s%s: %s;%s%s",
+		d.Name, formatParams(d.Params), d.Result, declsStr, stmtStr)
 }
 
 type TypeIdent struct {
@@ -181,12 +197,16 @@ func formatParams(params []*ParamGroup) string {
 }
 
 func (d *ProcDecl) String() string {
+	declsStr := ""
+	if d.Decls != nil {
+		declsStr = "\n" + indent(formatDecls(d.Decls))
+	}
 	stmtStr := ""
 	if d.Stmt != nil {
-		stmtStr = d.Stmt.String() + ";\n"
+		stmtStr = "\n" + indent(d.Stmt.String()) + ";\n"
 	}
-	return fmt.Sprintf("procedure %s%s;\n%s%s",
-		d.Name, formatParams(d.Params), formatDecls(d.Decls), stmtStr)
+	return fmt.Sprintf("procedure %s%s;%s%s",
+		d.Name, formatParams(d.Params), declsStr, stmtStr)
 }
 
 type TypeDefs struct {
@@ -196,7 +216,7 @@ type TypeDefs struct {
 func (d *TypeDefs) String() string {
 	strs := make([]string, len(d.Defs))
 	for i, def := range d.Defs {
-		strs[i] = "    " + def.String() + ";"
+		strs[i] = indent(def.String() + ";")
 	}
 	return "type\n" + strings.Join(strs, "\n")
 }
@@ -279,7 +299,7 @@ type RecordSpec struct {
 func (s *RecordSpec) String() string {
 	strs := []string{"record\n"}
 	for _, section := range s.Sections {
-		strs = append(strs, "    "+section.String()+";\n")
+		strs = append(strs, indent(section.String())+";\n")
 	}
 	strs = append(strs, "end")
 	return strings.Join(strs, "")
@@ -320,7 +340,7 @@ type VarDecls struct {
 func (d *VarDecls) String() string {
 	strs := make([]string, len(d.Decls))
 	for i, decl := range d.Decls {
-		strs[i] = "    " + decl.String() + ";"
+		strs[i] = indent(decl.String() + ";")
 	}
 	return "var\n" + strings.Join(strs, "\n")
 }
@@ -378,11 +398,11 @@ type CaseStmt struct {
 func (s *CaseStmt) String() string {
 	caseStrs := make([]string, len(s.Cases))
 	for i, c := range s.Cases {
-		caseStrs[i] = "    " + c.String() + ";\n"
+		caseStrs[i] = indent(c.String()) + ";\n"
 	}
 	elseStr := ""
 	if s.Else != nil {
-		elseStr = "else\n" + indentStmts(s.Else)
+		elseStr = "else\n" + indent(formatStmts(s.Else))
 	}
 	return fmt.Sprintf("case %s of\n%s%send",
 		s.Selector, strings.Join(caseStrs, ""), elseStr)
@@ -405,22 +425,19 @@ type CompoundStmt struct {
 	Stmts []Stmt
 }
 
-func indentStmts(stmts []Stmt) string {
+func formatStmts(stmts []Stmt) string {
 	lines := []string{}
 	for _, stmt := range stmts {
-		subLines := strings.Split(stmt.String()+";", "\n")
-		for _, sl := range subLines {
-			lines = append(lines, "    "+sl+"\n")
-		}
+		lines = append(lines, stmt.String()+";")
 	}
-	if len(lines) > 0 && lines[len(lines)-1] == "    ;\n" {
+	if len(lines) > 0 && lines[len(lines)-1] == ";" {
 		lines = lines[:len(lines)-1]
 	}
-	return strings.Join(lines, "")
+	return strings.Join(lines, "\n")
 }
 
 func (s *CompoundStmt) String() string {
-	return "begin\n" + indentStmts(s.Stmts) + "end"
+	return "begin\n" + indent(formatStmts(s.Stmts)) + "\nend"
 }
 
 type EmptyStmt struct{}
@@ -430,7 +447,7 @@ func (s *EmptyStmt) String() string {
 }
 
 type ForStmt struct {
-	Var     string // TODO
+	Var     string
 	Initial Expr
 	Down    bool
 	Final   Expr
@@ -442,7 +459,14 @@ func (s *ForStmt) String() string {
 	if s.Down {
 		toStr = "downto"
 	}
-	return fmt.Sprintf("for %s := %s %s %s do %s", s.Var, s.Initial, toStr, s.Final, s.Stmt)
+	_, isCompound := s.Stmt.(*CompoundStmt)
+	stmtStr := s.Stmt.String()
+	if isCompound {
+		stmtStr = " " + stmtStr
+	} else {
+		stmtStr = "\n" + indent(stmtStr)
+	}
+	return fmt.Sprintf("for %s := %s %s %s do%s", s.Var, s.Initial, toStr, s.Final, stmtStr)
 }
 
 type GotoStmt struct {
@@ -460,11 +484,20 @@ type IfStmt struct {
 }
 
 func (s *IfStmt) String() string {
-	str := fmt.Sprintf("if %s then %s", s.Cond, s.Then)
-	if s.Else != nil {
-		str += fmt.Sprintf(" else %s", s.Else)
+	_, isCompound := s.Then.(*CompoundStmt)
+	if isCompound {
+		str := fmt.Sprintf("if %s then %s", s.Cond, s.Then)
+		if s.Else != nil {
+			str += fmt.Sprintf(" else %s", s.Else)
+		}
+		return str
+	} else {
+		str := fmt.Sprintf("if %s then\n%s", s.Cond, indent(s.Then.String()))
+		if s.Else != nil {
+			str += fmt.Sprintf("\nelse\n%s", indent(s.Else.String()))
+		}
+		return str
 	}
-	return str
 }
 
 type LabelledStmt struct {
@@ -503,7 +536,7 @@ type RepeatStmt struct {
 }
 
 func (s *RepeatStmt) String() string {
-	return fmt.Sprintf("repeat\n%suntil %s", indentStmts(s.Stmts), s.Cond)
+	return fmt.Sprintf("repeat\n%s\nuntil %s", indent(formatStmts(s.Stmts)), s.Cond)
 }
 
 type WhileStmt struct {
@@ -512,7 +545,14 @@ type WhileStmt struct {
 }
 
 func (s *WhileStmt) String() string {
-	return fmt.Sprintf("while %s do %s", s.Cond, s.Stmt)
+	_, isCompound := s.Stmt.(*CompoundStmt)
+	stmtStr := s.Stmt.String()
+	if isCompound {
+		stmtStr = " " + stmtStr
+	} else {
+		stmtStr = "\n" + indent(stmtStr)
+	}
+	return fmt.Sprintf("while %s do%s", s.Cond, stmtStr)
 }
 
 type WithStmt struct {
