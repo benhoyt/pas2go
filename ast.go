@@ -251,7 +251,7 @@ type FuncSpec struct {
 }
 
 func (s *FuncSpec) String() string {
-	return fmt.Sprintf("%s: %s", formatParams(s.Params), s.Result)
+	return fmt.Sprintf("function%s: %s", formatParams(s.Params), s.Result)
 }
 
 type ProcSpec struct {
@@ -259,7 +259,7 @@ type ProcSpec struct {
 }
 
 func (s *ProcSpec) String() string {
-	return formatParams(s.Params)
+	return "procedure" + formatParams(s.Params)
 }
 
 type ScalarSpec struct {
@@ -606,6 +606,12 @@ func (e *ConstExpr) String() string {
 	switch value := e.Value.(type) {
 	case string:
 		return escapeString(value)
+	case float64:
+		s := fmt.Sprintf("%g", value)
+		if !strings.Contains(s, ".") {
+			s += ".0"
+		}
+		return s
 	case nil:
 		return "nil"
 	default:
