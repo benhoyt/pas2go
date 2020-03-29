@@ -79,7 +79,7 @@ implementation
 func indent(s string) string {
 	strs := strings.Split(s, "\n")
 	for i, s := range strs {
-		strs[i] = "\t" + s
+		strs[i] = "    " + s
 	}
 	return strings.Join(strs, "\n")
 }
