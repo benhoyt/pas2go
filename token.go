@@ -43,6 +43,7 @@ const (
 	BEGIN
 	BOOLEAN
 	CASE
+	CHAR
 	CONST
 	DIV
 	DO
@@ -90,7 +91,6 @@ const (
 	IDENT
 	NUM
 	HEX
-	CHAR
 	STR
 )
 
@@ -100,6 +100,7 @@ var keywordTokens = map[string]Token{
 	"BEGIN":          BEGIN,
 	"BOOLEAN":        BOOLEAN,
 	"CASE":           CASE,
+	"CHAR":           CHAR,
 	"CONST":          CONST,
 	"DIV":            DIV,
 	"DO":             DO,
@@ -182,6 +183,7 @@ var tokenNames = map[Token]string{
 	BEGIN:          "BEGIN",
 	BOOLEAN:        "BOOLEAN",
 	CASE:           "CASE",
+	CHAR:           "CHAR",
 	CONST:          "CONST",
 	DIV:            "DIV",
 	DO:             "DO",
@@ -228,7 +230,6 @@ var tokenNames = map[Token]string{
 	IDENT: "ident",
 	NUM:   "num",
 	HEX:   "hex",
-	CHAR:  "char",
 	STR:   "str",
 }
 

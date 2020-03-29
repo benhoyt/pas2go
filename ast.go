@@ -537,6 +537,7 @@ func (e *ConstRecordExpr) expr() {}
 func (e *FuncExpr) expr()        {}
 func (e *PointerExpr) expr()     {}
 func (e *SetExpr) expr()         {}
+func (e *TypeConvExpr) expr()    {}
 func (e *UnaryExpr) expr()       {}
 func (e *VarExpr) expr()         {}
 
@@ -651,6 +652,17 @@ func (e *SetExpr) String() string {
 		strs[i] = v.String()
 	}
 	return "[" + strings.Join(strs, ", ") + "]"
+}
+
+type TypeConvExpr struct {
+	Type Token
+	Expr Expr
+}
+
+func (e *TypeConvExpr) String() string {
+	typeStr := e.Type.String()
+	typeStr = string(typeStr[0]) + strings.ToLower(typeStr[1:])
+	return fmt.Sprintf("%s(%s)", typeStr, e.Expr)
 }
 
 type UnaryExpr struct {

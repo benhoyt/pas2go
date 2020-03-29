@@ -3,7 +3,6 @@
 /*
 TODO:
 - allow: Str(expr:width, s)
-- allow: Integer(x), Boolean(x) etc
 - allow: x in ['0' .. '9']
 - allow case: '0' .. '9':
 - allow: Char(labelPtr^) := #39;
@@ -659,6 +658,13 @@ func (p *parser) factor() Expr {
 	case NIL:
 		p.next()
 		return &ConstExpr{nil, false}
+	case CHAR, BOOLEAN, INTEGER, REAL, STRING:
+		typ := p.tok
+		p.next()
+		p.expect(LPAREN)
+		expr := p.expr()
+		p.expect(RPAREN)
+		return &TypeConvExpr{typ, expr}
 	case IDENT, AT:
 		varExpr := p.varExpr()
 		switch p.tok {
