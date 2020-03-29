@@ -1,10 +1,5 @@
 // Turbo Pascal recursive descent parser
 
-/*
-TODO:
-- allow: Char(labelPtr^) := #39;
-*/
-
 package main
 
 import (

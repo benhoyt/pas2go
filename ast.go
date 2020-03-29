@@ -378,7 +378,7 @@ type CaseStmt struct {
 func (s *CaseStmt) String() string {
 	caseStrs := make([]string, len(s.Cases))
 	for i, c := range s.Cases {
-		caseStrs[i] = "    " + c.String() + ";\n" // TODO: indentation
+		caseStrs[i] = "    " + c.String() + ";\n"
 	}
 	elseStr := ""
 	if s.Else != nil {
@@ -389,7 +389,7 @@ func (s *CaseStmt) String() string {
 }
 
 type CaseElement struct {
-	Consts []Expr // TODO: should be []Constant
+	Consts []Expr
 	Stmt   Stmt
 }
 
@@ -413,7 +413,6 @@ func indentStmts(stmts []Stmt) string {
 			lines = append(lines, "    "+sl+"\n")
 		}
 	}
-	// TODO: better way to do this with Join?
 	if len(lines) > 0 && lines[len(lines)-1] == "    ;\n" {
 		lines = lines[:len(lines)-1]
 	}
