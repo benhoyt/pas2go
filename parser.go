@@ -2,7 +2,6 @@
 
 /*
 TODO:
-- allow: Str(expr:width, s)
 - allow: x in ['0' .. '9']
 - allow case: '0' .. '9':
 - allow: Char(labelPtr^) := #39;
@@ -13,6 +12,7 @@ package main
 import (
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 // ParseError (actually *ParseError) is the type of error returned by
@@ -395,7 +395,19 @@ func (p *parser) labelledStmt(allowLabel bool) Stmt {
 			return &LabelledStmt{varExpr.Name, stmt}
 		case LPAREN:
 			p.next()
-			args := p.argList()
+			var args []Expr
+			if strings.ToLower(varExpr.Name) == "str" {
+				// Special case: Str(expr:width, str);
+				args = append(args, p.expr())
+				if p.tok == COLON {
+					p.next()
+					args = append(args, p.constant())
+				}
+				p.expect(COMMA)
+				args = append(args, p.expr())
+			} else {
+				args = p.argList()
+			}
 			p.expect(RPAREN)
 			return &ProcStmt{varExpr.Name, args}
 		default:
