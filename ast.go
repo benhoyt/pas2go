@@ -576,7 +576,6 @@ func (e *ConstExpr) String() string {
 	}
 }
 
-// TODO: avoid #249''#208''#210
 func escapeString(s string) string {
 	if s == "" {
 		return "''"
@@ -586,7 +585,12 @@ func escapeString(s string) string {
 	for i := 0; i < len(s); i++ {
 		c := s[i]
 		if c < 32 || c == 39 || c > 126 {
-			out = append(out, []byte(fmt.Sprintf("'#%d'", c))...)
+			if out[len(out)-1] == '\'' {
+				out = out[:len(out)-1]
+				out = append(out, []byte(fmt.Sprintf("#%d'", c))...)
+			} else {
+				out = append(out, []byte(fmt.Sprintf("'#%d'", c))...)
+			}
 		} else {
 			out = append(out, c)
 		}
