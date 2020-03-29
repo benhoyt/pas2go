@@ -420,9 +420,9 @@ func (p *parser) labelledStmt(allowLabel bool) Stmt {
 				args = p.argList()
 			}
 			p.expect(RPAREN)
-			return &ProcStmt{varExpr.Name, args}
+			return &ProcStmt{varExpr, args}
 		default:
-			return &ProcStmt{varExpr.Name, nil}
+			return &ProcStmt{varExpr, nil}
 		}
 	case GOTO:
 		p.next()
@@ -704,7 +704,7 @@ func (p *parser) factor() Expr {
 			p.next()
 			args := p.argList()
 			p.expect(RPAREN)
-			var expr Expr = &FuncExpr{varExpr.Name, args}
+			var expr Expr = &FuncExpr{varExpr, args}
 			if p.tok == POINTER {
 				p.next()
 				expr = &PointerExpr{expr}

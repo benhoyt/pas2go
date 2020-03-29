@@ -1,14 +1,5 @@
 // Turbo Pascal abstract syntax tree (AST) type
 
-/*
-AST glitches:
-- FIX: if ... else if chains
-- NO: should have no blank line after "uses" in interface
-- NO: blank lines between statements
-- NO: line breaks within statements like procedure argument lists
-- NO: label indentation
-*/
-
 package main
 
 import (
@@ -504,6 +495,12 @@ func (s *IfStmt) String() string {
 		} else {
 			str += "\n"
 		}
+
+		innerIf, isElseIf := s.Else.(*IfStmt)
+		if isElseIf {
+			return str + fmt.Sprintf("else %s", innerIf)
+		}
+
 		str += fmt.Sprintf("else%s", formatCompound(s.Else))
 	}
 	return str
@@ -519,7 +516,7 @@ func (s *LabelledStmt) String() string {
 }
 
 type ProcStmt struct {
-	Proc string
+	Proc *VarExpr
 	Args []Expr
 }
 
@@ -532,7 +529,7 @@ func formatArgList(args []Expr) string {
 }
 
 func (s *ProcStmt) String() string {
-	str := s.Proc
+	str := s.Proc.String()
 	if s.Args != nil {
 		str += formatArgList(s.Args)
 	}
@@ -567,7 +564,7 @@ func (s *WithStmt) String() string {
 	for i, v := range s.Vars {
 		strs[i] = v.String()
 	}
-	return fmt.Sprintf("with %s do %s", strings.Join(strs, ", "), s.Stmt)
+	return fmt.Sprintf("with %s do%s", strings.Join(strs, ", "), formatCompound(s.Stmt))
 }
 
 // Expressions
@@ -679,12 +676,12 @@ func (f *ConstField) String() string {
 }
 
 type FuncExpr struct {
-	Func string
+	Func *VarExpr
 	Args []Expr
 }
 
 func (e *FuncExpr) String() string {
-	return e.Func + formatArgList(e.Args)
+	return e.Func.String() + formatArgList(e.Args)
 }
 
 type ParenExpr struct {
