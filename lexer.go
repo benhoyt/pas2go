@@ -95,7 +95,7 @@ func (l *Lexer) Scan() (Position, Token, string) {
 		for l.ch >= '0' && l.ch <= '9' {
 			l.next()
 		}
-		if l.ch == '.' {
+		if l.ch == '.' && l.peekNext() != '.' {
 			l.next()
 			gotDigit := false
 			for l.ch >= '0' && l.ch <= '9' {
@@ -256,4 +256,11 @@ func (l *Lexer) choice(ch byte, one, two Token) Token {
 		return two
 	}
 	return one
+}
+
+func (l *Lexer) peekNext() byte {
+	if l.offset >= len(l.src) {
+		return 0
+	}
+	return l.src[l.offset]
 }

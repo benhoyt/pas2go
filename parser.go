@@ -3,7 +3,6 @@
 /*
 TODO:
 - allow: Str(expr:width, s)
-- allow lexer to handle: array[0..7]
 - allow: Integer(x), Boolean(x) etc
 - allow: x in ['0' .. '9']
 - allow case: '0' .. '9':
