@@ -536,6 +536,7 @@ func (e *ConstArrayExpr) expr()  {}
 func (e *ConstRecordExpr) expr() {}
 func (e *FuncExpr) expr()        {}
 func (e *PointerExpr) expr()     {}
+func (e *RangeExpr) expr()       {}
 func (e *SetExpr) expr()         {}
 func (e *TypeConvExpr) expr()    {}
 func (e *UnaryExpr) expr()       {}
@@ -640,6 +641,15 @@ type PointerExpr struct {
 
 func (e *PointerExpr) String() string {
 	return e.Expr.String() + "^"
+}
+
+type RangeExpr struct {
+	Min Expr
+	Max Expr
+}
+
+func (e *RangeExpr) String() string {
+	return fmt.Sprintf("%s .. %s", e.Min, e.Max)
 }
 
 type SetExpr struct {

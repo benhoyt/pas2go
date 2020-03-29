@@ -61,6 +61,7 @@ const (
 	INLINE
 	INTEGER
 	INTERFACE
+	INTERRUPT
 	LABEL
 	MOD
 	NIL
@@ -118,6 +119,7 @@ var keywordTokens = map[string]Token{
 	"INLINE":         INLINE,
 	"INTEGER":        INTEGER,
 	"INTERFACE":      INTERFACE,
+	"INTERRUPT":      INTERRUPT,
 	"LABEL":          LABEL,
 	"MOD":            MOD,
 	"NIL":            NIL,
@@ -201,6 +203,7 @@ var tokenNames = map[Token]string{
 	INLINE:         "INLINE",
 	INTEGER:        "INTEGER",
 	INTERFACE:      "INTERFACE",
+	INTERRUPT:      "INTERRUPT",
 	LABEL:          "LABEL",
 	MOD:            "MOD",
 	NIL:            "NIL",

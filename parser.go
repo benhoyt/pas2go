@@ -2,8 +2,6 @@
 
 /*
 TODO:
-- allow: x in ['0' .. '9']
-- allow case: '0' .. '9':
 - allow: Char(labelPtr^) := #39;
 */
 
@@ -202,6 +200,11 @@ func (p *parser) declPart(allowBodies bool) DeclPart {
 		p.expect(IDENT)
 		params := p.optionalParamList()
 		p.expect(SEMICOLON)
+
+		if p.tok == INTERRUPT {
+			p.next()
+			p.expect(SEMICOLON)
+		}
 
 		var decls []DeclPart
 		var stmt *CompoundStmt
@@ -497,17 +500,26 @@ func (p *parser) labelledStmt(allowLabel bool) Stmt {
 }
 
 func (p *parser) caseElement() *CaseElement {
-	consts := []Expr{p.factor()} // TODO: tighten up?
+	consts := []Expr{p.constantOrRange()}
 	for p.tok == COMMA {
 		p.next()
-		consts = append(consts, p.factor()) // TODO: tighten up?
+		consts = append(consts, p.constantOrRange())
 	}
 	p.expect(COLON)
 	return &CaseElement{consts, p.stmt()}
 }
 
+func (p *parser) constantOrRange() Expr {
+	expr := p.constant()
+	if p.tok == DOT_DOT {
+		p.next()
+		return &RangeExpr{expr, p.constant()}
+	}
+	return expr
+}
+
 func (p *parser) constant() Expr {
-	return p.signedFactor() // TODO: tighten up?
+	return p.signedFactor()
 }
 
 func (p *parser) constDeclValue() Expr {
@@ -627,10 +639,10 @@ func (p *parser) factor() Expr {
 		return expr
 	case LBRACKET:
 		p.next()
-		consts := []Expr{p.constant()}
+		consts := []Expr{p.constantOrRange()}
 		for p.tok == COMMA {
 			p.next()
-			consts = append(consts, p.constant())
+			consts = append(consts, p.constantOrRange())
 		}
 		p.expect(RBRACKET)
 		return &SetExpr{consts}
