@@ -402,7 +402,7 @@ func (s *CaseStmt) String() string {
 	}
 	elseStr := ""
 	if s.Else != nil {
-		elseStr = "else\n" + indent(formatStmts(s.Else))
+		elseStr = "else\n" + indent(formatStmts(s.Else)) + "\n"
 	}
 	return fmt.Sprintf("case %s of\n%s%send",
 		s.Selector, strings.Join(caseStrs, ""), elseStr)
@@ -459,14 +459,8 @@ func (s *ForStmt) String() string {
 	if s.Down {
 		toStr = "downto"
 	}
-	_, isCompound := s.Stmt.(*CompoundStmt)
-	stmtStr := s.Stmt.String()
-	if isCompound {
-		stmtStr = " " + stmtStr
-	} else {
-		stmtStr = "\n" + indent(stmtStr)
-	}
-	return fmt.Sprintf("for %s := %s %s %s do%s", s.Var, s.Initial, toStr, s.Final, stmtStr)
+	return fmt.Sprintf("for %s := %s %s %s do%s",
+		s.Var, s.Initial, toStr, s.Final, formatCompound(s.Stmt))
 }
 
 type GotoStmt struct {
@@ -483,21 +477,27 @@ type IfStmt struct {
 	Else Stmt
 }
 
-func (s *IfStmt) String() string {
-	_, isCompound := s.Then.(*CompoundStmt)
+func formatCompound(stmt Stmt) string {
+	_, isCompound := stmt.(*CompoundStmt)
 	if isCompound {
-		str := fmt.Sprintf("if %s then %s", s.Cond, s.Then)
-		if s.Else != nil {
-			str += fmt.Sprintf(" else %s", s.Else)
-		}
-		return str
+		return fmt.Sprintf(" %s", stmt)
 	} else {
-		str := fmt.Sprintf("if %s then\n%s", s.Cond, indent(s.Then.String()))
-		if s.Else != nil {
-			str += fmt.Sprintf("\nelse\n%s", indent(s.Else.String()))
-		}
-		return str
+		return fmt.Sprintf("\n%s", indent(stmt.String()))
 	}
+}
+
+func (s *IfStmt) String() string {
+	_, thenIsCompound := s.Then.(*CompoundStmt)
+	str := fmt.Sprintf("if %s then%s", s.Cond, formatCompound(s.Then))
+	if s.Else != nil {
+		if thenIsCompound {
+			str += " "
+		} else {
+			str += "\n"
+		}
+		str += fmt.Sprintf("else%s", formatCompound(s.Else))
+	}
+	return str
 }
 
 type LabelledStmt struct {
@@ -545,14 +545,7 @@ type WhileStmt struct {
 }
 
 func (s *WhileStmt) String() string {
-	_, isCompound := s.Stmt.(*CompoundStmt)
-	stmtStr := s.Stmt.String()
-	if isCompound {
-		stmtStr = " " + stmtStr
-	} else {
-		stmtStr = "\n" + indent(stmtStr)
-	}
-	return fmt.Sprintf("while %s do%s", s.Cond, stmtStr)
+	return fmt.Sprintf("while %s do%s", s.Cond, formatCompound(s.Stmt))
 }
 
 type WithStmt struct {
