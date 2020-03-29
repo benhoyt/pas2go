@@ -1,5 +1,14 @@
 // Turbo Pascal abstract syntax tree (AST) type
 
+/*
+AST glitches:
+- FIX: if ... else if chains
+- NO: should have no blank line after "uses" in interface
+- NO: blank lines between statements
+- NO: line breaks within statements like procedure argument lists
+- NO: label indentation
+*/
+
 package main
 
 import (
@@ -573,6 +582,7 @@ func (e *ConstExpr) expr()       {}
 func (e *ConstArrayExpr) expr()  {}
 func (e *ConstRecordExpr) expr() {}
 func (e *FuncExpr) expr()        {}
+func (e *ParenExpr) expr()       {}
 func (e *PointerExpr) expr()     {}
 func (e *RangeExpr) expr()       {}
 func (e *SetExpr) expr()         {}
@@ -675,6 +685,14 @@ type FuncExpr struct {
 
 func (e *FuncExpr) String() string {
 	return e.Func + formatArgList(e.Args)
+}
+
+type ParenExpr struct {
+	Expr Expr
+}
+
+func (e *ParenExpr) String() string {
+	return "(" + e.Expr.String() + ")"
 }
 
 type PointerExpr struct {

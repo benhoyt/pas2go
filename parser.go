@@ -644,7 +644,7 @@ func (p *parser) factor() Expr {
 		p.next()
 		expr := p.expr()
 		p.expect(RPAREN)
-		return expr
+		return &ParenExpr{expr}
 	case LBRACKET:
 		p.next()
 		consts := []Expr{p.constantOrRange()}
