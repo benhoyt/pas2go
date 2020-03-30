@@ -230,10 +230,10 @@ var tokenNames = map[Token]string{
 	WITH:           "WITH",
 	XOR:            "XOR",
 
-	IDENT: "ident",
-	NUM:   "num",
-	HEX:   "hex",
-	STR:   "str",
+	IDENT: "IDENT",
+	NUM:   "NUM",
+	HEX:   "HEX",
+	STR:   "STR",
 }
 
 // String returns the string name of this token.
