@@ -8,7 +8,7 @@ for path in os.listdir('.'):
     with open(path, 'rb') as f:
         dos_text = f.read()
 
-    unix_text = dos_text.replace(b'\r\n', b'\n')
+    unix_text = dos_text.replace(b'\r\n', b'\n').replace(b'\t', b'    ')
 
     with open(path, 'wb') as f:
         f.write(unix_text)
