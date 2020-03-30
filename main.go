@@ -13,7 +13,7 @@ import (
 
 func main() {
 	if len(os.Args) < 2 || len(os.Args) > 3 {
-		fmt.Fprintf(os.Stderr, "usage: pas2go [lex | parse] [file.pas]\n")
+		fmt.Fprintf(os.Stderr, "usage: pas2go [lex | parse | convert] [file.pas]\n")
 		os.Exit(1)
 	}
 
@@ -41,7 +41,11 @@ func main() {
 	case "lex":
 		lex(src)
 	case "parse":
-		parse(src)
+		file := parse(src)
+		fmt.Print(file)
+	case "convert":
+		file := parse(src)
+		Convert(file, os.Stdout)
 	default:
 		fmt.Fprintf(os.Stderr, "command must be 'lex' or 'parse'")
 		os.Exit(1)
@@ -62,7 +66,7 @@ func lex(src []byte) {
 	}
 }
 
-func parse(src []byte) {
+func parse(src []byte) File {
 	file, err := Parse(src)
 	if err != nil {
 		errMsg := fmt.Sprintf("%s", err)
@@ -72,7 +76,7 @@ func parse(src []byte) {
 		fmt.Fprintf(os.Stderr, "%s\n", errMsg)
 		os.Exit(1)
 	}
-	fmt.Print(file)
+	return file
 }
 
 func showSourceLine(src []byte, pos Position, dividerLen int) {
