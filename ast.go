@@ -586,6 +586,7 @@ func (e *SetExpr) expr()         {}
 func (e *TypeConvExpr) expr()    {}
 func (e *UnaryExpr) expr()       {}
 func (e *VarExpr) expr()         {}
+func (e *WidthExpr) expr()       {}
 
 type BinaryExpr struct {
 	Left  Expr
@@ -757,20 +758,29 @@ type VarExpr struct {
 	Suffixes []VarSuffix
 }
 
-func (v *VarExpr) IsNameOnly() bool {
-	return !v.HasAt && v.Suffixes == nil
+func (e *VarExpr) IsNameOnly() bool {
+	return !e.HasAt && e.Suffixes == nil
 }
 
-func (v *VarExpr) String() string {
+func (e *VarExpr) String() string {
 	parts := []string{}
-	if v.HasAt {
+	if e.HasAt {
 		parts = append(parts, "@")
 	}
-	parts = append(parts, v.Name)
-	for _, part := range v.Suffixes {
+	parts = append(parts, e.Name)
+	for _, part := range e.Suffixes {
 		parts = append(parts, part.String())
 	}
 	return strings.Join(parts, "")
+}
+
+type WidthExpr struct {
+	Expr  Expr
+	Width Expr
+}
+
+func (e *WidthExpr) String() string {
+	return fmt.Sprintf("%s:%s", e.Expr, e.Width)
 }
 
 type VarSuffix interface {

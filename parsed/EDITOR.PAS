@@ -857,7 +857,7 @@ procedure HighScoresInitTextWindow(var state: TTextWindowState);
         TextWindowAppend(state, '-----  ----------------------------------');
         for i := 1 to HIGH_SCORE_COUNT do begin
             if Length(HighScoreList[i].Name) <> 0 then begin
-                Str(HighScoreList[i].Score, 5, scoreStr);
+                Str(HighScoreList[i].Score:5, scoreStr);
                 TextWindowAppend(state, scoreStr + '  ' + HighScoreList[i].Name);
             end;
         end;

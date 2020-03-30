@@ -409,13 +409,14 @@ func (p *parser) labelledStmt(allowLabel bool) Stmt {
 			var args []Expr
 			if strings.ToLower(varExpr.Name) == "str" {
 				// Special case: Str(expr:width, str);
-				args = append(args, p.expr())
+				first := p.expr()
 				if p.tok == COLON {
 					p.next()
-					args = append(args, p.constant())
+					first = &WidthExpr{first, p.constant()}
 				}
 				p.expect(COMMA)
-				args = append(args, p.expr())
+				second := p.expr()
+				args = []Expr{first, second}
 			} else {
 				args = p.argList()
 			}
