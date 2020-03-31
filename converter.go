@@ -5,7 +5,6 @@ ISSUES:
 - distinguishing string constants vs char, eg: pArg[1] == "/"
 - uses operator precedence rather than ParenExpr
 - "exit" -> break or return (should EXIT be a keyword in lexer?)
-- handle array[Max-Max+1] thing better
 */
 
 package main
@@ -424,7 +423,6 @@ func (c *converter) expr(expr Expr) {
 		// TODO: handle Width
 	default:
 		fmt.Fprintf(c.w, "%s", expr)
-		//TODO		panic(fmt.Sprintf("unhandled Stmt: %T", stmt))
 	}
 }
 
@@ -498,14 +496,13 @@ func (c *converter) typeSpec(spec TypeSpec) {
 		}
 		fmt.Fprint(c.w, "}")
 	case *FileSpec:
-		// TODO: handle Of
+		// TODO: handle Of, how to handle FILE?
 		fmt.Fprint(c.w, "FILE")
 	case *PointerSpec:
 		fmt.Fprint(c.w, "*")
 		c.typeIdent(spec.Type)
 	default:
 		fmt.Fprintf(c.w, "%s", spec)
-		//TODO		panic(fmt.Sprintf("unhandled TypeSpec: %T", spec))
 	}
 }
 
