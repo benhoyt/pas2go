@@ -75,6 +75,9 @@ func (c *converter) decl(decl DeclPart, isMain bool) {
 				c.typeSpec(d.Type)
 			}
 			fmt.Fprint(c.w, " = ")
+			if _, isConstRecord := d.Value.(*ConstRecordExpr); isConstRecord {
+				c.typeSpec(d.Type)
+			}
 			c.expr(d.Value)
 			fmt.Fprint(c.w, "\n")
 		}
@@ -158,7 +161,7 @@ func (c *converter) typeIdent(typ *TypeIdent) {
 	case BOOLEAN:
 		s = "bool"
 	case INTEGER:
-		s = "int"
+		s = "int16"
 	case REAL:
 		s = "float64"
 	case STRING:
@@ -200,7 +203,20 @@ func (c *converter) stmt(stmt Stmt) {
 		fmt.Fprint(c.w, " {\n")
 		for _, cas := range stmt.Cases {
 			fmt.Fprint(c.w, "case ")
-			c.exprs(cas.Consts) // TODO: handle RangeExpr with: case 1, 2, 3:
+			if rangeExpr, ok := cas.Consts[0].(*RangeExpr); ok {
+				// Making a lot of assumptions here, but this is the only
+				// way it's used in the ZZT source.
+				min := rangeExpr.Min.(*ConstExpr).Value.(string)[0]
+				max := rangeExpr.Max.(*ConstExpr).Value.(string)[0]
+				for i, b := 0, min; b <= max; i, b = i+1, b+1 {
+					if i > 0 {
+						fmt.Fprint(c.w, ", ")
+					}
+					fmt.Fprintf(c.w, "'%c'", b)
+				}
+			} else {
+				c.exprs(cas.Consts)
+			}
 			fmt.Fprint(c.w, ":\n")
 			c.stmtNoBraces(cas.Stmt)
 		}
@@ -303,7 +319,11 @@ func (c *converter) expr(expr Expr) {
 	case *ConstExpr:
 		switch value := expr.Value.(type) {
 		case string:
-			fmt.Fprintf(c.w, "%q", value)
+			if len(value) == 1 {
+				fmt.Fprintf(c.w, "%q", value[0])
+			} else {
+				fmt.Fprintf(c.w, "%q", value)
+			}
 		case float64:
 			s := fmt.Sprintf("%g", value)
 			if !strings.Contains(s, ".") {
