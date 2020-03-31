@@ -13,16 +13,16 @@ type (
 		Selectable     bool
 		LineCount      int16
 		LinePos        int16
-		Lines          [MAX_TEXT_WINDOW_LINES - 1 + 1]*TTextWindowLine
+		Lines          [MAX_TEXT_WINDOW_LINES]*TTextWindowLine
 		Hyperlink      string
 		Title          TTextWindowLine
 		LoadedFilename string
-		ScreenCopy     [25 - 1 + 1]string
+		ScreenCopy     [25]string
 	}
 	TResourceDataHeader struct {
 		EntryCount int16
-		Name       [MAX_RESOURCE_DATA_FILES - 1 + 1]string
-		FileOffset [MAX_RESOURCE_DATA_FILES - 1 + 1]int32
+		Name       [MAX_RESOURCE_DATA_FILES]string
+		FileOffset [MAX_RESOURCE_DATA_FILES]int32
 	}
 )
 

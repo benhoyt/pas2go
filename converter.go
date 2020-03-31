@@ -472,13 +472,22 @@ func (c *converter) typeSpec(spec TypeSpec) {
 		// TODO: how to handle string sizes? should we use [Size]byte
 		fmt.Fprint(c.w, "string")
 	case *ArraySpec:
-		// TODO: tidy up size if constants
-		// TODO: how to deal with Min?
-		fmt.Fprint(c.w, "[")
-		c.expr(spec.Max)
-		fmt.Fprint(c.w, "-")
-		c.expr(spec.Min)
-		fmt.Fprint(c.w, "+1]")
+		// TODO: record Min and adjust in code that indexes into array
+		min := spec.Min.(*ConstExpr).Value.(int)
+		maxConstExpr, maxIsConst := spec.Max.(*ConstExpr)
+		if maxIsConst {
+			fmt.Fprintf(c.w, "[%d]", maxConstExpr.Value.(int)-min+1)
+		} else {
+			fmt.Fprint(c.w, "[")
+			c.expr(spec.Max)
+			switch {
+			case min < 1:
+				fmt.Fprintf(c.w, "+%d", 1-min)
+			case min > 1:
+				fmt.Fprintf(c.w, "-%d", min-1)
+			}
+			fmt.Fprint(c.w, "]")
+		}
 		c.typeSpec(spec.Of)
 	case *RecordSpec:
 		fmt.Fprint(c.w, "struct {\n")

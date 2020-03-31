@@ -376,7 +376,7 @@ func ElementConveyorTick(x, y int16, direction int16) {
 		iStat      int16
 		ix, iy     int16
 		canMove    bool
-		tiles      [7 - 0 + 1]TTile
+		tiles      [8]TTile
 		iMin, iMax int16
 		tmpTile    TTile
 	)

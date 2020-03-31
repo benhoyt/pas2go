@@ -8,17 +8,17 @@ const (
 	PROMPT_ANY      = 2
 )
 const (
-	ProgressAnimColors  [7 - 0 + 1]byte   = [...]string{0x14, 0x1C, 0x15, 0x1D, 0x16, 0x1E, 0x17, 0x1F}
-	ProgressAnimStrings [7 - 0 + 1]string = [...]string{"....|", "...*/", "..*.-", ".*..\\", "*...|", "..../", "....-", "....\\"}
-	ColorNames          [7 - 1 + 1]string = [...]string{"Blue", "Green", "Cyan", "Red", "Purple", "Yellow", "White"}
-	DiagonalDeltaX      [7 - 0 + 1]int16  = [...]string{-1, 0, 1, 1, 1, 0, -1, -1}
-	DiagonalDeltaY      [7 - 0 + 1]int16  = [...]string{1, 1, 1, 0, -1, -1, -1, 0}
-	NeighborDeltaX      [3 - 0 + 1]int16  = [...]string{0, 0, -1, 1}
-	NeighborDeltaY      [3 - 0 + 1]int16  = [...]string{-1, 1, 0, 0}
-	TileBorder          TTile             = TTile{Element: E_NORMAL, Color: 0x0E}
-	TileBoardEdge       TTile             = TTile{Element: E_BOARD_EDGE, Color: 0x00}
-	StatTemplateDefault TStat             = TStat{X: 0, Y: 0, StepX: 0, StepY: 0, Cycle: 0, P1: 0, P2: 0, P3: 0, Follower: -1, Leader: -1}
-	LineChars           string            = "\xf9\xd0Һ\xb5\xbc\xbb\xb9\xc6\xc8\xc9\xcc\xcd\xca\xcb\xce"
+	ProgressAnimColors  [8]byte   = [...]string{0x14, 0x1C, 0x15, 0x1D, 0x16, 0x1E, 0x17, 0x1F}
+	ProgressAnimStrings [8]string = [...]string{"....|", "...*/", "..*.-", ".*..\\", "*...|", "..../", "....-", "....\\"}
+	ColorNames          [7]string = [...]string{"Blue", "Green", "Cyan", "Red", "Purple", "Yellow", "White"}
+	DiagonalDeltaX      [8]int16  = [...]string{-1, 0, 1, 1, 1, 0, -1, -1}
+	DiagonalDeltaY      [8]int16  = [...]string{1, 1, 1, 0, -1, -1, -1, 0}
+	NeighborDeltaX      [4]int16  = [...]string{0, 0, -1, 1}
+	NeighborDeltaY      [4]int16  = [...]string{-1, 1, 0, 0}
+	TileBorder          TTile     = TTile{Element: E_NORMAL, Color: 0x0E}
+	TileBoardEdge       TTile     = TTile{Element: E_BOARD_EDGE, Color: 0x00}
+	StatTemplateDefault TStat     = TStat{X: 0, Y: 0, StepX: 0, StepY: 0, Cycle: 0, P1: 0, P2: 0, P3: 0, Follower: -1, Leader: -1}
+	LineChars           string    = "\xf9\xd0Һ\xb5\xbc\xbb\xb9\xc6\xc8\xc9\xcc\xcd\xca\xcb\xce"
 )
 
 // implementation uses: Dos, Crt, Video, Sounds, Input, Elements, Editor, Oop

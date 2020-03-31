@@ -2,14 +2,14 @@ package main // unit: Sounds
 
 type TDrumData struct {
 	Len  int16
-	Data [255 - 1 + 1]uint16
+	Data [255]uint16
 }
 
 var (
 	SoundEnabled            bool
 	SoundBlockQueueing      bool
 	SoundCurrentPriority    int16
-	SoundFreqTable          [255 - 1 + 1]uint16
+	SoundFreqTable          [255]uint16
 	SoundDurationMultiplier byte
 	SoundDurationCounter    byte
 	SoundBuffer             string
@@ -21,7 +21,7 @@ var (
 	UseSystemTimeForElapsed bool
 	TimerTicks              uint16
 	SoundTimeCheckHsec      int16
-	SoundDrumTable          [9 - 0 + 1]TDrumData
+	SoundDrumTable          [10]TDrumData
 )
 
 // implementation uses: Crt, Dos

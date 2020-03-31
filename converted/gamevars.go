@@ -72,18 +72,18 @@ type (
 	TBoardInfo struct {
 		MaxShots          byte
 		IsDark            bool
-		NeighborBoards    [3 - 0 + 1]byte
+		NeighborBoards    [4]byte
 		ReenterWhenZapped bool
 		Message           string
 		StartPlayerX      byte
 		StartPlayerY      byte
 		TimeLimitSec      int16
-		unk1              [85 - 70 + 1]byte
+		unk1              [16]byte
 	}
 	TWorldInfo struct {
 		Ammo           int16
 		Gems           int16
-		Keys           [7 - 1 + 1]bool
+		Keys           [7]bool
 		Health         int16
 		CurrentBoard   int16
 		Torches        int16
@@ -92,11 +92,11 @@ type (
 		unk1           int16
 		Score          int16
 		Name           string
-		Flags          [MAX_FLAG - 1 + 1]string
+		Flags          [MAX_FLAG]string
 		BoardTimeSec   int16
 		BoardTimeHsec  int16
 		IsSave         bool
-		unkPad         [13 - 0 + 1]byte
+		unkPad         [14]byte
 	}
 	TEditorStatSetting struct {
 		P1, P2, P3   byte
@@ -104,24 +104,24 @@ type (
 	}
 	TBoard struct {
 		Name      TString50
-		Tiles     [BOARD_WIDTH + 1 - 0 + 1][BOARD_HEIGHT + 1 - 0 + 1]TTile
+		Tiles     [BOARD_WIDTH + 1 + 1][BOARD_HEIGHT + 1 + 1]TTile
 		StatCount int16
-		Stats     [MAX_STAT + 1 - 0 + 1]TStat
+		Stats     [MAX_STAT + 1 + 1]TStat
 		Info      TBoardInfo
 	}
 	TWorld struct {
 		BoardCount         int16
-		BoardData          [MAX_BOARD - 0 + 1]uintptr
-		BoardLen           [MAX_BOARD - 0 + 1]int16
+		BoardData          [MAX_BOARD + 1]uintptr
+		BoardLen           [MAX_BOARD + 1]int16
 		Info               TWorldInfo
-		EditorStatSettings [MAX_ELEMENT - 0 + 1]TEditorStatSetting
+		EditorStatSettings [MAX_ELEMENT + 1]TEditorStatSetting
 	}
 	THighScoreEntry struct {
 		Name  string
 		Score int16
 	}
-	THighScoreList [HIGH_SCORE_COUNT - 1 + 1]THighScoreEntry
-	TIoTmpBuf      [19999 - 0 + 1]byte
+	THighScoreList [HIGH_SCORE_COUNT]THighScoreEntry
+	TIoTmpBuf      [20000]byte
 )
 
 var (
@@ -129,7 +129,7 @@ var (
 	PlayerDirY                  int16
 	unkVar_0476                 int16
 	unkVar_0478                 int16
-	TransitionTable             [80*25 - 1 + 1]TCoord
+	TransitionTable             [80 * 25]TCoord
 	LoadedGameFileName          TString50
 	SavedGameFileName           TString50
 	SavedBoardFileName          TString50
@@ -147,7 +147,7 @@ var (
 	MessageFakeNotShown         bool
 	MessageGemNotShown          bool
 	MessageEnergizerNotShown    bool
-	unkVar_4ABA                 [14 - 0 + 1]byte
+	unkVar_4ABA                 [15]byte
 	GameTitleExitRequested      bool
 	GamePlayExitRequested       bool
 	GameStateElement            int16
@@ -155,9 +155,9 @@ var (
 	TransitionTableSize         int16
 	TickSpeed                   byte
 	IoTmpBuf                    *TIoTmpBuf
-	ElementDefs                 [MAX_ELEMENT - 0 + 1]TElementDef
+	ElementDefs                 [MAX_ELEMENT + 1]TElementDef
 	EditorPatternCount          int16
-	EditorPatterns              [10 - 1 + 1]byte
+	EditorPatterns              [10]byte
 	TickTimeDuration            int16
 	CurrentTick                 int16
 	CurrentStatTicked           int16
@@ -178,8 +178,8 @@ var (
 	ResetConfig                 bool
 	JustStarted                 bool
 	WorldFileDescCount          int16
-	WorldFileDescKeys           [10 - 1 + 1]TString50
-	WorldFileDescValues         [10 - 1 + 1]TString50
+	WorldFileDescKeys           [10]TString50
+	WorldFileDescValues         [10]TString50
 )
 
 const (

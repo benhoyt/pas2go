@@ -6,7 +6,7 @@ package main // unit: Editor
 
 type TDrawMode uint8
 
-const NeighborBoardStrs [3 - 0 + 1]string = [...]string{"       Board \x18", "       Board \x19", "       Board \x1b", "       Board \x1a"}
+const NeighborBoardStrs [4]string = [...]string{"       Board \x18", "       Board \x19", "       Board \x1b", "       Board \x1a"}
 
 func EditorAppendBoard() {
 	if World.BoardCount < MAX_BOARD {
@@ -37,7 +37,7 @@ func EditorLoop() {
 		cursorPattern, cursorColor int16
 		i, iElem                   int16
 		canModify                  bool
-		unk1                       [49 - 0 + 1]byte
+		unk1                       [50]byte
 		copiedStat                 TStat
 		copiedHasStat              bool
 		copiedTile                 TTile
@@ -290,7 +290,7 @@ func EditorLoop() {
 		var (
 			state        TTextWindowState
 			iLine, iChar int16
-			unk1         [51 - 0 + 1]byte
+			unk1         [52]byte
 			dataChar     byte
 			dataPtr      uintptr
 		)
@@ -498,8 +498,8 @@ func EditorLoop() {
 			i              int16
 			tileAt         TTile
 			toFill, filled byte
-			xPosition      [255 - 0 + 1]int16
-			yPosition      [255 - 0 + 1]int16
+			xPosition      [256]int16
+			yPosition      [256]int16
 		)
 		toFill = 1
 		filled = 0
