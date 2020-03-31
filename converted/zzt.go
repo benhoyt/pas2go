@@ -7,7 +7,7 @@ func ParseArguments() {
 		i    int16
 		pArg string
 	)
-	for i := 1; i <= ParamCount; i++ {
+	for i = 1; i <= ParamCount; i++ {
 		pArg = ParamStr(i)
 		if pArg[1] == '/' {
 			switch UpCase(pArg[2]) {

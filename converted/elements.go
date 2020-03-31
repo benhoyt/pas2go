@@ -41,9 +41,7 @@ func ElementDamagingTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16)
 }
 
 func ElementLionTick(statId int16) {
-	var (
-		deltaX, deltaY int16
-	)
+	var deltaX, deltaY int16
 	// WITH temp = Board.Stats[statId]
 	if P1 < Random(10) {
 		CalcDirectionRnd(deltaX, deltaY)
@@ -117,9 +115,7 @@ func ElementRuffianTick(statId int16) {
 }
 
 func ElementBearTick(statId int16) {
-	var (
-		deltaX, deltaY int16
-	)
+	var deltaX, deltaY int16
 	// WITH temp = Board.Stats[statId]
 	if X != Board.Stats[0].X {
 		if Difference(Y, Board.Stats[0].Y) <= (8 - P1) {
@@ -329,12 +325,10 @@ func ElementSpinningGunDraw(x, y int16, ch *byte) {
 }
 
 func ElementLineDraw(x, y int16, ch *byte) {
-	var (
-		i, v, shift int16
-	)
+	var i, v, shift int16
 	v = 1
 	shift = 1
-	for i := 0; i <= 3; i++ {
+	for i = 0; i <= 3; i++ {
 		switch Board.Tiles[x+NeighborDeltaX[i]][y+NeighborDeltaY[i]].Element {
 		case E_LINE, E_BOARD_EDGE:
 			v = v + shift
@@ -498,9 +492,7 @@ func ElementBombDraw(x, y int16, ch *byte) {
 }
 
 func ElementBombTick(statId int16) {
-	var (
-		oldX, oldY int16
-	)
+	var oldX, oldY int16
 	// WITH temp = Board.Stats[statId]
 	if P1 > 0 {
 		P1 = P1 - 1
@@ -675,7 +667,7 @@ func ElementSlimeTick(statId int16) {
 		startX = X
 		startY = Y
 		changedTiles = 0
-		for dir := 0; dir <= 3; dir++ {
+		for dir = 0; dir <= 3; dir++ {
 			if ElementDefs[Board.Tiles[startX+NeighborDeltaX[dir]][startY+NeighborDeltaY[dir]].Element].Walkable {
 				if changedTiles == 0 {
 					MoveStat(statId, startX+NeighborDeltaX[dir], startY+NeighborDeltaY[dir])
@@ -700,9 +692,7 @@ func ElementSlimeTick(statId int16) {
 }
 
 func ElementSlimeTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16) {
-	var (
-		color int16
-	)
+	var color int16
 	color = Board.Tiles[x][y].Color
 	DamageStat(GetStatIdAt(x, y))
 	Board.Tiles[x][y].Element = E_BREAKABLE
@@ -712,9 +702,7 @@ func ElementSlimeTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16) {
 }
 
 func ElementSharkTick(statId int16) {
-	var (
-		deltaX, deltaY int16
-	)
+	var deltaX, deltaY int16
 	// WITH temp = Board.Stats[statId]
 	if P1 < Random(10) {
 		CalcDirectionRnd(deltaX, deltaY)
@@ -811,9 +799,7 @@ func ElementBlinkWallTick(statId int16) {
 }
 
 func ElementMove(oldX, oldY, newX, newY int16) {
-	var (
-		statId int16
-	)
+	var statId int16
 	statId = GetStatIdAt(oldX, oldY)
 	if statId >= 0 {
 		MoveStat(statId, newX, newY)
@@ -826,9 +812,7 @@ func ElementMove(oldX, oldY, newX, newY int16) {
 }
 
 func ElementPushablePush(x, y int16, deltaX, deltaY int16) {
-	var (
-		unk1 int16
-	)
+	var unk1 int16
 	// WITH temp = Board.Tiles[x][y]
 	if ((Element == E_SLIDER_NS) && (deltaX == 0)) || ((Element == E_SLIDER_EW) && (deltaY == 0)) || ElementDefs[Element].Pushable {
 		if Board.Tiles[x+deltaX][y+deltaY].Element == E_TRANSPORTER {
@@ -867,9 +851,7 @@ func ElementDuplicatorDraw(x, y int16, ch *byte) {
 }
 
 func ElementObjectTick(statId int16) {
-	var (
-		retVal bool
-	)
+	var retVal bool
 	// WITH temp = Board.Stats[statId]
 	if DataPos >= 0 {
 		OopExecute(statId, DataPos, "Interaction")
@@ -898,9 +880,7 @@ func ElementObjectTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16) {
 }
 
 func ElementDuplicatorTick(statId int16) {
-	var (
-		sourceStatId int16
-	)
+	var sourceStatId int16
 	// WITH temp = Board.Stats[statId]
 	if P1 <= 4 {
 		P1 = P1 + 1
@@ -965,9 +945,7 @@ func ElementScrollTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16) {
 }
 
 func ElementKeyTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16) {
-	var (
-		key int16
-	)
+	var key int16
 	key = Board.Tiles[x][y].Color % 8
 	if World.Info.Keys[key] {
 		DisplayMessage(200, "You already have a "+ColorNames[key]+" key!")
@@ -1012,9 +990,7 @@ func ElementPassageTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16) 
 }
 
 func ElementDoorTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16) {
-	var (
-		key int16
-	)
+	var key int16
 	key = (Board.Tiles[x][y].Color / 16) % 8
 	if World.Info.Keys[key] {
 		Board.Tiles[x][y].Element = E_EMPTY
@@ -1049,9 +1025,7 @@ func ElementPusherDraw(x, y int16, ch *byte) {
 }
 
 func ElementPusherTick(statId int16) {
-	var (
-		i, startX, startY int16
-	)
+	var i, startX, startY int16
 	// WITH temp = Board.Stats[statId]
 	startX = X
 	startY = Y
@@ -1165,9 +1139,9 @@ func DrawPlayerSurroundings(x, y int16, bombPhase int16) {
 		istat  int16
 		result bool
 	)
-	for ix := ((x - TORCH_DX) - 1); ix <= ((x + TORCH_DX) + 1); ix++ {
+	for ix = ((x - TORCH_DX) - 1); ix <= ((x + TORCH_DX) + 1); ix++ {
 		if (ix >= 1) && (ix <= BOARD_WIDTH) {
-			for iy := ((y - TORCH_DY) - 1); iy <= ((y + TORCH_DY) + 1); iy++ {
+			for iy = ((y - TORCH_DY) - 1); iy <= ((y + TORCH_DY) + 1); iy++ {
 				if (iy >= 1) && (iy <= BOARD_HEIGHT) {
 					// WITH temp = Board.Tiles[ix][iy]
 					if (bombPhase > 0) && ((Sqr(ix-x) + Sqr(iy-y)*2) < TORCH_DIST_SQR) {
@@ -1266,7 +1240,7 @@ func ElementPlayerTick(statId int16) {
 				MessageOutOfAmmoNotShown = false
 			} else {
 				bulletCount = 0
-				for i := 0; i <= Board.StatCount; i++ {
+				for i = 0; i <= Board.StatCount; i++ {
 					if (Board.Tiles[Board.Stats[i].X][Board.Stats[i].Y].Element == E_BULLET) && (Board.Stats[i].P1 == 0) {
 						bulletCount = bulletCount + 1
 					}
@@ -1403,10 +1377,8 @@ func ResetMessageNotShownFlags() {
 }
 
 func InitElementDefs() {
-	var (
-		i int16
-	)
-	for i := 0; i <= MAX_ELEMENT; i++ {
+	var i int16
+	for i = 0; i <= MAX_ELEMENT; i++ {
 		// WITH temp = ElementDefs[i]
 		Character = ' '
 		Color = COLOR_CHOICE_ON_BLACK
@@ -1803,12 +1775,10 @@ func InitElementsGame() {
 }
 
 func InitEditorStatSettings() {
-	var (
-		i int16
-	)
+	var i int16
 	PlayerDirX = 0
 	PlayerDirY = 0
-	for i := 0; i <= MAX_ELEMENT; i++ {
+	for i = 0; i <= MAX_ELEMENT; i++ {
 		// WITH temp = World.EditorStatSettings[i]
 		P1 = 4
 		P2 = 4

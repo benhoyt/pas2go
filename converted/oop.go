@@ -154,9 +154,7 @@ func OopReadDirection(statId int16, position *int16, dx, dy *int16) {
 }
 
 func OopFindString(statId int16, s string) (OopFindString int16) {
-	var (
-		pos, wordPos, cmpPos int16
-	)
+	var pos, wordPos, cmpPos int16
 	// WITH temp = Board.Stats[statId]
 	pos = 0
 	for pos <= DataLen {
@@ -275,11 +273,9 @@ func OopFindLabel(statId int16, sendLabel string, iStat, iDataPos *int16, labelP
 }
 
 func WorldGetFlagPosition(name TString50) (WorldGetFlagPosition int16) {
-	var (
-		i int16
-	)
+	var i int16
 	WorldGetFlagPosition = -1
-	for i := 1; i <= 10; i++ {
+	for i = 1; i <= 10; i++ {
 		if World.Info.Flags[i] == name {
 			WorldGetFlagPosition = i
 		}
@@ -288,9 +284,7 @@ func WorldGetFlagPosition(name TString50) (WorldGetFlagPosition int16) {
 }
 
 func WorldSetFlag(name TString50) {
-	var (
-		i int16
-	)
+	var i int16
 	if WorldGetFlagPosition(name) < 0 {
 		i = 1
 		for (i < MAX_FLAG) && (Length(World.Info.Flags[i]) != 0) {
@@ -301,9 +295,7 @@ func WorldSetFlag(name TString50) {
 }
 
 func WorldClearFlag(name TString50) {
-	var (
-		i int16
-	)
+	var i int16
 	if WorldGetFlagPosition(name) >= 0 {
 		World.Info.Flags[WorldGetFlagPosition(name)] = ""
 	}
@@ -315,7 +307,7 @@ func OopStringToWord(input TString50) (OopStringToWord TString50) {
 		i      int16
 	)
 	output = ""
-	for i := 1; i <= Length(input); i++ {
+	for i = 1; i <= Length(input); i++ {
 		if ((input[i] >= 'A') && (input[i] <= 'Z')) || ((input[i] >= '0') && (input[i] <= '9')) {
 			output = output + input[i]
 		} else if (input[i] >= 'a') && (input[i] <= 'z') {
@@ -328,13 +320,11 @@ func OopStringToWord(input TString50) (OopStringToWord TString50) {
 }
 
 func OopParseTile(statId, position *int16, tile *TTile) (OopParseTile bool) {
-	var (
-		i int16
-	)
+	var i int16
 	OopParseTile = false
 	tile.Color = 0
 	OopReadWord(statId, position)
-	for i := 1; i <= 7; i++ {
+	for i = 1; i <= 7; i++ {
 		if OopWord == OopStringToWord(ColorNames[i]) {
 			tile.Color = i + 0x08
 			OopReadWord(statId, position)
@@ -342,7 +332,7 @@ func OopParseTile(statId, position *int16, tile *TTile) (OopParseTile bool) {
 		}
 	}
 ColorFound:
-	for i := 0; i <= MAX_ELEMENT; i++ {
+	for i = 0; i <= MAX_ELEMENT; i++ {
 		if OopWord == OopStringToWord(ElementDefs[i].Name) {
 			OopParseTile = true
 			tile.Element = i
@@ -387,9 +377,7 @@ func FindTileOnBoard(x, y *int16, tile TTile) (FindTileOnBoard bool) {
 }
 
 func OopPlaceTile(x, y int16, tile *TTile) {
-	var (
-		color byte
-	)
+	var color byte
 	if Board.Tiles[x][y].Element != 4 {
 		color = tile.Color
 		if ElementDefs[tile.Element].Color < COLOR_SPECIAL_MIN {
@@ -454,9 +442,7 @@ func OopCheckCondition(statId int16, position *int16) (OopCheckCondition bool) {
 }
 
 func OopReadLineToEnd(statId int16, position *int16) (OopReadLineToEnd string) {
-	var (
-		s string
-	)
+	var s string
 	s = ""
 	OopReadChar(statId, position)
 	for (OopChar != '\x00') && (OopChar != '\r') {

@@ -44,9 +44,7 @@ var (
 
 // implementation uses: Dos, Crt, Keys, Sounds
 
-const (
-	PORT_JOYSTICK = 0x201
-)
+const PORT_JOYSTICK = 0x201
 
 var (
 	JoystickXInitial, JoystickYInitial          int16
@@ -62,9 +60,7 @@ func InputIsJoystickButtonPressed() (InputIsJoystickButtonPressed bool) {
 }
 
 func InputJoystickGetCoords(x, y *int16) {
-	var (
-		startTicks uint16
-	)
+	var startTicks uint16
 	x = 0
 	y = 0
 	startTicks = TimerTicks
@@ -84,9 +80,7 @@ func InputJoystickGetCoords(x, y *int16) {
 }
 
 func InputCalibrateJoystickPosition(msg string, x, y *int16) (InputCalibrateJoystickPosition bool) {
-	var (
-		charTyped byte
-	)
+	var charTyped byte
 	charTyped = '\x00'
 	Write(msg)
 	for {
@@ -120,9 +114,7 @@ func InputCalibrateJoystickPosition(msg string, x, y *int16) (InputCalibrateJoys
 }
 
 func InputInitJoystick() (InputInitJoystick bool) {
-	var (
-		joyX, joyY int16
-	)
+	var joyX, joyY int16
 	InputJoystickGetCoords(joyX, joyY)
 	if (joyX > 0) && (joyY > 0) {
 		JoystickXInitial = joyX
@@ -135,9 +127,7 @@ func InputInitJoystick() (InputInitJoystick bool) {
 }
 
 func InputCalibrateJoystick() {
-	var (
-		charTyped byte
-	)
+	var charTyped byte
 CalibrationStart:
 	InputJoystickEnabled = false
 
@@ -304,9 +294,7 @@ func InputUpdate() {
 }
 
 func InputInitMouse() (InputInitMouse bool) {
-	var (
-		regs Registers
-	)
+	var regs Registers
 	regs.AX = 0
 	Intr(0x33, regs)
 	InputInitMouse = (regs.AX == 0)
@@ -320,9 +308,7 @@ func InputInitDevices() {
 }
 
 func InputConfigure() (InputConfigure bool) {
-	var (
-		charTyped byte
-	)
+	var charTyped byte
 	charTyped = ' '
 	if InputJoystickEnabled || InputMouseEnabled {
 		Writeln()

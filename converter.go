@@ -67,7 +67,11 @@ func (c *converter) decls(decls []DeclPart, isMain bool) {
 func (c *converter) decl(decl DeclPart, isMain bool) {
 	switch decl := decl.(type) {
 	case *ConstDecls:
-		fmt.Fprint(c.w, "const (\n")
+		if len(decl.Decls) == 1 {
+			fmt.Fprint(c.w, "const ")
+		} else {
+			fmt.Fprint(c.w, "const (\n")
+		}
 		for _, d := range decl.Decls {
 			fmt.Fprintf(c.w, "%s", d.Name)
 			if d.Type != nil {
@@ -81,7 +85,9 @@ func (c *converter) decl(decl DeclPart, isMain bool) {
 			c.expr(d.Value)
 			fmt.Fprint(c.w, "\n")
 		}
-		fmt.Fprint(c.w, ")\n")
+		if len(decl.Decls) != 1 {
+			fmt.Fprint(c.w, ")\n")
+		}
 	case *FuncDecl:
 		if decl.Stmt == nil {
 			return
@@ -115,21 +121,33 @@ func (c *converter) decl(decl DeclPart, isMain bool) {
 		c.stmts(decl.Stmt.Stmts)
 		fmt.Fprint(c.w, "}\n\n")
 	case *TypeDefs:
-		fmt.Fprint(c.w, "type (\n")
+		if len(decl.Defs) == 1 {
+			fmt.Fprint(c.w, "type ")
+		} else {
+			fmt.Fprint(c.w, "type (\n")
+		}
 		for _, d := range decl.Defs {
 			fmt.Fprintf(c.w, "%s ", d.Name)
 			c.typeSpec(d.Type)
 			fmt.Fprint(c.w, "\n")
 		}
-		fmt.Fprint(c.w, ")\n")
+		if len(decl.Defs) != 1 {
+			fmt.Fprint(c.w, ")\n")
+		}
 	case *VarDecls:
-		fmt.Fprint(c.w, "var (\n")
+		if len(decl.Decls) == 1 {
+			fmt.Fprint(c.w, "var ")
+		} else {
+			fmt.Fprint(c.w, "var (\n")
+		}
 		for _, d := range decl.Decls {
 			fmt.Fprintf(c.w, "%s ", strings.Join(d.Names, ", "))
 			c.typeSpec(d.Type)
 			fmt.Fprint(c.w, "\n")
 		}
-		fmt.Fprint(c.w, ")\n")
+		if len(decl.Decls) != 1 {
+			fmt.Fprint(c.w, ")\n")
+		}
 	default:
 		panic(fmt.Sprintf("unhandled DeclPart type: %T", decl))
 	}
@@ -238,7 +256,7 @@ func (c *converter) stmt(stmt Stmt) {
 	case *EmptyStmt:
 		return
 	case *ForStmt:
-		fmt.Fprintf(c.w, "for %s := ", stmt.Var)
+		fmt.Fprintf(c.w, "for %s = ", stmt.Var)
 		c.expr(stmt.Initial)
 		if stmt.Down {
 			fmt.Fprintf(c.w, "; %s >= ", stmt.Var)

@@ -4,13 +4,9 @@ package main // unit: Editor
 
 // implementation uses: Dos, Crt, Video, Sounds, Input, Elements, Oop, Game
 
-type (
-	TDrawMode uint8
-)
+type TDrawMode uint8
 
-const (
-	NeighborBoardStrs [3 - 0 + 1]string = [...]string{"       Board \x18", "       Board \x19", "       Board \x1b", "       Board \x1a"}
-)
+const NeighborBoardStrs [3 - 0 + 1]string = [...]string{"       Board \x18", "       Board \x19", "       Board \x1b", "       Board \x1a"}
 
 func EditorAppendBoard() {
 	if World.BoardCount < MAX_BOARD {
@@ -86,10 +82,10 @@ func EditorLoop() {
 		VideoWriteText(64, 18, 0x1F, " Pattern")
 		VideoWriteText(61, 19, 0x30, " C ")
 		VideoWriteText(64, 19, 0x1F, " Color:")
-		for i := 9; i <= 15; i++ {
+		for i = 9; i <= 15; i++ {
 			VideoWriteText(61+i, 22, i, 'Û')
 		}
-		for i := 1; i <= EditorPatternCount; i++ {
+		for i = 1; i <= EditorPatternCount; i++ {
 			VideoWriteText(61+i, 22, 0x0F, ElementDefs[EditorPatterns[i]].Character)
 		}
 		if ElementDefs[copiedTile.Element].HasDrawProc {
@@ -102,11 +98,9 @@ func EditorLoop() {
 	}
 
 	EditorDrawTileAndNeighborsAt := func(x, y int16) {
-		var (
-			i, ix, iy int16
-		)
+		var i, ix, iy int16
 		BoardDrawTile(x, y)
-		for i := 0; i <= 3; i++ {
+		for i = 0; i <= 3; i++ {
 			ix = x + NeighborDeltaX[i]
 			iy = y + NeighborDeltaY[i]
 			if (ix >= 1) && (ix <= BOARD_WIDTH) && (iy >= 1) && (iy <= BOARD_HEIGHT) {
@@ -130,9 +124,7 @@ func EditorLoop() {
 	}
 
 	EditorDrawRefresh := func() {
-		var (
-			boardNumStr string
-		)
+		var boardNumStr string
 		BoardDrawBorder()
 		EditorDrawSidebar()
 		Str(World.Info.CurrentBoard, boardNumStr)
@@ -225,20 +217,20 @@ func EditorLoop() {
 		state.LineCount = 9
 		state.Selectable = true
 		exitRequested = false
-		for i := 1; i <= state.LineCount; i++ {
+		for i = 1; i <= state.LineCount; i++ {
 			New(state.Lines[i])
 		}
 		for {
 			state.Selectable = true
 			state.LineCount = 10
-			for i := 1; i <= state.LineCount; i++ {
+			for i = 1; i <= state.LineCount; i++ {
 				New(state.Lines[i])
 			}
 			state.Lines[1] = "         Title: " + Board.Name
 			Str(Board.Info.MaxShots, numStr)
 			state.Lines[2] = "      Can fire: " + numStr + " shots."
 			state.Lines[3] = " Board is dark: " + BoolToString(Board.Info.IsDark)
-			for i := 4; i <= 7; i++ {
+			for i = 4; i <= 7; i++ {
 				state.Lines[i] = NeighborBoardStrs[i-4] + ": " + EditorGetBoardName(Board.Info.NeighborBoards[i-4], true)
 			}
 			state.Lines[8] = "Re-enter when zapped: " + BoolToString(Board.Info.ReenterWhenZapped)
@@ -312,13 +304,13 @@ func EditorLoop() {
 			DataLen = 0
 		}
 		EditorOpenEditTextWindow(state)
-		for iLine := 1; iLine <= state.LineCount; iLine++ {
+		for iLine = 1; iLine <= state.LineCount; iLine++ {
 			DataLen = DataLen + Length(state.Lines[iLine]) + 1
 		}
 		GetMem(Data, DataLen)
 		dataPtr = Data
-		for iLine := 1; iLine <= state.LineCount; iLine++ {
-			for iChar := 1; iChar <= Length(state.Lines[iLine]); iChar++ {
+		for iLine = 1; iLine <= state.LineCount; iLine++ {
+			for iChar = 1; iChar <= Length(state.Lines[iLine]); iChar++ {
 				dataChar = state.Lines[iLine][iChar]
 				Move(dataChar, dataPtr, 1)
 				AdvancePointer(dataPtr, 1)
@@ -422,7 +414,7 @@ func EditorLoop() {
 		element = Board.Tiles[X][Y].Element
 		wasModified = true
 		categoryName = ""
-		for i := 0; i <= element; i++ {
+		for i = 0; i <= element; i++ {
 			if (ElementDefs[i].EditorCategory == ElementDefs[element].EditorCategory) && (Length(ElementDefs[i].CategoryName) != 0) {
 				categoryName = ElementDefs[i].CategoryName
 			}
@@ -471,7 +463,7 @@ func EditorLoop() {
 					} else {
 						BoardOpen(World.Info.CurrentBoard)
 						EditorDrawRefresh()
-						for i := 0; i <= 3; i++ {
+						for i = 0; i <= 3; i++ {
 							Board.Info.NeighborBoards[i] = 0
 						}
 					}
@@ -515,7 +507,7 @@ func EditorLoop() {
 			tileAt = Board.Tiles[x][y]
 			EditorPlaceTile(x, y)
 			if (Board.Tiles[x][y].Element != tileAt.Element) || (Board.Tiles[x][y].Color != tileAt.Color) {
-				for i := 0; i <= 3; i++ {
+				for i = 0; i <= 3; i++ {
 					// WITH temp = Board.Tiles[x + NeighborDeltaX[i]][y + NeighborDeltaY[i]]
 					if (Element == from.Element) && ((from.Element == 0) || (Color == from.Color)) {
 						xPosition[toFill] = x + NeighborDeltaX[i]
@@ -673,7 +665,7 @@ func EditorLoop() {
 			EditorDrawSidebar()
 		case 'Z':
 			if SidebarPromptYesNo("Clear board? ", false) {
-				for i := Board.StatCount; i >= 1; i-- {
+				for i = Board.StatCount; i >= 1; i-- {
 					RemoveStat(i)
 				}
 				BoardCreate()
@@ -717,7 +709,7 @@ func EditorLoop() {
 			}
 		case KEY_F1, KEY_F2, KEY_F3:
 			VideoWriteText(cursorX-1, cursorY-1, 0x0F, 'Å')
-			for i := 3; i <= 20; i++ {
+			for i = 3; i <= 20; i++ {
 				SidebarClearLine(i)
 			}
 			switch InputKeyPressed {
@@ -729,7 +721,7 @@ func EditorLoop() {
 				selectedCategory = CATEGORY_TERRAIN
 			}
 			i = 3
-			for iElem := 0; iElem <= MAX_ELEMENT; iElem++ {
+			for iElem = 0; iElem <= MAX_ELEMENT; iElem++ {
 				if ElementDefs[iElem].EditorCategory == selectedCategory {
 					if Length(ElementDefs[iElem].CategoryName) != 0 {
 						i = i + 1
@@ -755,7 +747,7 @@ func EditorLoop() {
 				}
 			}
 			InputReadWaitKey()
-			for iElem := 1; iElem <= MAX_ELEMENT; iElem++ {
+			for iElem = 1; iElem <= MAX_ELEMENT; iElem++ {
 				if (ElementDefs[iElem].EditorCategory == selectedCategory) && (ElementDefs[iElem].EditorShortcut == UpCase(InputKeyPressed)) {
 					if iElem == E_PLAYER {
 						if EditorPrepareModifyTile(cursorX, cursorY) {
@@ -859,7 +851,7 @@ func HighScoresLoad() {
 	}
 	Close(f)
 	if IOResult != 0 {
-		for i := 1; i <= 30; i++ {
+		for i = 1; i <= 30; i++ {
 			HighScoreList[i].Name = ""
 			HighScoreList[i].Score = -1
 		}
@@ -867,9 +859,7 @@ func HighScoresLoad() {
 }
 
 func HighScoresSave() {
-	var (
-		f FILE
-	)
+	var f FILE
 	Assign(f, World.Info.Name+".HI")
 	Rewrite(f)
 	Write(f, HighScoreList)
@@ -887,7 +877,7 @@ func HighScoresInitTextWindow(state *TTextWindowState) {
 	TextWindowInitState(state)
 	TextWindowAppend(state, "Score  Name")
 	TextWindowAppend(state, "-----  ----------------------------------")
-	for i := 1; i <= HIGH_SCORE_COUNT; i++ {
+	for i = 1; i <= HIGH_SCORE_COUNT; i++ {
 		if Length(HighScoreList[i].Name) != 0 {
 			Str(HighScoreList[i].Score, scoreStr)
 			TextWindowAppend(state, scoreStr+"  "+HighScoreList[i].Name)
@@ -896,9 +886,7 @@ func HighScoresInitTextWindow(state *TTextWindowState) {
 }
 
 func HighScoresDisplay(linePos int16) {
-	var (
-		state TTextWindowState
-	)
+	var state TTextWindowState
 	state.LinePos = linePos
 	HighScoresInitTextWindow(state)
 	if state.LineCount > 2 {
@@ -956,7 +944,7 @@ func HighScoresAdd(score int16) {
 		listPos = listPos + 1
 	}
 	if (listPos <= 30) && (score > 0) {
-		for i := 29; i >= listPos; i-- {
+		for i = 29; i >= listPos; i-- {
 			HighScoreList[i+1] = HighScoreList[i]
 		}
 		HighScoreList[listPos].Score = score
@@ -1005,7 +993,7 @@ func EditorSelectBoard(title string, currentBoard int16, titleScreenIsNone bool)
 	textWindow.LinePos = currentBoard + 1
 	textWindow.Selectable = true
 	textWindow.LineCount = 0
-	for i := 0; i <= World.BoardCount; i++ {
+	for i = 0; i <= World.BoardCount; i++ {
 		TextWindowAppend(textWindow, EditorGetBoardName(i, titleScreenIsNone))
 	}
 	TextWindowAppend(textWindow, "Add new board")

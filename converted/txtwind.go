@@ -46,10 +46,8 @@ var (
 // implementation uses: Crt, Input, Printer
 
 func UpCaseString(input string) (UpCaseString string) {
-	var (
-		i int16
-	)
-	for i := 1; i <= Length(input); i++ {
+	var i int16
+	for i = 1; i <= Length(input); i++ {
 		input[i] = UpCase(input[i])
 	}
 	UpCaseString = input
@@ -70,14 +68,12 @@ func TextWindowDrawTitle(color int16, title TTextWindowLine) {
 }
 
 func TextWindowDrawOpen(state *TTextWindowState) {
-	var (
-		ix, iy int16
-	)
+	var ix, iy int16
 	// WITH temp = state
-	for iy := 1; iy <= (TextWindowHeight + 1); iy++ {
+	for iy = 1; iy <= (TextWindowHeight + 1); iy++ {
 		VideoMove(TextWindowX, iy+TextWindowY-1, TextWindowWidth, *ScreenCopy[iy], false)
 	}
-	for iy := (TextWindowHeight / 2); iy >= 0; iy-- {
+	for iy = (TextWindowHeight / 2); iy >= 0; iy-- {
 		VideoWriteText(TextWindowX, TextWindowY+iy+1, 0x0F, TextWindowStrText)
 		VideoWriteText(TextWindowX, TextWindowY+TextWindowHeight-iy-1, 0x0F, TextWindowStrText)
 		VideoWriteText(TextWindowX, TextWindowY+iy, 0x0F, TextWindowStrTop)
@@ -95,7 +91,7 @@ func TextWindowDrawClose(state *TTextWindowState) {
 		unk1, unk2 int16
 	)
 	// WITH temp = state
-	for iy := 0; iy <= (TextWindowHeight / 2); iy++ {
+	for iy = 0; iy <= (TextWindowHeight / 2); iy++ {
 		VideoWriteText(TextWindowX, TextWindowY+iy, 0x0F, TextWindowStrTop)
 		VideoWriteText(TextWindowX, TextWindowY+TextWindowHeight-iy, 0x0F, TextWindowStrBottom)
 		Delay(18)
@@ -161,7 +157,7 @@ func TextWindowDraw(state *TTextWindowState, withoutFormatting, viewingFile bool
 		i    int16
 		unk1 int16
 	)
-	for i := 0; i <= (TextWindowHeight - 4); i++ {
+	for i = 0; i <= (TextWindowHeight - 4); i++ {
 		TextWindowDrawLine(state, state.LinePos-(TextWindowHeight/2)+i+2, withoutFormatting, viewingFile)
 	}
 	TextWindowDrawTitle(0x1E, state.Title)
@@ -192,13 +188,13 @@ func TextWindowPrint(state *TTextWindowState) {
 	)
 	// WITH temp = state
 	Rewrite(Lst)
-	for iLine := 1; iLine <= LineCount; iLine++ {
+	for iLine = 1; iLine <= LineCount; iLine++ {
 		line = Lines[iLine]
 		if Length(line) > 0 {
 			switch line[1] {
 			case '$':
 				Delete(line, 1, 1)
-				for iChar := ((80 - Length(line)) / 2); iChar >= 1; iChar-- {
+				for iChar = ((80 - Length(line)) / 2); iChar >= 1; iChar-- {
 					line = ' ' + line
 				}
 			case '!', ':':
@@ -267,10 +263,10 @@ func TextWindowSelect(state *TTextWindowState, hyperlinkAsSelect, viewingFile bo
 						Hyperlink = pointerStr
 					} else {
 						pointerStr = ':' + pointerStr
-						for iLine := 1; iLine <= LineCount; iLine++ {
+						for iLine = 1; iLine <= LineCount; iLine++ {
 							if Length(pointerStr) > Length(Lines[iLine]) {
 							} else {
-								for iChar := 1; iChar <= Length(pointerStr); iChar++ {
+								for iChar = 1; iChar <= Length(pointerStr); iChar++ {
 									if UpCase(pointerStr[iChar]) != UpCase(Lines[iLine][iChar]) {
 										goto LabelNotMatched
 									}
@@ -336,13 +332,11 @@ func TextWindowEdit(state *TTextWindowState) {
 		i          int16
 	)
 	DeleteCurrLine := func() {
-		var (
-			i int16
-		)
+		var i int16
 		// WITH temp = state
 		if LineCount > 1 {
 			Dispose(Lines[LinePos])
-			for i := (LinePos + 1); i <= LineCount; i++ {
+			for i = (LinePos + 1); i <= LineCount; i++ {
 				Lines[i-1] = Lines[i]
 			}
 			LineCount = LineCount - 1
@@ -402,7 +396,7 @@ func TextWindowEdit(state *TTextWindowState) {
 			}
 		case KEY_ENTER:
 			if LineCount < MAX_TEXT_WINDOW_LINES {
-				for i := LineCount; i >= (LinePos + 1); i-- {
+				for i = LineCount; i >= (LinePos + 1); i-- {
 					Lines[i+1] = Lines[i]
 				}
 				New(Lines[LinePos+1])
@@ -476,7 +470,7 @@ func TextWindowOpenFile(filename TTextWindowLine, state *TTextWindowState) {
 	)
 	// WITH temp = state
 	retVal = true
-	for i := 1; i <= Length(filename); i++ {
+	for i = 1; i <= Length(filename); i++ {
 		retVal = retVal && (filename[i] != '.')
 	}
 	if retVal {
@@ -502,7 +496,7 @@ func TextWindowOpenFile(filename TTextWindowLine, state *TTextWindowState) {
 		Close(f)
 	}
 	if entryPos == 0 {
-		for i := 1; i <= ResourceDataHeader.EntryCount; i++ {
+		for i = 1; i <= ResourceDataHeader.EntryCount; i++ {
 			if UpCaseString(ResourceDataHeader.Name[i]) == UpCaseString(filename) {
 				entryPos = i
 			}
@@ -556,7 +550,7 @@ func TextWindowSaveFile(filename TTextWindowLine, state *TTextWindowState) {
 	if IOResult != 0 {
 		exit()
 	}
-	for i := 1; i <= LineCount; i++ {
+	for i = 1; i <= LineCount; i++ {
 		WriteLn(f, Lines[i])
 		if IOResult != 0 {
 			exit()
@@ -567,9 +561,7 @@ func TextWindowSaveFile(filename TTextWindowLine, state *TTextWindowState) {
 }
 
 func TextWindowDisplayFile(filename, title string) {
-	var (
-		state TTextWindowState
-	)
+	var state TTextWindowState
 	state.Title = title
 	TextWindowOpenFile(filename, state)
 	state.Selectable = false
@@ -582,16 +574,14 @@ func TextWindowDisplayFile(filename, title string) {
 }
 
 func TextWindowInit(x, y, width, height int16) {
-	var (
-		i int16
-	)
+	var i int16
 	TextWindowX = x
 	TextWindowWidth = width
 	TextWindowY = y
 	TextWindowHeight = height
 	TextWindowStrInnerEmpty = ""
 	TextWindowStrInnerLine = ""
-	for i := 1; i <= (TextWindowWidth - 5); i++ {
+	for i = 1; i <= (TextWindowWidth - 5); i++ {
 		TextWindowStrInnerEmpty = TextWindowStrInnerEmpty + ' '
 		TextWindowStrInnerLine = TextWindowStrInnerLine + 'Í'
 	}
@@ -603,7 +593,7 @@ func TextWindowInit(x, y, width, height int16) {
 	TextWindowStrInnerArrows[1] = '¯'
 	TextWindowStrInnerArrows[Length(TextWindowStrInnerArrows)] = '®'
 	TextWindowStrInnerSep = TextWindowStrInnerEmpty
-	for i := 1; i <= (TextWindowWidth / 5); i++ {
+	for i = 1; i <= (TextWindowWidth / 5); i++ {
 		TextWindowStrInnerSep[i*5+((TextWindowWidth%5)/2)] = '\a'
 	}
 }

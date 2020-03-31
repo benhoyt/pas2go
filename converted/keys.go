@@ -12,9 +12,7 @@ var (
 // implementation uses: Dos
 
 func KeysUpdateModifiers() {
-	var (
-		regs Registers
-	)
+	var regs Registers
 	regs.AH = 0x02
 	Intr(0x16, regs)
 	KeysRightShiftHeld = (regs.AL % 2) == 1
