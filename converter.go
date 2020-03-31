@@ -291,10 +291,23 @@ func (c *converter) stmt(stmt Stmt) {
 		fmt.Fprintf(c.w, "%s:\n", stmt.Label)
 		c.stmt(stmt.Stmt)
 	case *ProcStmt:
-		c.expr(stmt.Proc)
-		fmt.Fprint(c.w, "(")
-		c.exprs(stmt.Args)
-		fmt.Fprint(c.w, ")")
+		switch strings.ToLower(stmt.Proc.String()) {
+		case "str":
+			c.expr(stmt.Args[1])
+			if widthExpr, isWidth := stmt.Args[0].(*WidthExpr); isWidth {
+				fmt.Fprintf(c.w, " = fmt.Sprintf(\"%%%dv\", ",
+					widthExpr.Width.(*ConstExpr).Value.(int))
+			} else {
+				fmt.Fprint(c.w, " = fmt.Sprint(")
+			}
+			c.expr(stmt.Args[0])
+			fmt.Fprint(c.w, ")")
+		default:
+			c.expr(stmt.Proc)
+			fmt.Fprint(c.w, "(")
+			c.exprs(stmt.Args)
+			fmt.Fprint(c.w, ")")
+		}
 	case *RepeatStmt:
 		fmt.Fprint(c.w, "for {\n")
 		c.stmts(stmt.Stmts)
@@ -367,7 +380,6 @@ func (c *converter) expr(expr Expr) {
 		c.exprs(expr.Values)
 		fmt.Fprint(c.w, "}")
 	case *ConstRecordExpr:
-		// TODO: need type of const expr here
 		fmt.Fprint(c.w, "{")
 		for i, field := range expr.Fields {
 			if i > 0 {
@@ -390,8 +402,10 @@ func (c *converter) expr(expr Expr) {
 	case *PointerExpr:
 		fmt.Fprint(c.w, "&")
 		c.expr(expr.Expr)
-	// case *RangeExpr:
-	// case *SetExpr:
+	case *RangeExpr:
+		panic("unexpected RangeExpr: should be handled by 'case' and 'in'")
+	case *SetExpr:
+		panic("unexpected SetExpr: should be handled by 'in'")
 	case *TypeConvExpr:
 		c.typeIdent(&TypeIdent{"", expr.Type})
 		fmt.Fprint(c.w, "(")
@@ -419,8 +433,8 @@ func (c *converter) expr(expr Expr) {
 			}
 		}
 	case *WidthExpr:
+		// Width itself is handled in ProcStmt "str" case
 		c.expr(expr.Expr)
-		// TODO: handle Width
 	default:
 		fmt.Fprintf(c.w, "%s", expr)
 	}

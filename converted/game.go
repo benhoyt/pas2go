@@ -538,7 +538,7 @@ func DisplayIOError() (DisplayIOError bool) {
 		exit()
 	}
 	DisplayIOError = true
-	Str(IOResult, textWindow.Title)
+	textWindow.Title = fmt.Sprint(IOResult)
 	textWindow.Title = "Error # " + textWindow.Title
 	TextWindowInitState(textWindow)
 	TextWindowAppend(textWindow, "$DOS Error: ")
@@ -958,7 +958,7 @@ func GameUpdateSidebar() {
 	if GameStateElement == E_PLAYER {
 		if Board.Info.TimeLimitSec > 0 {
 			VideoWriteText(64, 6, 0x1E, "   Time:")
-			Str(Board.Info.TimeLimitSec-World.Info.BoardTimeSec, numStr)
+			numStr = fmt.Sprint(Board.Info.TimeLimitSec - World.Info.BoardTimeSec)
 			VideoWriteText(72, 6, 0x1E, numStr+' ')
 		} else {
 			SidebarClearLine(6)
@@ -966,15 +966,15 @@ func GameUpdateSidebar() {
 		if World.Info.Health < 0 {
 			World.Info.Health = 0
 		}
-		Str(World.Info.Health, numStr)
+		numStr = fmt.Sprint(World.Info.Health)
 		VideoWriteText(72, 7, 0x1E, numStr+' ')
-		Str(World.Info.Ammo, numStr)
+		numStr = fmt.Sprint(World.Info.Ammo)
 		VideoWriteText(72, 8, 0x1E, numStr+"  ")
-		Str(World.Info.Torches, numStr)
+		numStr = fmt.Sprint(World.Info.Torches)
 		VideoWriteText(72, 9, 0x1E, numStr+' ')
-		Str(World.Info.Gems, numStr)
+		numStr = fmt.Sprint(World.Info.Gems)
 		VideoWriteText(72, 10, 0x1E, numStr+' ')
-		Str(World.Info.Score, numStr)
+		numStr = fmt.Sprint(World.Info.Score)
 		VideoWriteText(72, 11, 0x1E, numStr+' ')
 		if World.Info.TorchTicks == 0 {
 			VideoWriteText(75, 9, 0x16, "    ")
@@ -1000,7 +1000,7 @@ func GameUpdateSidebar() {
 			VideoWriteText(65, 15, 0x1F, " Be noisy")
 		}
 		if DebugEnabled {
-			Str(MemAvail, numStr)
+			numStr = fmt.Sprint(MemAvail)
 			VideoWriteText(69, 4, 0x1E, 'm'+numStr+' ')
 		}
 	}
