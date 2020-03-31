@@ -167,9 +167,15 @@ func (c *converter) typeIdent(typ *TypeIdent) {
 	case STRING:
 		s = "string"
 	default:
-		s = typ.Name
-		if strings.ToLower(s) == "pointer" {
+		switch strings.ToLower(typ.Name) {
+		case "pointer":
 			s = "uintptr" // TODO: hmmm
+		case "word":
+			s = "uint16"
+		case "longint":
+			s = "int32"
+		default:
+			s = typ.Name
 		}
 	}
 	fmt.Fprint(c.w, s)

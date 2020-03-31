@@ -3,7 +3,7 @@ package main // unit: Sounds
 type (
 	TDrumData struct {
 		Len  int16
-		Data [255 - 1 + 1]word
+		Data [255 - 1 + 1]uint16
 	}
 )
 
@@ -11,7 +11,7 @@ var (
 	SoundEnabled            bool
 	SoundBlockQueueing      bool
 	SoundCurrentPriority    int16
-	SoundFreqTable          [255 - 1 + 1]word
+	SoundFreqTable          [255 - 1 + 1]uint16
 	SoundDurationMultiplier byte
 	SoundDurationCounter    byte
 	SoundBuffer             string
@@ -21,7 +21,7 @@ var (
 	SoundIsPlaying          bool
 	SoundTimeCheckCounter   int16
 	UseSystemTimeForElapsed bool
-	TimerTicks              word
+	TimerTicks              uint16
 	SoundTimeCheckHsec      int16
 	SoundDrumTable          [9 - 0 + 1]TDrumData
 )
@@ -118,7 +118,7 @@ func SoundPlayDrum(drum *TDrumData) {
 
 func SoundCheckTimeIntr() {
 	var (
-		hour, minute, sec, hSec word
+		hour, minute, sec, hSec uint16
 	)
 	GetTime(hour, minute, sec, hSec)
 	if (SoundTimeCheckHsec != 0) && (int16(hSec) != SoundTimeCheckHsec) {
@@ -130,8 +130,8 @@ func SoundCheckTimeIntr() {
 
 func SoundHasTimeElapsed(counter *int16, duration int16) (SoundHasTimeElapsed bool) {
 	var (
-		hour, minute, sec, hSec word
-		hSecsDiff               word
+		hour, minute, sec, hSec uint16
+		hSecsDiff               uint16
 		hSecsTotal              int16
 	)
 	if (SoundTimeCheckCounter > 0) && ((SoundTimeCheckCounter % 2) == 1) {

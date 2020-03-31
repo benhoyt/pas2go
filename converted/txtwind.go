@@ -22,7 +22,7 @@ type (
 	TResourceDataHeader struct {
 		EntryCount int16
 		Name       [MAX_RESOURCE_DATA_FILES - 1 + 1]string
-		FileOffset [MAX_RESOURCE_DATA_FILES - 1 + 1]longint
+		FileOffset [MAX_RESOURCE_DATA_FILES - 1 + 1]int32
 	}
 )
 

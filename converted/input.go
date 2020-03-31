@@ -63,7 +63,7 @@ func InputIsJoystickButtonPressed() (InputIsJoystickButtonPressed bool) {
 
 func InputJoystickGetCoords(x, y *int16) {
 	var (
-		startTicks word
+		startTicks uint16
 	)
 	x = 0
 	y = 0
