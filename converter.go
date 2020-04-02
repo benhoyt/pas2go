@@ -31,30 +31,38 @@ type converter struct {
 	w io.Writer
 }
 
+func (c *converter) print(a ...interface{}) {
+	fmt.Fprint(c.w, a...)
+}
+
+func (c *converter) printf(format string, a ...interface{}) {
+	fmt.Fprintf(c.w, format, a...)
+}
+
 func (c *converter) program(program *Program) {
-	fmt.Fprint(c.w, "package main\n\n")
+	c.print("package main\n\n")
 	if program.Uses != nil {
-		fmt.Fprintf(c.w, "// uses: %s\n\n", strings.Join(program.Uses, ", "))
+		c.printf("// uses: %s\n\n", strings.Join(program.Uses, ", "))
 	}
 	c.decls(program.Decls, true)
-	fmt.Fprint(c.w, "func main() {\n")
+	c.print("func main() {\n")
 	c.stmts(program.Stmt.Stmts)
-	fmt.Fprint(c.w, "}\n")
+	c.print("}\n")
 }
 
 func (c *converter) unit(unit *Unit) {
-	fmt.Fprintf(c.w, "package main // unit: %s\n\n", unit.Name)
+	c.printf("package main // unit: %s\n\n", unit.Name)
 	if unit.InterfaceUses != nil {
-		fmt.Fprintf(c.w, "// interface uses: %s\n\n", strings.Join(unit.InterfaceUses, ", "))
+		c.printf("// interface uses: %s\n\n", strings.Join(unit.InterfaceUses, ", "))
 	}
 	c.decls(unit.Interface, true)
 	if unit.ImplementationUses != nil {
-		fmt.Fprintf(c.w, "\n// implementation uses: %s\n\n", strings.Join(unit.ImplementationUses, ", "))
+		c.printf("\n// implementation uses: %s\n\n", strings.Join(unit.ImplementationUses, ", "))
 	}
 	c.decls(unit.Implementation, true)
-	fmt.Fprint(c.w, "func init() {\n")
+	c.print("func init() {\n")
 	c.stmts(unit.Init.Stmts)
-	fmt.Fprint(c.w, "}\n")
+	c.print("}\n")
 }
 
 func (c *converter) decls(decls []DeclPart, isMain bool) {
@@ -67,42 +75,42 @@ func (c *converter) decl(decl DeclPart, isMain bool) {
 	switch decl := decl.(type) {
 	case *ConstDecls:
 		if len(decl.Decls) == 1 {
-			fmt.Fprint(c.w, "const ")
+			c.print("const ")
 		} else {
-			fmt.Fprint(c.w, "const (\n")
+			c.print("const (\n")
 		}
 		for _, d := range decl.Decls {
-			fmt.Fprintf(c.w, "%s", d.Name)
+			c.printf("%s", d.Name)
 			if d.Type != nil {
-				fmt.Fprint(c.w, " ")
+				c.print(" ")
 				c.typeSpec(d.Type)
 			}
-			fmt.Fprint(c.w, " = ")
+			c.print(" = ")
 			if _, isConstRecord := d.Value.(*ConstRecordExpr); isConstRecord {
 				c.typeSpec(d.Type)
 			}
 			c.expr(d.Value)
-			fmt.Fprint(c.w, "\n")
+			c.print("\n")
 		}
 		if len(decl.Decls) != 1 {
-			fmt.Fprint(c.w, ")\n")
+			c.print(")\n")
 		}
 	case *FuncDecl:
 		if decl.Stmt == nil {
 			return
 		}
 		if isMain {
-			fmt.Fprintf(c.w, "func %s(", decl.Name)
+			c.printf("func %s(", decl.Name)
 		} else {
-			fmt.Fprintf(c.w, "%s := func(", decl.Name)
+			c.printf("%s := func(", decl.Name)
 		}
 		c.params(decl.Params)
-		fmt.Fprintf(c.w, ") (%s ", decl.Name)
+		c.printf(") (%s ", decl.Name)
 		c.typeIdent(decl.Result)
-		fmt.Fprint(c.w, ") {\n")
+		c.print(") {\n")
 		c.decls(decl.Decls, false)
 		c.stmts(decl.Stmt.Stmts)
-		fmt.Fprint(c.w, "return\n}\n\n")
+		c.print("return\n}\n\n")
 	case *LabelDecls:
 		// not needed
 	case *ProcDecl:
@@ -110,42 +118,42 @@ func (c *converter) decl(decl DeclPart, isMain bool) {
 			return
 		}
 		if isMain {
-			fmt.Fprintf(c.w, "func %s(", decl.Name)
+			c.printf("func %s(", decl.Name)
 		} else {
-			fmt.Fprintf(c.w, "%s := func(", decl.Name)
+			c.printf("%s := func(", decl.Name)
 		}
 		c.params(decl.Params)
-		fmt.Fprint(c.w, ") {\n")
+		c.print(") {\n")
 		c.decls(decl.Decls, false)
 		c.stmts(decl.Stmt.Stmts)
-		fmt.Fprint(c.w, "}\n\n")
+		c.print("}\n\n")
 	case *TypeDefs:
 		if len(decl.Defs) == 1 {
-			fmt.Fprint(c.w, "type ")
+			c.print("type ")
 		} else {
-			fmt.Fprint(c.w, "type (\n")
+			c.print("type (\n")
 		}
 		for _, d := range decl.Defs {
-			fmt.Fprintf(c.w, "%s ", d.Name)
+			c.printf("%s ", d.Name)
 			c.typeSpec(d.Type)
-			fmt.Fprint(c.w, "\n")
+			c.print("\n")
 		}
 		if len(decl.Defs) != 1 {
-			fmt.Fprint(c.w, ")\n")
+			c.print(")\n")
 		}
 	case *VarDecls:
 		if len(decl.Decls) == 1 {
-			fmt.Fprint(c.w, "var ")
+			c.print("var ")
 		} else {
-			fmt.Fprint(c.w, "var (\n")
+			c.print("var (\n")
 		}
 		for _, d := range decl.Decls {
-			fmt.Fprintf(c.w, "%s ", strings.Join(d.Names, ", "))
+			c.printf("%s ", strings.Join(d.Names, ", "))
 			c.typeSpec(d.Type)
-			fmt.Fprint(c.w, "\n")
+			c.print("\n")
 		}
 		if len(decl.Decls) != 1 {
-			fmt.Fprint(c.w, ")\n")
+			c.print(")\n")
 		}
 	default:
 		panic(fmt.Sprintf("unhandled DeclPart type: %T", decl))
@@ -155,12 +163,12 @@ func (c *converter) decl(decl DeclPart, isMain bool) {
 func (c *converter) params(params []*ParamGroup) {
 	for i, param := range params {
 		if i > 0 {
-			fmt.Fprint(c.w, ", ")
+			c.print(", ")
 		}
-		fmt.Fprint(c.w, strings.Join(param.Names, ", "), " ")
+		c.print(strings.Join(param.Names, ", "), " ")
 		switch param.Prefix {
 		case VAR:
-			fmt.Fprint(c.w, "*")
+			c.print("*")
 		case ILLEGAL:
 			// no prefix
 		default:
@@ -195,7 +203,7 @@ func (c *converter) typeIdent(typ *TypeIdent) {
 			s = typ.Name
 		}
 	}
-	fmt.Fprint(c.w, s)
+	c.print(s)
 }
 
 func (c *converter) stmts(stmts []Stmt) {
@@ -218,14 +226,14 @@ func (c *converter) stmt(stmt Stmt) {
 	case *AssignStmt:
 		// TODO: handle TypeConv?
 		c.expr(stmt.Var)
-		fmt.Fprint(c.w, " = ")
+		c.print(" = ")
 		c.expr(stmt.Value)
 	case *CaseStmt:
-		fmt.Fprint(c.w, "switch ")
+		c.print("switch ")
 		c.expr(stmt.Selector)
-		fmt.Fprint(c.w, " {\n")
+		c.print(" {\n")
 		for _, cas := range stmt.Cases {
-			fmt.Fprint(c.w, "case ")
+			c.print("case ")
 			if rangeExpr, ok := cas.Consts[0].(*RangeExpr); ok {
 				// Making a lot of assumptions here, but this is the only
 				// way it's used in the ZZT source.
@@ -233,109 +241,109 @@ func (c *converter) stmt(stmt Stmt) {
 				max := rangeExpr.Max.(*ConstExpr).Value.(string)[0]
 				for i, b := 0, min; b <= max; i, b = i+1, b+1 {
 					if i > 0 {
-						fmt.Fprint(c.w, ", ")
+						c.print(", ")
 					}
-					fmt.Fprintf(c.w, "'%c'", b)
+					c.printf("'%c'", b)
 				}
 			} else {
 				c.exprs(cas.Consts)
 			}
-			fmt.Fprint(c.w, ":\n")
+			c.print(":\n")
 			c.stmtNoBraces(cas.Stmt)
 		}
 		if stmt.Else != nil {
-			fmt.Fprint(c.w, "default:\n")
+			c.print("default:\n")
 			c.stmts(stmt.Else)
 		}
-		fmt.Fprint(c.w, "}")
+		c.print("}")
 	case *CompoundStmt:
-		fmt.Fprint(c.w, "{\n")
+		c.print("{\n")
 		c.stmts(stmt.Stmts)
-		fmt.Fprint(c.w, "}")
+		c.print("}")
 	case *EmptyStmt:
 		return
 	case *ForStmt:
-		fmt.Fprintf(c.w, "for %s = ", stmt.Var)
+		c.printf("for %s = ", stmt.Var)
 		c.expr(stmt.Initial)
 		if stmt.Down {
-			fmt.Fprintf(c.w, "; %s >= ", stmt.Var)
+			c.printf("; %s >= ", stmt.Var)
 			c.expr(stmt.Final)
-			fmt.Fprintf(c.w, "; %s-- {\n", stmt.Var)
+			c.printf("; %s-- {\n", stmt.Var)
 		} else {
-			fmt.Fprintf(c.w, "; %s <= ", stmt.Var)
+			c.printf("; %s <= ", stmt.Var)
 			c.expr(stmt.Final)
-			fmt.Fprintf(c.w, "; %s++ {\n", stmt.Var)
+			c.printf("; %s++ {\n", stmt.Var)
 		}
 		c.stmtNoBraces(stmt.Stmt)
-		fmt.Fprint(c.w, "}")
+		c.print("}")
 	case *GotoStmt:
-		fmt.Fprintf(c.w, "goto %s", stmt.Label)
+		c.printf("goto %s", stmt.Label)
 	case *IfStmt:
-		fmt.Fprint(c.w, "if ")
+		c.print("if ")
 		c.expr(stmt.Cond)
-		fmt.Fprint(c.w, " {\n")
+		c.print(" {\n")
 		c.stmtNoBraces(stmt.Then)
-		fmt.Fprint(c.w, "}")
+		c.print("}")
 		if stmt.Else != nil {
 			innerIf, isElseIf := stmt.Else.(*IfStmt)
 			if isElseIf {
-				fmt.Fprint(c.w, " else ")
+				c.print(" else ")
 				c.stmtNoBraces(innerIf)
 			} else {
-				fmt.Fprint(c.w, " else {\n")
+				c.print(" else {\n")
 				c.stmtNoBraces(stmt.Else)
-				fmt.Fprint(c.w, "}")
+				c.print("}")
 			}
 		}
 	case *LabelledStmt:
-		fmt.Fprintf(c.w, "%s:\n", stmt.Label)
+		c.printf("%s:\n", stmt.Label)
 		c.stmt(stmt.Stmt)
 	case *ProcStmt:
 		switch strings.ToLower(stmt.Proc.String()) {
 		case "str":
 			c.expr(stmt.Args[1])
 			if widthExpr, isWidth := stmt.Args[0].(*WidthExpr); isWidth {
-				fmt.Fprintf(c.w, " = fmt.Sprintf(\"%%%dv\", ",
+				c.printf(" = fmt.Sprintf(\"%%%dv\", ",
 					widthExpr.Width.(*ConstExpr).Value.(int))
 			} else {
-				fmt.Fprint(c.w, " = fmt.Sprint(")
+				c.print(" = fmt.Sprint(")
 			}
 			c.expr(stmt.Args[0])
-			fmt.Fprint(c.w, ")")
+			c.print(")")
 		default:
 			c.expr(stmt.Proc)
-			fmt.Fprint(c.w, "(")
+			c.print("(")
 			c.exprs(stmt.Args)
-			fmt.Fprint(c.w, ")")
+			c.print(")")
 		}
 	case *RepeatStmt:
-		fmt.Fprint(c.w, "for {\n")
+		c.print("for {\n")
 		c.stmts(stmt.Stmts)
-		fmt.Fprint(c.w, "if ")
+		c.print("if ")
 		c.expr(stmt.Cond)
-		fmt.Fprint(c.w, " {\nbreak\n}\n}")
+		c.print(" {\nbreak\n}\n}")
 	case *WhileStmt:
-		fmt.Fprint(c.w, "for ")
+		c.print("for ")
 		c.expr(stmt.Cond)
-		fmt.Fprint(c.w, " {\n")
+		c.print(" {\n")
 		c.stmtNoBraces(stmt.Stmt)
-		fmt.Fprint(c.w, "}")
+		c.print("}")
 	case *WithStmt:
 		// TODO: fix this; drop multi Vars support?
-		fmt.Fprint(c.w, "// WITH temp = ")
+		c.print("// WITH temp = ")
 		c.expr(stmt.Vars[0])
-		fmt.Fprint(c.w, "\n")
+		c.print("\n")
 		c.stmtNoBraces(stmt.Stmt)
 	default:
 		panic(fmt.Sprintf("unhandled Stmt: %T", stmt))
 	}
-	fmt.Fprint(c.w, "\n")
+	c.print("\n")
 }
 
 func (c *converter) exprs(exprs []Expr) {
 	for i, expr := range exprs {
 		if i > 0 {
-			fmt.Fprint(c.w, ", ")
+			c.print(", ")
 		}
 		c.expr(expr)
 	}
@@ -350,57 +358,57 @@ func (c *converter) expr(expr Expr) {
 			return
 		}
 		c.expr(expr.Left)
-		fmt.Fprintf(c.w, " %s ", operatorStr(expr.Op))
+		c.printf(" %s ", operatorStr(expr.Op))
 		c.expr(expr.Right)
 	case *ConstExpr:
 		switch value := expr.Value.(type) {
 		case string:
 			if len(value) == 1 {
-				fmt.Fprintf(c.w, "%q", value[0])
+				c.printf("%q", value[0])
 			} else {
-				fmt.Fprintf(c.w, "%q", value)
+				c.printf("%q", value)
 			}
 		case float64:
 			s := fmt.Sprintf("%g", value)
 			if !strings.Contains(s, ".") {
 				s += ".0"
 			}
-			fmt.Fprint(c.w, s)
+			c.print(s)
 		case nil:
-			fmt.Fprint(c.w, "nil")
+			c.print("nil")
 		default:
 			if expr.IsHex {
-				fmt.Fprintf(c.w, "0x%02X", value)
+				c.printf("0x%02X", value)
 			} else {
-				fmt.Fprintf(c.w, "%v", value)
+				c.printf("%v", value)
 			}
 		}
 	case *ConstArrayExpr:
-		fmt.Fprint(c.w, "[...]string{") // TODO: not necessarily string
+		c.print("[...]string{") // TODO: not necessarily string
 		c.exprs(expr.Values)
-		fmt.Fprint(c.w, "}")
+		c.print("}")
 	case *ConstRecordExpr:
-		fmt.Fprint(c.w, "{")
+		c.print("{")
 		for i, field := range expr.Fields {
 			if i > 0 {
-				fmt.Fprint(c.w, ", ")
+				c.print(", ")
 			}
-			fmt.Fprint(c.w, field.Name)
-			fmt.Fprint(c.w, ": ")
+			c.print(field.Name)
+			c.print(": ")
 			c.expr(field.Value)
 		}
-		fmt.Fprint(c.w, "}")
+		c.print("}")
 	case *FuncExpr:
 		c.expr(expr.Func)
-		fmt.Fprint(c.w, "(")
+		c.print("(")
 		c.exprs(expr.Args)
-		fmt.Fprint(c.w, ")")
+		c.print(")")
 	case *ParenExpr:
-		fmt.Fprint(c.w, "(")
+		c.print("(")
 		c.expr(expr.Expr)
-		fmt.Fprint(c.w, ")")
+		c.print(")")
 	case *PointerExpr:
-		fmt.Fprint(c.w, "&")
+		c.print("&")
 		c.expr(expr.Expr)
 	case *RangeExpr:
 		panic("unexpected RangeExpr: should be handled by 'case' and 'in'")
@@ -408,25 +416,25 @@ func (c *converter) expr(expr Expr) {
 		panic("unexpected SetExpr: should be handled by 'in'")
 	case *TypeConvExpr:
 		c.typeIdent(&TypeIdent{"", expr.Type})
-		fmt.Fprint(c.w, "(")
+		c.print("(")
 		c.expr(expr.Expr)
-		fmt.Fprint(c.w, ")")
+		c.print(")")
 	case *UnaryExpr:
-		fmt.Fprint(c.w, operatorStr(expr.Op))
+		c.print(operatorStr(expr.Op))
 		c.expr(expr.Expr)
 	case *VarExpr:
 		if expr.HasAt {
-			fmt.Fprintf(c.w, "*")
+			c.printf("*")
 		}
-		fmt.Fprintf(c.w, expr.Name)
+		c.printf(expr.Name)
 		for _, suffix := range expr.Suffixes {
 			switch suffix := suffix.(type) {
 			case *IndexSuffix:
-				fmt.Fprint(c.w, "[")
+				c.print("[")
 				c.exprs(suffix.Indexes)
-				fmt.Fprint(c.w, "]")
+				c.print("]")
 			case *DotSuffix:
-				fmt.Fprint(c.w, ".", suffix.Field)
+				c.print(".", suffix.Field)
 			case *PointerSuffix:
 			default:
 				panic(fmt.Sprintf("unhandled VarSuffix: %T", suffix))
@@ -436,87 +444,87 @@ func (c *converter) expr(expr Expr) {
 		// Width itself is handled in ProcStmt "str" case
 		c.expr(expr.Expr)
 	default:
-		fmt.Fprintf(c.w, "%s", expr)
+		c.printf("%s", expr)
 	}
 }
 
 func (c *converter) inExpr(expr *BinaryExpr) {
-	fmt.Fprint(c.w, "(")
+	c.print("(")
 	values := expr.Right.(*SetExpr)
 	for i, value := range values.Values {
 		if i > 0 {
-			fmt.Fprint(c.w, " || ")
+			c.print(" || ")
 		}
 		if rangeExpr, ok := value.(*RangeExpr); ok {
 			c.expr(expr.Left)
-			fmt.Fprint(c.w, ">=")
+			c.print(">=")
 			c.expr(rangeExpr.Min)
-			fmt.Fprint(c.w, " && ")
+			c.print(" && ")
 			c.expr(expr.Left)
-			fmt.Fprint(c.w, "<=")
+			c.print("<=")
 			c.expr(rangeExpr.Max)
 		} else {
 			c.expr(expr.Left)
-			fmt.Fprint(c.w, "==")
+			c.print("==")
 			c.expr(value)
 		}
 	}
-	fmt.Fprint(c.w, ")")
+	c.print(")")
 }
 
 func (c *converter) typeSpec(spec TypeSpec) {
 	switch spec := spec.(type) {
 	case *FuncSpec:
-		fmt.Fprint(c.w, "func(")
+		c.print("func(")
 		c.params(spec.Params)
-		fmt.Fprint(c.w, ") ")
+		c.print(") ")
 		c.typeIdent(spec.Result)
 	case *ProcSpec:
-		fmt.Fprint(c.w, "func(")
+		c.print("func(")
 		c.params(spec.Params)
-		fmt.Fprint(c.w, ")")
+		c.print(")")
 	case *ScalarSpec:
 		// TODO: also define constants, see EDITOR.PAS: TDrawMode = (DrawingOff, DrawingOn, TextEntry);
-		fmt.Fprint(c.w, "uint8")
+		c.print("uint8")
 	case *IdentSpec:
 		c.typeIdent(spec.TypeIdent)
 	case *StringSpec:
 		// TODO: how to handle string sizes? should we use [Size]byte
-		fmt.Fprint(c.w, "string")
+		c.print("string")
 	case *ArraySpec:
 		// TODO: record Min and adjust in code that indexes into array
 		min := spec.Min.(*ConstExpr).Value.(int)
 		maxConstExpr, maxIsConst := spec.Max.(*ConstExpr)
 		if maxIsConst {
-			fmt.Fprintf(c.w, "[%d]", maxConstExpr.Value.(int)-min+1)
+			c.printf("[%d]", maxConstExpr.Value.(int)-min+1)
 		} else {
-			fmt.Fprint(c.w, "[")
+			c.print("[")
 			c.expr(spec.Max)
 			switch {
 			case min < 1:
-				fmt.Fprintf(c.w, "+%d", 1-min)
+				c.printf("+%d", 1-min)
 			case min > 1:
-				fmt.Fprintf(c.w, "-%d", min-1)
+				c.printf("-%d", min-1)
 			}
-			fmt.Fprint(c.w, "]")
+			c.print("]")
 		}
 		c.typeSpec(spec.Of)
 	case *RecordSpec:
-		fmt.Fprint(c.w, "struct {\n")
+		c.print("struct {\n")
 		for _, section := range spec.Sections {
-			fmt.Fprint(c.w, strings.Join(section.Names, ", "), " ")
+			c.print(strings.Join(section.Names, ", "), " ")
 			c.typeSpec(section.Type)
-			fmt.Fprint(c.w, "\n")
+			c.print("\n")
 		}
-		fmt.Fprint(c.w, "}")
+		c.print("}")
 	case *FileSpec:
 		// TODO: handle Of, how to handle FILE?
-		fmt.Fprint(c.w, "FILE")
+		c.print("FILE")
 	case *PointerSpec:
-		fmt.Fprint(c.w, "*")
+		c.print("*")
 		c.typeIdent(spec.Type)
 	default:
-		fmt.Fprintf(c.w, "%s", spec)
+		c.printf("%s", spec)
 	}
 }
 
