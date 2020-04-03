@@ -61,7 +61,7 @@ func SoundInitFreqTable() {
 	for octave = 1; octave <= 15; octave++ {
 		noteBase = Exp(octave*ln2) * freqC1
 		for note = 0; note <= 11; note++ {
-			SoundFreqTable[octave*16+note+1] = Trunc(noteBase)
+			SoundFreqTable[(octave*16+note)+1] = Trunc(noteBase)
 			noteBase = noteBase * noteStep
 		}
 	}
@@ -70,7 +70,7 @@ func SoundInitFreqTable() {
 func SoundInitDrumTable() {
 	var i int16
 	SoundDrumTable[0].Len = 1
-	SoundDrumTable[0].Data[1+1] = 3200
+	SoundDrumTable[0].Data[2] = 3200
 	for i = 1; i <= 9; i++ {
 		SoundDrumTable[i].Len = 14
 	}
@@ -84,8 +84,8 @@ func SoundInitDrumTable() {
 		SoundDrumTable[4].Data[i+1] = Random(5000) + 500
 	}
 	for i = 1; i <= 8; i++ {
-		SoundDrumTable[5].Data[i*2-1+1] = 1600
-		SoundDrumTable[5].Data[i*2+1] = Random(1600) + 800
+		SoundDrumTable[5].Data[(i*2-1)+1] = 1600
+		SoundDrumTable[5].Data[(i*2)+1] = Random(1600) + 800
 	}
 	for i = 1; i <= 14; i++ {
 		SoundDrumTable[6].Data[i+1] = ((i % 2) * 880) + 880 + ((i % 3) * 440)

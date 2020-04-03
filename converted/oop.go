@@ -815,7 +815,7 @@ StartParsing:
 			}
 		}
 	} else if textWindow.LineCount == 1 {
-		DisplayMessage(200, textWindow.Lines[1+1])
+		DisplayMessage(200, textWindow.Lines[2])
 		TextWindowFree(textWindow)
 	}
 

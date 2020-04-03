@@ -1755,11 +1755,11 @@ func InitElementDefs() {
 	ElementDefs[2].TickProc = ElementMessageTimerTick
 	ElementDefs[1].TouchProc = ElementBoardEdgeTouch
 	EditorPatternCount = 5
-	EditorPatterns[1+1] = E_SOLID
-	EditorPatterns[2+1] = E_NORMAL
-	EditorPatterns[3+1] = E_BREAKABLE
-	EditorPatterns[4+1] = E_EMPTY
-	EditorPatterns[5+1] = E_LINE
+	EditorPatterns[2] = E_SOLID
+	EditorPatterns[3] = E_NORMAL
+	EditorPatterns[4] = E_BREAKABLE
+	EditorPatterns[5] = E_EMPTY
+	EditorPatterns[6] = E_LINE
 }
 
 func InitElementsEditor() {

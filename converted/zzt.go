@@ -100,20 +100,20 @@ func GameConfigure() {
 
 func main() {
 	WorldFileDescCount = 7
-	WorldFileDescKeys[1+1] = "TOWN"
-	WorldFileDescValues[1+1] = "TOWN       The Town of ZZT"
-	WorldFileDescKeys[2+1] = "DEMO"
-	WorldFileDescValues[2+1] = "DEMO       Demo of the ZZT World Editor"
-	WorldFileDescKeys[3+1] = "CAVES"
-	WorldFileDescValues[3+1] = "CAVES      The Caves of ZZT"
-	WorldFileDescKeys[4+1] = "DUNGEONS"
-	WorldFileDescValues[4+1] = "DUNGEONS   The Dungeons of ZZT"
-	WorldFileDescKeys[5+1] = "CITY"
-	WorldFileDescValues[5+1] = "CITY       Underground City of ZZT"
-	WorldFileDescKeys[6+1] = "BEST"
-	WorldFileDescValues[6+1] = "BEST       The Best of ZZT"
-	WorldFileDescKeys[7+1] = "TOUR"
-	WorldFileDescValues[7+1] = "TOUR       Guided Tour ZZT's Other Worlds"
+	WorldFileDescKeys[2] = "TOWN"
+	WorldFileDescValues[2] = "TOWN       The Town of ZZT"
+	WorldFileDescKeys[3] = "DEMO"
+	WorldFileDescValues[3] = "DEMO       Demo of the ZZT World Editor"
+	WorldFileDescKeys[4] = "CAVES"
+	WorldFileDescValues[4] = "CAVES      The Caves of ZZT"
+	WorldFileDescKeys[5] = "DUNGEONS"
+	WorldFileDescValues[5] = "DUNGEONS   The Dungeons of ZZT"
+	WorldFileDescKeys[6] = "CITY"
+	WorldFileDescValues[6] = "CITY       Underground City of ZZT"
+	WorldFileDescKeys[7] = "BEST"
+	WorldFileDescValues[7] = "BEST       The Best of ZZT"
+	WorldFileDescKeys[8] = "TOUR"
+	WorldFileDescValues[8] = "TOUR       Guided Tour ZZT's Other Worlds"
 	Randomize()
 	SetCBreak(false)
 	InitialTextAttr = TextAttr

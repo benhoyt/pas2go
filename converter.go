@@ -712,9 +712,18 @@ func (c *converter) expr(expr Expr) {
 
 				c.print("[")
 				if min != 0 {
-					// TODO: if index is ConstExpr, add 1 as const, if VarExpr then +1, else add parens and +1
-					c.expr(suffix.Index)
-					c.printf(" + %d", min)
+					switch index := suffix.Index.(type) {
+					case *ConstExpr:
+						val := index.Value.(int)
+						c.printf("%d", val+min)
+					case *FuncExpr, *ParenExpr, *PointerExpr, *TypeConvExpr, *UnaryExpr, *VarExpr:
+						c.expr(suffix.Index)
+						c.printf(" + %d", min)
+					default:
+						c.print("(")
+						c.expr(suffix.Index)
+						c.printf(") + %d", min)
+					}
 				} else {
 					c.expr(suffix.Index)
 				}

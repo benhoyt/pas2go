@@ -124,7 +124,7 @@ func EditorLoop() {
 			VideoWriteText(68, 24, 0x1E, "Drawing off")
 		}
 
-		VideoWriteText(72, 19, 0x1E, ColorNames[cursorColor-8+1])
+		VideoWriteText(72, 19, 0x1E, ColorNames[(cursorColor-8)+1])
 		VideoWriteText(61+cursorPattern, 21, 0x1F, '\x1f')
 		VideoWriteText(61+cursorColor, 21, 0x1F, '\x1f')
 	}
@@ -232,17 +232,17 @@ func EditorLoop() {
 			for i = 1; i <= state.LineCount; i++ {
 				New(state.Lines[i+1])
 			}
-			state.Lines[1+1] = "         Title: " + Board.Name
+			state.Lines[2] = "         Title: " + Board.Name
 			numStr = fmt.Sprint(Board.Info.MaxShots)
-			state.Lines[2+1] = "      Can fire: " + numStr + " shots."
-			state.Lines[3+1] = " Board is dark: " + BoolToString(Board.Info.IsDark)
+			state.Lines[3] = "      Can fire: " + numStr + " shots."
+			state.Lines[4] = " Board is dark: " + BoolToString(Board.Info.IsDark)
 			for i = 4; i <= 7; i++ {
 				state.Lines[i+1] = NeighborBoardStrs[i-4] + ": " + EditorGetBoardName(Board.Info.NeighborBoards[i-4], true)
 			}
-			state.Lines[8+1] = "Re-enter when zapped: " + BoolToString(Board.Info.ReenterWhenZapped)
+			state.Lines[9] = "Re-enter when zapped: " + BoolToString(Board.Info.ReenterWhenZapped)
 			numStr = fmt.Sprint(Board.Info.TimeLimitSec)
-			state.Lines[9+1] = "  Time limit, 0=None: " + numStr + " sec."
-			state.Lines[10+1] = "          Quit!"
+			state.Lines[10] = "  Time limit, 0=None: " + numStr + " sec."
+			state.Lines[11] = "          Quit!"
 			TextWindowSelect(state, false, false)
 			if (InputKeyPressed == KEY_ENTER) && (state.LinePos >= 1) && (state.LinePos <= 8) {
 				wasModified = true
@@ -951,7 +951,7 @@ func HighScoresAdd(score int16) {
 	}
 	if (listPos <= 30) && (score > 0) {
 		for i = 29; i >= listPos; i-- {
-			HighScoreList[i+1+1] = HighScoreList[i+1]
+			HighScoreList[(i+1)+1] = HighScoreList[i+1]
 		}
 		HighScoreList[listPos+1].Score = score
 		HighScoreList[listPos+1].Name = "-- You! --"

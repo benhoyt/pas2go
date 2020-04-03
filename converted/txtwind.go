@@ -92,8 +92,8 @@ func TextWindowDrawClose(state *TTextWindowState) {
 		VideoWriteText(TextWindowX, TextWindowY+iy, 0x0F, TextWindowStrTop)
 		VideoWriteText(TextWindowX, TextWindowY+TextWindowHeight-iy, 0x0F, TextWindowStrBottom)
 		Delay(18)
-		VideoMove(TextWindowX, TextWindowY+iy, TextWindowWidth, *ScreenCopy[iy+1+1], true)
-		VideoMove(TextWindowX, TextWindowY+TextWindowHeight-iy, TextWindowWidth, *ScreenCopy[(TextWindowHeight-iy)+1+1], true)
+		VideoMove(TextWindowX, TextWindowY+iy, TextWindowWidth, *ScreenCopy[(iy+1)+1], true)
+		VideoMove(TextWindowX, TextWindowY+TextWindowHeight-iy, TextWindowWidth, *ScreenCopy[((TextWindowHeight-iy)+1)+1], true)
 	}
 
 }
@@ -328,7 +328,7 @@ func TextWindowEdit(state *TTextWindowState) {
 		if state.LineCount > 1 {
 			Dispose(Lines[state.LinePos+1])
 			for i = (state.LinePos + 1); i <= state.LineCount; i++ {
-				Lines[i-1+1] = Lines[i+1]
+				Lines[(i-1)+1] = Lines[i+1]
 			}
 			state.LineCount = state.LineCount - 1
 			if state.LinePos > state.LineCount {
@@ -337,7 +337,7 @@ func TextWindowEdit(state *TTextWindowState) {
 				TextWindowDraw(state, true, false)
 			}
 		} else {
-			Lines[1+1] = ""
+			Lines[2] = ""
 		}
 
 	}
@@ -387,10 +387,10 @@ func TextWindowEdit(state *TTextWindowState) {
 		case KEY_ENTER:
 			if state.LineCount < MAX_TEXT_WINDOW_LINES {
 				for i = state.LineCount; i >= (state.LinePos + 1); i-- {
-					Lines[i+1+1] = Lines[i+1]
+					Lines[(i+1)+1] = Lines[i+1]
 				}
-				New(Lines[state.LinePos+1+1])
-				Lines[state.LinePos+1+1] = Copy(Lines[state.LinePos+1], charPos, Length(Lines[state.LinePos+1])-charPos+1)
+				New(Lines[(state.LinePos+1)+1])
+				Lines[(state.LinePos+1)+1] = Copy(Lines[state.LinePos+1], charPos, Length(Lines[state.LinePos+1])-charPos+1)
 				Lines[state.LinePos+1] = Copy(Lines[state.LinePos+1], 1, charPos-1)
 				newLinePos = state.LinePos + 1
 				charPos = 1
