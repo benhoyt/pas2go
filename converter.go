@@ -89,44 +89,7 @@ func (c *converter) lookupVarType(name string) (Scope, TypeSpec) {
 	return Scope{}, nil
 }
 
-// TODO: merge with lookupVarExprType?
-func (c *converter) lookupRecordType(varExpr *VarExpr) (string, *RecordSpec) {
-	if varExpr.HasAt {
-		panic(fmt.Sprintf("unexpected HasAt in 'with' VarExpr: %q", varExpr))
-	}
-	_, spec := c.lookupVarType(varExpr.Name)
-	if spec == nil {
-		panic(fmt.Sprintf("with var not found: %q", varExpr.Name))
-	}
-	spec = c.lookupNamedType(spec)
-
-	fieldName := varExpr.Name
-	for _, suffix := range varExpr.Suffixes {
-		switch suffix := suffix.(type) {
-		case *DotSuffix:
-			fieldName = suffix.Field
-			record := spec.(*RecordSpec)
-			spec = findField(record, suffix.Field)
-			if spec == nil {
-				panic(fmt.Sprintf("field not found: %q", suffix.Field))
-			}
-			switch innerSpec := spec.(type) {
-			case *IdentSpec:
-				spec = c.lookupNamedType(spec)
-			case *ArraySpec:
-				if a, ok := innerSpec.Of.(*ArraySpec); ok {
-					// Two-dimensional array
-					innerSpec = a
-				}
-				spec = c.lookupNamedType(innerSpec.Of)
-			}
-		}
-	}
-
-	return fieldName, spec.(*RecordSpec)
-}
-
-func (c *converter) lookupVarExprType(varExpr *VarExpr) TypeSpec {
+func (c *converter) lookupVarExprType(varExpr *VarExpr) (TypeSpec, string) {
 	if varExpr.HasAt {
 		panic(fmt.Sprintf("unexpected HasAt in VarExpr: %q", varExpr))
 	}
@@ -136,9 +99,11 @@ func (c *converter) lookupVarExprType(varExpr *VarExpr) TypeSpec {
 	}
 	spec = c.lookupIdentSpec(spec)
 
+	fieldName := varExpr.Name
 	for _, suffix := range varExpr.Suffixes {
 		switch suffix := suffix.(type) {
 		case *DotSuffix:
+			fieldName = suffix.Field
 			record := spec.(*RecordSpec)
 			spec = findField(record, suffix.Field)
 			if spec == nil {
@@ -154,7 +119,7 @@ func (c *converter) lookupVarExprType(varExpr *VarExpr) TypeSpec {
 		spec = c.lookupIdentSpec(spec)
 	}
 
-	return spec
+	return spec, fieldName
 }
 
 func (c *converter) lookupIdentSpec(spec TypeSpec) TypeSpec {
@@ -575,7 +540,8 @@ func (c *converter) stmt(stmt Stmt) {
 		c.stmtNoBraces(stmt.Stmt)
 		c.print("}")
 	case *WithStmt:
-		fieldName, record := c.lookupRecordType(stmt.Var)
+		spec, fieldName := c.lookupVarExprType(stmt.Var)
+		record := spec.(*RecordSpec)
 		var withName string
 		if len(stmt.Var.Suffixes) == 0 && strings.ToLower(fieldName) == strings.ToLower(stmt.Var.Name) {
 			withName = stmt.Var.Name
@@ -722,7 +688,7 @@ func (c *converter) expr(expr Expr) {
 			case *IndexSuffix:
 				// Look up var + suffixes so far and add Min array index if not 0
 				varExprSoFar := &VarExpr{false, expr.Name, expr.Suffixes[:i]}
-				spec := c.lookupVarExprType(varExprSoFar)
+				spec, _ := c.lookupVarExprType(varExprSoFar)
 
 				var min int
 				switch spec := spec.(type) {
