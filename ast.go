@@ -555,16 +555,12 @@ func (s *WhileStmt) String() string {
 }
 
 type WithStmt struct {
-	Vars []*VarExpr
+	Var *VarExpr
 	Stmt Stmt
 }
 
 func (s *WithStmt) String() string {
-	strs := make([]string, len(s.Vars))
-	for i, v := range s.Vars {
-		strs[i] = v.String()
-	}
-	return fmt.Sprintf("with %s do%s", strings.Join(strs, ", "), formatCompound(s.Stmt))
+	return fmt.Sprintf("with %s do%s", s.Var, formatCompound(s.Stmt))
 }
 
 // Expressions

@@ -495,14 +495,10 @@ func (p *parser) labelledStmt(allowLabel bool) Stmt {
 		return &ForStmt{ident, initial, down, final, stmt}
 	case WITH:
 		p.next()
-		vars := []*VarExpr{p.varExpr()}
-		for p.tok == COMMA {
-			p.next()
-			vars = append(vars, p.varExpr())
-		}
+		varExpr := p.varExpr()
 		p.expect(DO)
 		stmt := p.stmt()
-		return &WithStmt{vars, stmt}
+		return &WithStmt{varExpr, stmt}
 	default:
 		return &EmptyStmt{}
 	}

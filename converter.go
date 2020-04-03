@@ -6,6 +6,7 @@ ISSUES:
 - uses operator precedence rather than ParenExpr
 - "exit" -> break or return (should EXIT be a keyword in lexer?)
 - output Go x+=y for Pascal x=x+y?
+- better names for with statement var? eg: elementdef, editorstatsetting, transitiontable
 */
 
 package main
@@ -496,16 +497,14 @@ func (c *converter) stmt(stmt Stmt) {
 		c.stmtNoBraces(stmt.Stmt)
 		c.print("}")
 	case *WithStmt:
-		// TODO: drop multi Vars support in parser?
-		expr := stmt.Vars[0]
-		fieldName, record := c.lookupRecordType(expr)
+		fieldName, record := c.lookupRecordType(stmt.Var)
 		var withName string
-		if len(expr.Suffixes) == 0 && strings.ToLower(fieldName) == strings.ToLower(expr.Name) {
-			withName = expr.Name
+		if len(stmt.Var.Suffixes) == 0 && strings.ToLower(fieldName) == strings.ToLower(stmt.Var.Name) {
+			withName = stmt.Var.Name
 		} else {
 			withName = c.makeWithName(fieldName)
 			c.printf("%s := &", withName)
-			c.expr(stmt.Vars[0])
+			c.expr(stmt.Var)
 			c.print("\n")
 		}
 		c.pushScope(ScopeWith, &VarExpr{Name: withName})
