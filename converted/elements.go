@@ -947,14 +947,14 @@ func ElementScrollTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16) {
 func ElementKeyTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16) {
 	var key int16
 	key = Board.Tiles[x][y].Color % 8
-	if World.Info.Keys[key] {
-		DisplayMessage(200, "You already have a "+ColorNames[key]+" key!")
+	if World.Info.Keys[key+1] {
+		DisplayMessage(200, "You already have a "+ColorNames[key+1]+" key!")
 		SoundQueue(2, "0\x02 \x02")
 	} else {
-		World.Info.Keys[key] = true
+		World.Info.Keys[key+1] = true
 		Board.Tiles[x][y].Element = E_EMPTY
 		GameUpdateSidebar()
-		DisplayMessage(200, "You now have the "+ColorNames[key]+" key.")
+		DisplayMessage(200, "You now have the "+ColorNames[key+1]+" key.")
 		SoundQueue(2, "@\x01D\x01G\x01@\x01D\x01G\x01@\x01D\x01G\x01P\x02")
 	}
 }
@@ -992,15 +992,15 @@ func ElementPassageTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16) 
 func ElementDoorTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16) {
 	var key int16
 	key = (Board.Tiles[x][y].Color / 16) % 8
-	if World.Info.Keys[key] {
+	if World.Info.Keys[key+1] {
 		Board.Tiles[x][y].Element = E_EMPTY
 		BoardDrawTile(x, y)
-		World.Info.Keys[key] = false
+		World.Info.Keys[key+1] = false
 		GameUpdateSidebar()
-		DisplayMessage(200, "The "+ColorNames[key]+" door is now open.")
+		DisplayMessage(200, "The "+ColorNames[key+1]+" door is now open.")
 		SoundQueue(3, "0\x017\x01;\x010\x017\x01;\x01@\x04")
 	} else {
-		DisplayMessage(200, "The "+ColorNames[key]+" door is locked!")
+		DisplayMessage(200, "The "+ColorNames[key+1]+" door is locked!")
 		SoundQueue(3, "\x17\x01\x10\x01")
 	}
 }
@@ -1755,11 +1755,11 @@ func InitElementDefs() {
 	ElementDefs[2].TickProc = ElementMessageTimerTick
 	ElementDefs[1].TouchProc = ElementBoardEdgeTouch
 	EditorPatternCount = 5
-	EditorPatterns[1] = E_SOLID
-	EditorPatterns[2] = E_NORMAL
-	EditorPatterns[3] = E_BREAKABLE
-	EditorPatterns[4] = E_EMPTY
-	EditorPatterns[5] = E_LINE
+	EditorPatterns[1+1] = E_SOLID
+	EditorPatterns[2+1] = E_NORMAL
+	EditorPatterns[3+1] = E_BREAKABLE
+	EditorPatterns[4+1] = E_EMPTY
+	EditorPatterns[5+1] = E_LINE
 }
 
 func InitElementsEditor() {

@@ -61,7 +61,7 @@ func SoundInitFreqTable() {
 	for octave = 1; octave <= 15; octave++ {
 		noteBase = Exp(octave*ln2) * freqC1
 		for note = 0; note <= 11; note++ {
-			SoundFreqTable[octave*16+note] = Trunc(noteBase)
+			SoundFreqTable[octave*16+note+1] = Trunc(noteBase)
 			noteBase = noteBase * noteStep
 		}
 	}
@@ -70,41 +70,41 @@ func SoundInitFreqTable() {
 func SoundInitDrumTable() {
 	var i int16
 	SoundDrumTable[0].Len = 1
-	SoundDrumTable[0].Data[1] = 3200
+	SoundDrumTable[0].Data[1+1] = 3200
 	for i = 1; i <= 9; i++ {
 		SoundDrumTable[i].Len = 14
 	}
 	for i = 1; i <= 14; i++ {
-		SoundDrumTable[1].Data[i] = i*100 + 1000
+		SoundDrumTable[1].Data[i+1] = i*100 + 1000
 	}
 	for i = 1; i <= 16; i++ {
-		SoundDrumTable[2].Data[i] = (i%2)*1600 + 1600 + (i%4)*1600
+		SoundDrumTable[2].Data[i+1] = (i%2)*1600 + 1600 + (i%4)*1600
 	}
 	for i = 1; i <= 14; i++ {
-		SoundDrumTable[4].Data[i] = Random(5000) + 500
+		SoundDrumTable[4].Data[i+1] = Random(5000) + 500
 	}
 	for i = 1; i <= 8; i++ {
-		SoundDrumTable[5].Data[i*2-1] = 1600
-		SoundDrumTable[5].Data[i*2] = Random(1600) + 800
+		SoundDrumTable[5].Data[i*2-1+1] = 1600
+		SoundDrumTable[5].Data[i*2+1] = Random(1600) + 800
 	}
 	for i = 1; i <= 14; i++ {
-		SoundDrumTable[6].Data[i] = ((i % 2) * 880) + 880 + ((i % 3) * 440)
+		SoundDrumTable[6].Data[i+1] = ((i % 2) * 880) + 880 + ((i % 3) * 440)
 	}
 	for i = 1; i <= 14; i++ {
-		SoundDrumTable[7].Data[i] = 700 - (i * 12)
+		SoundDrumTable[7].Data[i+1] = 700 - (i * 12)
 	}
 	for i = 1; i <= 14; i++ {
-		SoundDrumTable[8].Data[i] = (i*20 + 1200) - Random(i*40)
+		SoundDrumTable[8].Data[i+1] = (i*20 + 1200) - Random(i*40)
 	}
 	for i = 1; i <= 14; i++ {
-		SoundDrumTable[9].Data[i] = Random(440) + 220
+		SoundDrumTable[9].Data[i+1] = Random(440) + 220
 	}
 }
 
 func SoundPlayDrum(drum *TDrumData) {
 	var i int16
 	for i = 1; i <= drum.Len; i++ {
-		Sound(drum.Data[i])
+		Sound(drum.Data[i+1])
 		Delay(1)
 	}
 	NoSound()
@@ -166,7 +166,7 @@ func SoundTimerHandler() {
 				if SoundBuffer[SoundBufferPos] == '\x00' {
 					NoSound()
 				} else if SoundBuffer[SoundBufferPos] < 'ð' {
-					Sound(SoundFreqTable[Ord(SoundBuffer[SoundBufferPos])])
+					Sound(SoundFreqTable[Ord(SoundBuffer[SoundBufferPos])+1])
 				} else {
 					SoundPlayDrum(SoundDrumTable[Ord(SoundBuffer[SoundBufferPos])-240])
 				}

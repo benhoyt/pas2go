@@ -92,7 +92,7 @@ func EditorLoop() {
 			VideoWriteText(61+i, 22, i, 'Û')
 		}
 		for i = 1; i <= EditorPatternCount; i++ {
-			VideoWriteText(61+i, 22, 0x0F, ElementDefs[EditorPatterns[i]].Character)
+			VideoWriteText(61+i, 22, 0x0F, ElementDefs[EditorPatterns[i+1]].Character)
 		}
 		if ElementDefs[copiedTile.Element].HasDrawProc {
 			ElementDefs[copiedTile.Element].DrawProc(copiedX, copiedY, copiedChr)
@@ -124,7 +124,7 @@ func EditorLoop() {
 			VideoWriteText(68, 24, 0x1E, "Drawing off")
 		}
 
-		VideoWriteText(72, 19, 0x1E, ColorNames[cursorColor-8])
+		VideoWriteText(72, 19, 0x1E, ColorNames[cursorColor-8+1])
 		VideoWriteText(61+cursorPattern, 21, 0x1F, '\x1f')
 		VideoWriteText(61+cursorColor, 21, 0x1F, '\x1f')
 	}
@@ -184,7 +184,7 @@ func EditorLoop() {
 		tile := &Board.Tiles[x][y]
 		if cursorPattern <= EditorPatternCount {
 			if EditorPrepareModifyTile(x, y) {
-				tile.Element = EditorPatterns[cursorPattern]
+				tile.Element = EditorPatterns[cursorPattern+1]
 				tile.Color = cursorColor
 			}
 		} else if copiedHasStat {
@@ -224,25 +224,25 @@ func EditorLoop() {
 		state.Selectable = true
 		exitRequested = false
 		for i = 1; i <= state.LineCount; i++ {
-			New(state.Lines[i])
+			New(state.Lines[i+1])
 		}
 		for {
 			state.Selectable = true
 			state.LineCount = 10
 			for i = 1; i <= state.LineCount; i++ {
-				New(state.Lines[i])
+				New(state.Lines[i+1])
 			}
-			state.Lines[1] = "         Title: " + Board.Name
+			state.Lines[1+1] = "         Title: " + Board.Name
 			numStr = fmt.Sprint(Board.Info.MaxShots)
-			state.Lines[2] = "      Can fire: " + numStr + " shots."
-			state.Lines[3] = " Board is dark: " + BoolToString(Board.Info.IsDark)
+			state.Lines[2+1] = "      Can fire: " + numStr + " shots."
+			state.Lines[3+1] = " Board is dark: " + BoolToString(Board.Info.IsDark)
 			for i = 4; i <= 7; i++ {
-				state.Lines[i] = NeighborBoardStrs[i-4] + ": " + EditorGetBoardName(Board.Info.NeighborBoards[i-4], true)
+				state.Lines[i+1] = NeighborBoardStrs[i-4] + ": " + EditorGetBoardName(Board.Info.NeighborBoards[i-4], true)
 			}
-			state.Lines[8] = "Re-enter when zapped: " + BoolToString(Board.Info.ReenterWhenZapped)
+			state.Lines[8+1] = "Re-enter when zapped: " + BoolToString(Board.Info.ReenterWhenZapped)
 			numStr = fmt.Sprint(Board.Info.TimeLimitSec)
-			state.Lines[9] = "  Time limit, 0=None: " + numStr + " sec."
-			state.Lines[10] = "          Quit!"
+			state.Lines[9+1] = "  Time limit, 0=None: " + numStr + " sec."
+			state.Lines[10+1] = "          Quit!"
 			TextWindowSelect(state, false, false)
 			if (InputKeyPressed == KEY_ENTER) && (state.LinePos >= 1) && (state.LinePos <= 8) {
 				wasModified = true
@@ -311,13 +311,13 @@ func EditorLoop() {
 		}
 		EditorOpenEditTextWindow(state)
 		for iLine = 1; iLine <= state.LineCount; iLine++ {
-			stat.DataLen = stat.DataLen + Length(state.Lines[iLine]) + 1
+			stat.DataLen = stat.DataLen + Length(state.Lines[iLine+1]) + 1
 		}
 		GetMem(stat.Data, stat.DataLen)
 		dataPtr = stat.Data
 		for iLine = 1; iLine <= state.LineCount; iLine++ {
-			for iChar = 1; iChar <= Length(state.Lines[iLine]); iChar++ {
-				dataChar = state.Lines[iLine][iChar]
+			for iChar = 1; iChar <= Length(state.Lines[iLine+1]); iChar++ {
+				dataChar = state.Lines[iLine+1][iChar]
 				Move(dataChar, dataPtr, 1)
 				AdvancePointer(dataPtr, 1)
 			}
@@ -858,8 +858,8 @@ func HighScoresLoad() {
 	Close(f)
 	if IOResult != 0 {
 		for i = 1; i <= 30; i++ {
-			HighScoreList[i].Name = ""
-			HighScoreList[i].Score = -1
+			HighScoreList[i+1].Name = ""
+			HighScoreList[i+1].Score = -1
 		}
 	}
 }
@@ -884,9 +884,9 @@ func HighScoresInitTextWindow(state *TTextWindowState) {
 	TextWindowAppend(state, "Score  Name")
 	TextWindowAppend(state, "-----  ----------------------------------")
 	for i = 1; i <= HIGH_SCORE_COUNT; i++ {
-		if Length(HighScoreList[i].Name) != 0 {
-			scoreStr = fmt.Sprintf("%5v", HighScoreList[i].Score)
-			TextWindowAppend(state, scoreStr+"  "+HighScoreList[i].Name)
+		if Length(HighScoreList[i+1].Name) != 0 {
+			scoreStr = fmt.Sprintf("%5v", HighScoreList[i+1].Score)
+			TextWindowAppend(state, scoreStr+"  "+HighScoreList[i+1].Name)
 		}
 	}
 }
@@ -946,15 +946,15 @@ func HighScoresAdd(score int16) {
 		i, listPos int16
 	)
 	listPos = 1
-	for (listPos <= 30) && (score < HighScoreList[listPos].Score) {
+	for (listPos <= 30) && (score < HighScoreList[listPos+1].Score) {
 		listPos = listPos + 1
 	}
 	if (listPos <= 30) && (score > 0) {
 		for i = 29; i >= listPos; i-- {
-			HighScoreList[i+1] = HighScoreList[i]
+			HighScoreList[i+1+1] = HighScoreList[i+1]
 		}
-		HighScoreList[listPos].Score = score
-		HighScoreList[listPos].Name = "-- You! --"
+		HighScoreList[listPos+1].Score = score
+		HighScoreList[listPos+1].Name = "-- You! --"
 		HighScoresInitTextWindow(textWindow)
 		textWindow.LinePos = listPos
 		textWindow.Title = "New high score for " + World.Info.Name
@@ -962,7 +962,7 @@ func HighScoresAdd(score int16) {
 		TextWindowDraw(textWindow, false, false)
 		name = ""
 		PopupPromptString("Congratulations!  Enter your name:", name)
-		HighScoreList[listPos].Name = name
+		HighScoreList[listPos+1].Name = name
 		HighScoresSave()
 		TextWindowDrawClose(textWindow)
 		TransitionDrawToBoard()

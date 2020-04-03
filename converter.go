@@ -26,6 +26,12 @@ func Convert(file File, units []*Unit, w io.Writer) {
 	c.types = make(map[string]TypeSpec)
 	c.pushScope(ScopeGlobal, nil)
 
+	// TODO: hacks - Port is predefined by Turbo Pascal; TVideoLine is defined in VIDEO.PAS
+	min := &ConstExpr{0, false}
+	max := &ConstExpr{1000, false}
+	c.defineVar("Port", &ArraySpec{min, max, &IdentSpec{&TypeIdent{"", INTEGER}}})
+	c.types["TVideoLine"] = &StringSpec{80}
+
 	switch file := file.(type) {
 	case *Program:
 		c.program(file)
@@ -69,7 +75,7 @@ func (c *converter) popScope() {
 
 func (c *converter) defineVar(name string, spec TypeSpec) {
 	scope := c.scopes[len(c.scopes)-1]
-	scope.Vars[name] = spec
+	scope.Vars[name] = spec // TODO: ToLower, also on lookup?
 }
 
 func (c *converter) lookupVarType(name string) (Scope, TypeSpec) {
@@ -83,9 +89,10 @@ func (c *converter) lookupVarType(name string) (Scope, TypeSpec) {
 	return Scope{}, nil
 }
 
+// TODO: merge with lookupVarExprType?
 func (c *converter) lookupRecordType(varExpr *VarExpr) (string, *RecordSpec) {
 	if varExpr.HasAt {
-		panic(fmt.Sprintf("unexpected HasAt for in 'with' VarExpr: %q", varExpr))
+		panic(fmt.Sprintf("unexpected HasAt in 'with' VarExpr: %q", varExpr))
 	}
 	_, spec := c.lookupVarType(varExpr.Name)
 	if spec == nil {
@@ -117,6 +124,53 @@ func (c *converter) lookupRecordType(varExpr *VarExpr) (string, *RecordSpec) {
 	}
 
 	return fieldName, spec.(*RecordSpec)
+}
+
+func (c *converter) lookupVarExprType(varExpr *VarExpr) TypeSpec {
+	if varExpr.HasAt {
+		panic(fmt.Sprintf("unexpected HasAt in VarExpr: %q", varExpr))
+	}
+	_, spec := c.lookupVarType(varExpr.Name)
+	if spec == nil {
+		panic(fmt.Sprintf("var not found: %q", varExpr.Name))
+	}
+	spec = c.lookupIdentSpec(spec)
+
+	for _, suffix := range varExpr.Suffixes {
+		switch suffix := suffix.(type) {
+		case *DotSuffix:
+			record := spec.(*RecordSpec)
+			spec = findField(record, suffix.Field)
+			if spec == nil {
+				panic(fmt.Sprintf("field not found: %q", suffix.Field))
+			}
+		case *IndexSuffix:
+			array := spec.(*ArraySpec)
+			spec = array.Of
+		case *PointerSuffix:
+			pointer := spec.(*PointerSpec)
+			spec = &IdentSpec{pointer.Type}
+		}
+		spec = c.lookupIdentSpec(spec)
+	}
+
+	return spec
+}
+
+func (c *converter) lookupIdentSpec(spec TypeSpec) TypeSpec {
+	ident, isIdent := spec.(*IdentSpec)
+	if !isIdent {
+		return spec
+	}
+	if ident.Name == "" {
+		return spec // builtin type
+	}
+	var found bool
+	spec, found = c.types[ident.Name]
+	if !found {
+		panic(fmt.Sprintf("named type not found: %q", ident.Name))
+	}
+	return spec
 }
 
 func (c *converter) lookupNamedType(spec TypeSpec) TypeSpec {
@@ -186,6 +240,10 @@ func (c *converter) defineDecls(decls []DeclPart) {
 					c.defineVar(name, d.Type)
 				}
 			}
+		case *ConstDecls:
+			for _, d := range decl.Decls {
+				c.defineVar(d.Name, d.Type)
+			}
 		}
 	}
 }
@@ -214,6 +272,7 @@ func (c *converter) unit(unit *Unit) {
 			c.addUnitDecls(unitName)
 		}
 	}
+	c.defineDecls(unit.Implementation)
 	c.decls(unit.Implementation, true)
 	c.print("func init() {\n")
 	c.stmts(unit.Init.Stmts)
@@ -644,6 +703,7 @@ func (c *converter) expr(expr Expr) {
 		c.print(operatorStr(expr.Op))
 		c.expr(expr.Expr)
 	case *VarExpr:
+		// TODO2: handle func/proc "var" parameters
 		if expr.HasAt {
 			c.printf("*")
 		}
@@ -657,11 +717,30 @@ func (c *converter) expr(expr Expr) {
 			}
 		}
 		c.printf(expr.Name)
-		for _, suffix := range expr.Suffixes {
+		for i, suffix := range expr.Suffixes {
 			switch suffix := suffix.(type) {
 			case *IndexSuffix:
+				// Look up var + suffixes so far and add Min array index if not 0
+				varExprSoFar := &VarExpr{false, expr.Name, expr.Suffixes[:i]}
+				spec := c.lookupVarExprType(varExprSoFar)
+
+				var min int
+				switch spec := spec.(type) {
+				case *ArraySpec:
+					min = spec.Min.(*ConstExpr).Value.(int)
+				case *StringSpec:
+					min = 0
+				}
+
 				c.print("[")
-				c.exprs(suffix.Indexes)
+				if min != 0 {
+					// TODO: need suffix.Indexes to be multiple indexes?
+					// TODO: if index is ConstExpr, add 1 as const, if VarExpr then +1, else add parens and +1
+					c.exprs(suffix.Indexes)
+					c.printf(" + %d", min)
+				} else {
+					c.exprs(suffix.Indexes)
+				}
 				c.print("]")
 			case *DotSuffix:
 				c.print(".", suffix.Field)
@@ -722,7 +801,7 @@ func (c *converter) typeSpec(spec TypeSpec) {
 		// TODO: how to handle string sizes? should we use [Size]byte
 		c.print("string")
 	case *ArraySpec:
-		// TODO: record Min and adjust in code that indexes into array
+		// TODO2: record Min and adjust in code that indexes into array
 		min := spec.Min.(*ConstExpr).Value.(int)
 		maxConstExpr, maxIsConst := spec.Max.(*ConstExpr)
 		if maxIsConst {
