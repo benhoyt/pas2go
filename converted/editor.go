@@ -175,11 +175,11 @@ func EditorLoop() {
 	}
 
 	EditorPlaceTile := func(x, y int16) {
-		// WITH temp = Board.Tiles[x][y]
+		tile := &Board.Tiles[x][y]
 		if cursorPattern <= EditorPatternCount {
 			if EditorPrepareModifyTile(x, y) {
-				Element = EditorPatterns[cursorPattern]
-				Color = cursorColor
+				tile.Element = EditorPatterns[cursorPattern]
+				tile.Color = cursorColor
 			}
 		} else if copiedHasStat {
 			if EditorPrepareModifyStatAtCursor {
@@ -294,21 +294,21 @@ func EditorLoop() {
 			dataChar     byte
 			dataPtr      uintptr
 		)
-		// WITH temp = Board.Stats[statId]
+		stat := &Board.Stats[statId]
 		state.Title = prompt
 		TextWindowDrawOpen(state)
 		state.Selectable = false
 		CopyStatDataToTextWindow(statId, state)
-		if DataLen > 0 {
-			FreeMem(Data, DataLen)
-			DataLen = 0
+		if stat.DataLen > 0 {
+			FreeMem(stat.Data, stat.DataLen)
+			stat.DataLen = 0
 		}
 		EditorOpenEditTextWindow(state)
 		for iLine = 1; iLine <= state.LineCount; iLine++ {
-			DataLen = DataLen + Length(state.Lines[iLine]) + 1
+			stat.DataLen = stat.DataLen + Length(state.Lines[iLine]) + 1
 		}
-		GetMem(Data, DataLen)
-		dataPtr = Data
+		GetMem(stat.Data, stat.DataLen)
+		dataPtr = stat.Data
 		for iLine = 1; iLine <= state.LineCount; iLine++ {
 			for iChar = 1; iChar <= Length(state.Lines[iLine]); iChar++ {
 				dataChar = state.Lines[iLine][iChar]
@@ -335,22 +335,22 @@ func EditorLoop() {
 			promptByte    byte
 		)
 		EditorEditStatSettings := func(selected bool) {
-			// WITH temp = Board.Stats[statId]
+			stat := &Board.Stats[statId]
 			InputKeyPressed = '\x00'
 			iy = 9
 			if Length(ElementDefs[element].Param1Name) != 0 {
 				if Length(ElementDefs[element].ParamTextName) == 0 {
-					SidebarPromptSlider(selected, 63, iy, ElementDefs[element].Param1Name, P1)
+					SidebarPromptSlider(selected, 63, iy, ElementDefs[element].Param1Name, stat.P1)
 				} else {
-					if P1 == 0 {
-						P1 = World.EditorStatSettings[element].P1
+					if stat.P1 == 0 {
+						stat.P1 = World.EditorStatSettings[element].P1
 					}
-					BoardDrawTile(X, Y)
-					SidebarPromptCharacter(selected, 63, iy, ElementDefs[element].Param1Name, P1)
-					BoardDrawTile(X, Y)
+					BoardDrawTile(stat.X, stat.Y)
+					SidebarPromptCharacter(selected, 63, iy, ElementDefs[element].Param1Name, stat.P1)
+					BoardDrawTile(stat.X, stat.Y)
 				}
 				if selected {
-					World.EditorStatSettings[element].P1 = P1
+					World.EditorStatSettings[element].P1 = stat.P1
 				}
 				iy = iy + 4
 			}
@@ -360,58 +360,58 @@ func EditorLoop() {
 				}
 			}
 			if (InputKeyPressed != KEY_ESCAPE) && (Length(ElementDefs[element].Param2Name) != 0) {
-				promptByte = (P2 % 0x80)
+				promptByte = (stat.P2 % 0x80)
 				SidebarPromptSlider(selected, 63, iy, ElementDefs[element].Param2Name, promptByte)
 				if selected {
-					P2 = (P2 && 0x80) + promptByte
-					World.EditorStatSettings[element].P2 = P2
+					stat.P2 = (stat.P2 && 0x80) + promptByte
+					World.EditorStatSettings[element].P2 = stat.P2
 				}
 				iy = iy + 4
 			}
 			if (InputKeyPressed != KEY_ESCAPE) && (Length(ElementDefs[element].ParamBulletTypeName) != 0) {
-				promptByte = (P2) / 0x80
+				promptByte = (stat.P2) / 0x80
 				SidebarPromptChoice(selected, iy, ElementDefs[element].ParamBulletTypeName, "Bullets Stars", promptByte)
 				if selected {
-					P2 = (P2 % 0x80) + (promptByte * 0x80)
-					World.EditorStatSettings[element].P2 = P2
+					stat.P2 = (stat.P2 % 0x80) + (promptByte * 0x80)
+					World.EditorStatSettings[element].P2 = stat.P2
 				}
 				iy = iy + 4
 			}
 			if (InputKeyPressed != KEY_ESCAPE) && (Length(ElementDefs[element].ParamDirName) != 0) {
-				SidebarPromptDirection(selected, iy, ElementDefs[element].ParamDirName, StepX, StepY)
+				SidebarPromptDirection(selected, iy, ElementDefs[element].ParamDirName, stat.StepX, stat.StepY)
 				if selected {
-					World.EditorStatSettings[element].StepX = StepX
-					World.EditorStatSettings[element].StepY = StepY
+					World.EditorStatSettings[element].StepX = stat.StepX
+					World.EditorStatSettings[element].StepY = stat.StepY
 				}
 				iy = iy + 4
 			}
 			if (InputKeyPressed != KEY_ESCAPE) && (Length(ElementDefs[element].ParamBoardName) != 0) {
 				if selected {
-					selectedBoard = EditorSelectBoard(ElementDefs[element].ParamBoardName, P3, true)
+					selectedBoard = EditorSelectBoard(ElementDefs[element].ParamBoardName, stat.P3, true)
 					if selectedBoard != 0 {
-						P3 = selectedBoard
+						stat.P3 = selectedBoard
 						World.EditorStatSettings[element].P3 = World.Info.CurrentBoard
-						if P3 > World.BoardCount {
+						if stat.P3 > World.BoardCount {
 							EditorAppendBoard()
 							copiedHasStat = false
 							copiedTile.Element = 0
 							copiedTile.Color = 0x0F
 						}
-						World.EditorStatSettings[element].P3 = P3
+						World.EditorStatSettings[element].P3 = stat.P3
 					} else {
 						InputKeyPressed = KEY_ESCAPE
 					}
 					iy = iy + 4
 				} else {
-					VideoWriteText(63, iy, 0x1F, "Room: "+Copy(EditorGetBoardName(P3, true), 1, 10))
+					VideoWriteText(63, iy, 0x1F, "Room: "+Copy(EditorGetBoardName(stat.P3, true), 1, 10))
 				}
 			}
 
 		}
 
-		// WITH temp = Board.Stats[statId]
+		stat := &Board.Stats[statId]
 		SidebarClear()
-		element = Board.Tiles[X][Y].Element
+		element = Board.Tiles[stat.X][stat.Y].Element
 		wasModified = true
 		categoryName = ""
 		for i = 0; i <= element; i++ {
@@ -426,9 +426,9 @@ func EditorLoop() {
 		if InputKeyPressed != KEY_ESCAPE {
 			copiedHasStat = true
 			copiedStat = Board.Stats[statId]
-			copiedTile = Board.Tiles[X][Y]
-			copiedX = X
-			copiedY = Y
+			copiedTile = Board.Tiles[stat.X][stat.Y]
+			copiedX = stat.X
+			copiedY = stat.Y
 		}
 
 	}
@@ -508,8 +508,8 @@ func EditorLoop() {
 			EditorPlaceTile(x, y)
 			if (Board.Tiles[x][y].Element != tileAt.Element) || (Board.Tiles[x][y].Color != tileAt.Color) {
 				for i = 0; i <= 3; i++ {
-					// WITH temp = Board.Tiles[x + NeighborDeltaX[i]][y + NeighborDeltaY[i]]
-					if (Element == from.Element) && ((from.Element == 0) || (Color == from.Color)) {
+					tile := &Board.Tiles[x+NeighborDeltaX[i]][y+NeighborDeltaY[i]]
+					if (tile.Element == from.Element) && ((from.Element == 0) || (tile.Color == from.Color)) {
 						xPosition[toFill] = x + NeighborDeltaX[i]
 						yPosition[toFill] = y + NeighborDeltaY[i]
 						toFill = toFill + 1
@@ -583,10 +583,10 @@ func EditorLoop() {
 			}
 
 		}
-		// WITH temp = Board.Tiles[cursorX][cursorY]
+		tile := &Board.Tiles[cursorX][cursorY]
 		if InputShiftPressed || (InputKeyPressed == ' ') {
 			InputShiftAccepted = true
-			if (Element == 0) || (ElementDefs[Element].PlaceableOnTop && copiedHasStat && (cursorPattern > EditorPatternCount)) || (InputDeltaX != 0) || (InputDeltaY != 0) {
+			if (tile.Element == 0) || (ElementDefs[tile.Element].PlaceableOnTop && copiedHasStat && (cursorPattern > EditorPatternCount)) || (InputDeltaX != 0) || (InputDeltaY != 0) {
 				EditorPlaceTile(cursorX, cursorY)
 			} else {
 				canModify = EditorPrepareModifyTile(cursorX, cursorY)
@@ -771,19 +771,19 @@ func EditorLoop() {
 						} else {
 							if EditorPrepareModifyStatAtCursor {
 								AddStat(cursorX, cursorY, iElem, elemMenuColor, ElementDefs[iElem].Cycle, StatTemplateDefault)
-								// WITH temp = Board.Stats[Board.StatCount]
+								stat := &Board.Stats[Board.StatCount]
 								if Length(ElementDefs[iElem].Param1Name) != 0 {
-									P1 = World.EditorStatSettings[iElem].P1
+									stat.P1 = World.EditorStatSettings[iElem].P1
 								}
 								if Length(ElementDefs[iElem].Param2Name) != 0 {
-									P2 = World.EditorStatSettings[iElem].P2
+									stat.P2 = World.EditorStatSettings[iElem].P2
 								}
 								if Length(ElementDefs[iElem].ParamDirName) != 0 {
-									StepX = World.EditorStatSettings[iElem].StepX
-									StepY = World.EditorStatSettings[iElem].StepY
+									stat.StepX = World.EditorStatSettings[iElem].StepX
+									stat.StepY = World.EditorStatSettings[iElem].StepY
 								}
 								if Length(ElementDefs[iElem].ParamBoardName) != 0 {
-									P3 = World.EditorStatSettings[iElem].P3
+									stat.P3 = World.EditorStatSettings[iElem].P3
 								}
 
 								EditorEditStat(Board.StatCount)

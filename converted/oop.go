@@ -5,16 +5,16 @@ package main // unit: Oop
 // implementation uses: Sounds, TxtWind, Game, Elements
 
 func OopError(statId int16, message string) {
-	// WITH temp = Board.Stats[statId]
+	stat := &Board.Stats[statId]
 	DisplayMessage(200, "ERR: "+message)
 	SoundQueue(5, "P\n")
-	DataPos = -1
+	stat.DataPos = -1
 
 }
 
 func OopReadChar(statId int16, position *int16) {
-	// WITH temp = Board.Stats[statId]
-	if (position >= 0) && (position < DataLen) {
+	stat := &Board.Stats[statId]
+	if (position >= 0) && (position < stat.DataLen) {
 		Move(&Ptr(Seg(Data), Ofs(Data)+position), OopChar, 1)
 		Inc(position)
 	} else {
@@ -82,7 +82,7 @@ func OopSkipLine(statId int16, position *int16) {
 }
 
 func OopParseDirection(statId int16, position *int16, dx, dy *int16) (OopParseDirection bool) {
-	// WITH temp = Board.Stats[statId]
+	stat := &Board.Stats[statId]
 	OopParseDirection = true
 	if (OopWord == 'N') || (OopWord == "NORTH") {
 		dx = 0
@@ -100,10 +100,10 @@ func OopParseDirection(statId int16, position *int16, dx, dy *int16) (OopParseDi
 		dx = 0
 		dy = 0
 	} else if OopWord == "SEEK" {
-		CalcDirectionSeek(X, Y, dx, dy)
+		CalcDirectionSeek(stat.X, stat.Y, dx, dy)
 	} else if OopWord == "FLOW" {
-		dx = StepX
-		dy = StepY
+		dx = stat.StepX
+		dy = stat.StepY
 	} else if OopWord == "RND" {
 		CalcDirectionRnd(dx, dy)
 	} else if OopWord == "RNDNS" {
@@ -155,9 +155,9 @@ func OopReadDirection(statId int16, position *int16, dx, dy *int16) {
 
 func OopFindString(statId int16, s string) (OopFindString int16) {
 	var pos, wordPos, cmpPos int16
-	// WITH temp = Board.Stats[statId]
+	stat := &Board.Stats[statId]
 	pos = 0
-	for pos <= DataLen {
+	for pos <= stat.DataLen {
 		wordPos = 1
 		cmpPos = pos
 		for {
@@ -414,17 +414,17 @@ func OopCheckCondition(statId int16, position *int16) (OopCheckCondition bool) {
 		tile           TTile
 		ix, iy         int16
 	)
-	// WITH temp = Board.Stats[statId]
+	stat := &Board.Stats[statId]
 	if OopWord == "NOT" {
 		OopReadWord(statId, position)
 		OopCheckCondition = !OopCheckCondition(statId, position)
 	} else if OopWord == "ALLIGNED" {
-		OopCheckCondition = (X == Board.Stats[0].X) || (Y == Board.Stats[0].Y)
+		OopCheckCondition = (stat.X == Board.Stats[0].X) || (stat.Y == Board.Stats[0].Y)
 	} else if OopWord == "CONTACT" {
-		OopCheckCondition = (Sqr(X-Board.Stats[0].X) + Sqr(Y-Board.Stats[0].Y)) == 1
+		OopCheckCondition = (Sqr(stat.X-Board.Stats[0].X) + Sqr(stat.Y-Board.Stats[0].Y)) == 1
 	} else if OopWord == "BLOCKED" {
 		OopReadDirection(statId, position, deltaX, deltaY)
-		OopCheckCondition = !ElementDefs[Board.Tiles[X+deltaX][Y+deltaY].Element].Walkable
+		OopCheckCondition = !ElementDefs[Board.Tiles[stat.X+deltaX][stat.Y+deltaY].Element].Walkable
 	} else if OopWord == "ENERGIZED" {
 		OopCheckCondition = World.Info.EnergizerTicks > 0
 	} else if OopWord == "ANY" {
@@ -501,7 +501,7 @@ func OopExecute(statId int16, position *int16, name TString50) {
 		argTile           TTile
 		argTile2          TTile
 	)
-	// WITH temp = Board.Stats[statId]
+	stat := &Board.Stats[statId]
 StartParsing:
 	TextWindowInitState(textWindow)
 
@@ -537,11 +537,11 @@ StartParsing:
 			OopReadWord(statId, position)
 			if OopParseDirection(statId, position, deltaX, deltaY) {
 				if (deltaX != 0) || (deltaY != 0) {
-					if !ElementDefs[Board.Tiles[X+deltaX][Y+deltaY].Element].Walkable {
-						ElementPushablePush(X+deltaX, Y+deltaY, deltaX, deltaY)
+					if !ElementDefs[Board.Tiles[stat.X+deltaX][stat.Y+deltaY].Element].Walkable {
+						ElementPushablePush(stat.X+deltaX, stat.Y+deltaY, deltaX, deltaY)
 					}
-					if ElementDefs[Board.Tiles[X+deltaX][Y+deltaY].Element].Walkable {
-						MoveStat(statId, X+deltaX, Y+deltaY)
+					if ElementDefs[Board.Tiles[stat.X+deltaX][stat.Y+deltaY].Element].Walkable {
+						MoveStat(statId, stat.X+deltaX, stat.Y+deltaY)
 						repeatInsNextTick = false
 					}
 				} else {
@@ -569,30 +569,30 @@ StartParsing:
 			if Length(OopWord) != 0 {
 				if OopWord == "GO" {
 					OopReadDirection(statId, position, deltaX, deltaY)
-					if !ElementDefs[Board.Tiles[X+deltaX][Y+deltaY].Element].Walkable {
-						ElementPushablePush(X+deltaX, Y+deltaY, deltaX, deltaY)
+					if !ElementDefs[Board.Tiles[stat.X+deltaX][stat.Y+deltaY].Element].Walkable {
+						ElementPushablePush(stat.X+deltaX, stat.Y+deltaY, deltaX, deltaY)
 					}
-					if ElementDefs[Board.Tiles[X+deltaX][Y+deltaY].Element].Walkable {
-						MoveStat(statId, X+deltaX, Y+deltaY)
+					if ElementDefs[Board.Tiles[stat.X+deltaX][stat.Y+deltaY].Element].Walkable {
+						MoveStat(statId, stat.X+deltaX, stat.Y+deltaY)
 					} else {
 						repeatInsNextTick = true
 					}
 					stopRunning = true
 				} else if OopWord == "TRY" {
 					OopReadDirection(statId, position, deltaX, deltaY)
-					if !ElementDefs[Board.Tiles[X+deltaX][Y+deltaY].Element].Walkable {
-						ElementPushablePush(X+deltaX, Y+deltaY, deltaX, deltaY)
+					if !ElementDefs[Board.Tiles[stat.X+deltaX][stat.Y+deltaY].Element].Walkable {
+						ElementPushablePush(stat.X+deltaX, stat.Y+deltaY, deltaX, deltaY)
 					}
-					if ElementDefs[Board.Tiles[X+deltaX][Y+deltaY].Element].Walkable {
-						MoveStat(statId, X+deltaX, Y+deltaY)
+					if ElementDefs[Board.Tiles[stat.X+deltaX][stat.Y+deltaY].Element].Walkable {
+						MoveStat(statId, stat.X+deltaX, stat.Y+deltaY)
 						stopRunning = true
 					} else {
 						goto ReadCommand
 					}
 				} else if OopWord == "WALK" {
 					OopReadDirection(statId, position, deltaX, deltaY)
-					StepX = deltaX
-					StepY = deltaY
+					stat.StepX = deltaX
+					stat.StepY = deltaY
 				} else if OopWord == "SET" {
 					OopReadWord(statId, position)
 					WorldSetFlag(OopWord)
@@ -606,13 +606,13 @@ StartParsing:
 					}
 				} else if OopWord == "SHOOT" {
 					OopReadDirection(statId, position, deltaX, deltaY)
-					if BoardShoot(E_BULLET, X, Y, deltaX, deltaY, SHOT_SOURCE_ENEMY) {
+					if BoardShoot(E_BULLET, stat.X, stat.Y, deltaX, deltaY, SHOT_SOURCE_ENEMY) {
 						SoundQueue(2, "0\x01&\x01")
 					}
 					stopRunning = true
 				} else if OopWord == "THROWSTAR" {
 					OopReadDirection(statId, position, deltaX, deltaY)
-					if BoardShoot(E_STAR, X, Y, deltaX, deltaY, SHOT_SOURCE_ENEMY) {
+					if BoardShoot(E_STAR, stat.X, stat.Y, deltaX, deltaY, SHOT_SOURCE_ENEMY) {
 					}
 					stopRunning = true
 				} else if (OopWord == "GIVE") || (OopWord == "TAKE") {
@@ -685,9 +685,9 @@ StartParsing:
 						}
 					}
 				} else if OopWord == "LOCK" {
-					P2 = 1
+					stat.P2 = 1
 				} else if OopWord == "UNLOCK" {
-					P2 = 0
+					stat.P2 = 0
 				} else if OopWord == "SEND" {
 					OopReadWord(statId, position)
 					if OopSend(statId, OopWord, false) {
@@ -707,11 +707,11 @@ StartParsing:
 						OopError(statId, "Bad #PUT")
 					} else if !OopParseTile(statId, position, argTile) {
 						OopError(statId, "Bad #PUT")
-					} else if ((X + deltaX) > 0) && ((X + deltaX) <= BOARD_WIDTH) && ((Y + deltaY) > 0) && ((Y + deltaY) < BOARD_HEIGHT) {
-						if !ElementDefs[Board.Tiles[X+deltaX][Y+deltaY].Element].Walkable {
-							ElementPushablePush(X+deltaX, Y+deltaY, deltaX, deltaY)
+					} else if ((stat.X + deltaX) > 0) && ((stat.X + deltaX) <= BOARD_WIDTH) && ((stat.Y + deltaY) > 0) && ((stat.Y + deltaY) < BOARD_HEIGHT) {
+						if !ElementDefs[Board.Tiles[stat.X+deltaX][stat.Y+deltaY].Element].Walkable {
+							ElementPushablePush(stat.X+deltaX, stat.Y+deltaY, deltaX, deltaY)
 						}
-						OopPlaceTile(X+deltaX, Y+deltaY, argTile)
+						OopPlaceTile(stat.X+deltaX, stat.Y+deltaY, argTile)
 					}
 
 				} else if OopWord == "CHANGE" {
@@ -738,13 +738,13 @@ StartParsing:
 				} else if OopWord == "CYCLE" {
 					OopReadValue(statId, position)
 					if OopValue > 0 {
-						Cycle = OopValue
+						stat.Cycle = OopValue
 					}
 				} else if OopWord == "CHAR" {
 					OopReadValue(statId, position)
 					if (OopValue > 0) && (OopValue <= 255) {
-						P1 = OopValue
-						BoardDrawTile(X, Y)
+						stat.P1 = OopValue
+						BoardDrawTile(stat.X, stat.Y)
 					}
 				} else if OopWord == "DIE" {
 					replaceStat = true
@@ -754,9 +754,9 @@ StartParsing:
 					OopReadWord(statId, position)
 					bindStatId = 0
 					if OopIterateStat(statId, bindStatId, OopWord) {
-						FreeMem(Data, DataLen)
-						Data = Board.Stats[bindStatId].Data
-						DataLen = Board.Stats[bindStatId].DataLen
+						FreeMem(stat.Data, stat.DataLen)
+						stat.Data = Board.Stats[bindStatId].Data
+						stat.DataLen = Board.Stats[bindStatId].DataLen
 						position = 0
 					}
 				} else {
@@ -820,8 +820,8 @@ StartParsing:
 	}
 
 	if replaceStat {
-		ix = X
-		iy = Y
+		ix = stat.X
+		iy = stat.Y
 		DamageStat(statId)
 		OopPlaceTile(ix, iy, replaceTile)
 	}

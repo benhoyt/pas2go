@@ -5,6 +5,7 @@ ISSUES:
 - distinguishing string constants vs char, eg: pArg[1] == "/"
 - uses operator precedence rather than ParenExpr
 - "exit" -> break or return (should EXIT be a keyword in lexer?)
+- output Go x+=y for Pascal x=x+y?
 */
 
 package main
@@ -15,8 +16,16 @@ import (
 	"strings"
 )
 
-func Convert(file File, w io.Writer) {
-	c := &converter{w}
+func Convert(file File, units []*Unit, w io.Writer) {
+	c := &converter{w: w}
+
+	c.units = make(map[string]*Unit)
+	for _, unit := range units {
+		c.units[strings.ToLower(unit.Name)] = unit
+	}
+	c.types = make(map[string]TypeSpec)
+	c.pushScope(ScopeGlobal, nil)
+
 	switch file := file.(type) {
 	case *Program:
 		c.program(file)
@@ -28,7 +37,109 @@ func Convert(file File, w io.Writer) {
 }
 
 type converter struct {
-	w io.Writer
+	units  map[string]*Unit
+	w      io.Writer
+	types  map[string]TypeSpec
+	scopes []Scope
+}
+
+type Scope struct {
+	Type     ScopeType
+	WithExpr *VarExpr
+	Vars     map[string]TypeSpec
+}
+
+type ScopeType int
+
+const (
+	ScopeNone ScopeType = iota
+	ScopeGlobal
+	ScopeLocal
+	ScopeWith
+)
+
+func (c *converter) pushScope(typ ScopeType, withExpr *VarExpr) {
+	scope := Scope{typ, withExpr, make(map[string]TypeSpec)}
+	c.scopes = append(c.scopes, scope)
+}
+
+func (c *converter) popScope() {
+	c.scopes = c.scopes[:len(c.scopes)-1]
+}
+
+func (c *converter) defineVar(name string, spec TypeSpec) {
+	scope := c.scopes[len(c.scopes)-1]
+	scope.Vars[name] = spec
+}
+
+func (c *converter) lookupVarType(name string) (Scope, TypeSpec) {
+	for i := len(c.scopes) - 1; i >= 0; i-- {
+		scope := c.scopes[i]
+		spec := scope.Vars[name]
+		if spec != nil {
+			return scope, spec
+		}
+	}
+	return Scope{}, nil
+}
+
+func (c *converter) lookupRecordType(varExpr *VarExpr) (string, *RecordSpec) {
+	if varExpr.HasAt {
+		panic(fmt.Sprintf("unexpected HasAt for in 'with' VarExpr: %q", varExpr))
+	}
+	_, spec := c.lookupVarType(varExpr.Name)
+	if spec == nil {
+		panic(fmt.Sprintf("with var not found: %q", varExpr.Name))
+	}
+	spec = c.lookupNamedType(spec)
+
+	fieldName := varExpr.Name
+	for _, suffix := range varExpr.Suffixes {
+		switch suffix := suffix.(type) {
+		case *DotSuffix:
+			fieldName = suffix.Field
+			record := spec.(*RecordSpec)
+			spec = findField(record, suffix.Field)
+			if spec == nil {
+				panic(fmt.Sprintf("field not found: %q", suffix.Field))
+			}
+			switch innerSpec := spec.(type) {
+			case *IdentSpec:
+				spec = c.lookupNamedType(spec)
+			case *ArraySpec:
+				if a, ok := innerSpec.Of.(*ArraySpec); ok {
+					// Two-dimensional array
+					innerSpec = a
+				}
+				spec = c.lookupNamedType(innerSpec.Of)
+			}
+		}
+	}
+
+	return fieldName, spec.(*RecordSpec)
+}
+
+func (c *converter) lookupNamedType(spec TypeSpec) TypeSpec {
+	if a, ok := spec.(*ArraySpec); ok {
+		spec = a.Of
+	}
+	typeName := spec.(*IdentSpec).Name
+	spec, ok := c.types[typeName]
+	if !ok {
+		panic(fmt.Sprintf("named type not found: %q", typeName))
+	}
+	return spec
+}
+
+func findField(record *RecordSpec, field string) TypeSpec {
+	for _, section := range record.Sections {
+		for _, name := range section.Names {
+			if name == field {
+				return section.Type
+			}
+		}
+	}
+	return nil
 }
 
 func (c *converter) print(a ...interface{}) {
@@ -43,21 +154,65 @@ func (c *converter) program(program *Program) {
 	c.print("package main\n\n")
 	if program.Uses != nil {
 		c.printf("// uses: %s\n\n", strings.Join(program.Uses, ", "))
+		for _, unitName := range program.Uses {
+			c.addUnitDecls(unitName)
+		}
 	}
 	c.decls(program.Decls, true)
+	c.defineDecls(program.Decls)
 	c.print("func main() {\n")
 	c.stmts(program.Stmt.Stmts)
 	c.print("}\n")
+}
+
+func (c *converter) addUnitDecls(unitName string) {
+	unit, loaded := c.units[strings.ToLower(unitName)]
+	if !loaded {
+		return
+	}
+	c.defineDecls(unit.Interface)
+}
+
+func (c *converter) defineDecls(decls []DeclPart) {
+	for _, decl := range decls {
+		switch decl := decl.(type) {
+		case *TypeDefs:
+			for _, d := range decl.Defs {
+				c.types[d.Name] = d.Type
+			}
+		case *VarDecls:
+			for _, d := range decl.Decls {
+				for _, name := range d.Names {
+					c.defineVar(name, d.Type)
+				}
+			}
+		}
+	}
+}
+
+func (c *converter) defineParams(params []*ParamGroup) {
+	for _, group := range params {
+		for _, name := range group.Names {
+			c.defineVar(name, &IdentSpec{group.Type})
+		}
+	}
 }
 
 func (c *converter) unit(unit *Unit) {
 	c.printf("package main // unit: %s\n\n", unit.Name)
 	if unit.InterfaceUses != nil {
 		c.printf("// interface uses: %s\n\n", strings.Join(unit.InterfaceUses, ", "))
+		for _, unitName := range unit.InterfaceUses {
+			c.addUnitDecls(unitName)
+		}
 	}
 	c.decls(unit.Interface, true)
+	c.defineDecls(unit.Interface)
 	if unit.ImplementationUses != nil {
 		c.printf("\n// implementation uses: %s\n\n", strings.Join(unit.ImplementationUses, ", "))
+		for _, unitName := range unit.ImplementationUses {
+			c.addUnitDecls(unitName)
+		}
 	}
 	c.decls(unit.Implementation, true)
 	c.print("func init() {\n")
@@ -108,8 +263,14 @@ func (c *converter) decl(decl DeclPart, isMain bool) {
 		c.printf(") (%s ", decl.Name)
 		c.typeIdent(decl.Result)
 		c.print(") {\n")
+
+		c.pushScope(ScopeLocal, nil)
+		c.defineParams(decl.Params)
+		c.defineDecls(decl.Decls)
 		c.decls(decl.Decls, false)
 		c.stmts(decl.Stmt.Stmts)
+		c.popScope()
+
 		c.print("return\n}\n\n")
 	case *LabelDecls:
 		// not needed
@@ -124,8 +285,14 @@ func (c *converter) decl(decl DeclPart, isMain bool) {
 		}
 		c.params(decl.Params)
 		c.print(") {\n")
+
+		c.pushScope(ScopeLocal, nil)
+		c.defineParams(decl.Params)
+		c.defineDecls(decl.Decls)
 		c.decls(decl.Decls, false)
 		c.stmts(decl.Stmt.Stmts)
+		c.popScope()
+
 		c.print("}\n\n")
 	case *TypeDefs:
 		if len(decl.Defs) == 1 {
@@ -329,15 +496,34 @@ func (c *converter) stmt(stmt Stmt) {
 		c.stmtNoBraces(stmt.Stmt)
 		c.print("}")
 	case *WithStmt:
-		// TODO: fix this; drop multi Vars support?
-		c.print("// WITH temp = ")
-		c.expr(stmt.Vars[0])
-		c.print("\n")
+		// TODO: drop multi Vars support in parser?
+		expr := stmt.Vars[0]
+		fieldName, record := c.lookupRecordType(expr)
+		var withName string
+		if len(expr.Suffixes) == 0 && strings.ToLower(fieldName) == strings.ToLower(expr.Name) {
+			withName = expr.Name
+		} else {
+			withName = c.makeWithName(fieldName)
+			c.printf("%s := &", withName)
+			c.expr(stmt.Vars[0])
+			c.print("\n")
+		}
+		c.pushScope(ScopeWith, &VarExpr{Name: withName})
+		for _, section := range record.Sections {
+			for _, name := range section.Names {
+				c.defineVar(name, section.Type)
+			}
+		}
 		c.stmtNoBraces(stmt.Stmt)
+		c.popScope()
 	default:
 		panic(fmt.Sprintf("unhandled Stmt: %T", stmt))
 	}
 	c.print("\n")
+}
+
+func (c *converter) makeWithName(fieldName string) string {
+	return strings.ToLower(strings.TrimSuffix(fieldName, "s"))
 }
 
 func (c *converter) exprs(exprs []Expr) {
@@ -425,6 +611,15 @@ func (c *converter) expr(expr Expr) {
 	case *VarExpr:
 		if expr.HasAt {
 			c.printf("*")
+		}
+		if len(expr.Suffixes) == 0 {
+			// If record field name is being used inside "with"
+			// statement, prefix it with the with expression and ".".
+			scope, spec := c.lookupVarType(expr.Name)
+			if spec != nil && scope.Type == ScopeWith {
+				c.expr(scope.WithExpr)
+				c.print(".")
+			}
 		}
 		c.printf(expr.Name)
 		for _, suffix := range expr.Suffixes {

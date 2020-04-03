@@ -12,8 +12,8 @@ import (
 )
 
 func main() {
-	if len(os.Args) < 2 || len(os.Args) > 3 {
-		fmt.Fprintf(os.Stderr, "usage: pas2go [lex | parse | convert] [file.pas]\n")
+	if len(os.Args) < 2 {
+		fmt.Fprintf(os.Stderr, "usage: pas2go [lex | parse | convert] [file.pas] [unit1.pas ...]\n")
 		os.Exit(1)
 	}
 
@@ -45,7 +45,23 @@ func main() {
 		fmt.Print(file)
 	case "convert":
 		file := parse(src)
-		Convert(file, os.Stdout)
+
+		units := []*Unit{}
+		for _, path := range os.Args[3:] {
+			unitSrc, err := ioutil.ReadFile(path)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "error reading file: %v\n", err)
+				os.Exit(1)
+			}
+			unitFile := parse(unitSrc)
+			unit, ok := unitFile.(*Unit)
+			if !ok {
+				continue
+			}
+			units = append(units, unit)
+		}
+
+		Convert(file, units, os.Stdout)
 	default:
 		fmt.Fprintf(os.Stderr, "command must be 'lex' or 'parse'")
 		os.Exit(1)

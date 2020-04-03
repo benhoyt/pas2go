@@ -95,20 +95,20 @@ func BoardClose() {
 	Move(Board.StatCount, ptr, SizeOf(Board.StatCount))
 	AdvancePointer(ptr, SizeOf(Board.StatCount))
 	for ix = 0; ix <= Board.StatCount; ix++ {
-		// WITH temp = Board.Stats[ix]
-		if DataLen > 0 {
+		stat := &Board.Stats[ix]
+		if stat.DataLen > 0 {
 			for iy = 1; iy <= (ix - 1); iy++ {
-				if Board.Stats[iy].Data == Data {
-					DataLen = -iy
+				if Board.Stats[iy].Data == stat.Data {
+					stat.DataLen = -iy
 				}
 			}
 		}
 		Move(Board.Stats[ix], ptr, SizeOf(TStat))
 		AdvancePointer(ptr, SizeOf(TStat))
-		if DataLen > 0 {
-			Move(Data, ptr, DataLen)
-			FreeMem(Data, DataLen)
-			AdvancePointer(ptr, DataLen)
+		if stat.DataLen > 0 {
+			Move(Data, ptr, stat.DataLen)
+			FreeMem(stat.Data, stat.DataLen)
+			AdvancePointer(ptr, stat.DataLen)
 		}
 
 	}
@@ -154,16 +154,16 @@ func BoardOpen(boardId int16) {
 	Move(ptr, Board.StatCount, SizeOf(Board.StatCount))
 	AdvancePointer(ptr, SizeOf(Board.StatCount))
 	for ix = 0; ix <= Board.StatCount; ix++ {
-		// WITH temp = Board.Stats[ix]
+		stat := &Board.Stats[ix]
 		Move(ptr, Board.Stats[ix], SizeOf(TStat))
 		AdvancePointer(ptr, SizeOf(TStat))
-		if DataLen > 0 {
-			GetMem(Data, DataLen)
-			Move(ptr, Data, DataLen)
-			AdvancePointer(ptr, DataLen)
-		} else if DataLen < 0 {
-			Data = Board.Stats[-DataLen].Data
-			DataLen = Board.Stats[-DataLen].DataLen
+		if stat.DataLen > 0 {
+			GetMem(stat.Data, stat.DataLen)
+			Move(ptr, Data, stat.DataLen)
+			AdvancePointer(ptr, stat.DataLen)
+		} else if stat.DataLen < 0 {
+			stat.Data = Board.Stats[-stat.DataLen].Data
+			stat.DataLen = Board.Stats[-stat.DataLen].DataLen
 		}
 
 	}
@@ -262,22 +262,22 @@ func TransitionDrawToFill(chr byte, color int16) {
 
 func BoardDrawTile(x, y int16) {
 	var ch byte
-	// WITH temp = Board.Tiles[x][y]
+	tile := &Board.Tiles[x][y]
 	if !Board.Info.IsDark || (ElementDefs[Board.Tiles[x][y].Element].VisibleInDark) || ((World.Info.TorchTicks > 0) && ((Sqr(Board.Stats[0].X-x) + Sqr(Board.Stats[0].Y-y)*2) < TORCH_DIST_SQR)) || ForceDarknessOff {
-		if Element == E_EMPTY {
+		if tile.Element == E_EMPTY {
 			VideoWriteText(x-1, y-1, 0x0F, ' ')
-		} else if ElementDefs[Element].HasDrawProc {
-			ElementDefs[Element].DrawProc(x, y, ch)
-			VideoWriteText(x-1, y-1, Color, Chr(ch))
-		} else if Element < E_TEXT_MIN {
-			VideoWriteText(x-1, y-1, Color, ElementDefs[Element].Character)
+		} else if ElementDefs[tile.Element].HasDrawProc {
+			ElementDefs[tile.Element].DrawProc(x, y, ch)
+			VideoWriteText(x-1, y-1, tile.Color, Chr(ch))
+		} else if tile.Element < E_TEXT_MIN {
+			VideoWriteText(x-1, y-1, tile.Color, ElementDefs[tile.Element].Character)
 		} else {
-			if Element == E_TEXT_WHITE {
+			if tile.Element == E_TEXT_WHITE {
 				VideoWriteText(x-1, y-1, 0x0F, Chr(Board.Tiles[x][y].Color))
 			} else if VideoMonochrome {
-				VideoWriteText(x-1, y-1, ((Element-E_TEXT_MIN)+1)*16, Chr(Board.Tiles[x][y].Color))
+				VideoWriteText(x-1, y-1, ((tile.Element-E_TEXT_MIN)+1)*16, Chr(Board.Tiles[x][y].Color))
 			} else {
-				VideoWriteText(x-1, y-1, (((Element-E_TEXT_MIN)+1)*16)+0x0F, Chr(Board.Tiles[x][y].Color))
+				VideoWriteText(x-1, y-1, (((tile.Element-E_TEXT_MIN)+1)*16)+0x0F, Chr(Board.Tiles[x][y].Color))
 			}
 
 		}
@@ -304,8 +304,8 @@ func TransitionDrawToBoard() {
 	var i int16
 	BoardDrawBorder()
 	for i = 1; i <= TransitionTableSize; i++ {
-		// WITH temp = TransitionTable[i]
-		BoardDrawTile(X, Y)
+		transitiontable := &TransitionTable[i]
+		BoardDrawTile(transitiontable.X, transitiontable.Y)
 
 	}
 }
@@ -736,11 +736,11 @@ func CopyStatDataToTextWindow(statId int16, state *TTextWindowState) {
 		dataChr byte
 		i       int16
 	)
-	// WITH temp = Board.Stats[statId]
+	stat := &Board.Stats[statId]
 	TextWindowInitState(state)
 	dataStr = ""
-	dataPtr = Data
-	for i = 0; i <= DataLen; i++ {
+	dataPtr = stat.Data
+	for i = 0; i <= stat.DataLen; i++ {
 		Move(dataPtr, dataChr, 1)
 		if dataChr == KEY_ENTER {
 			TextWindowAppend(state, dataStr)
@@ -757,12 +757,12 @@ func AddStat(tx, ty int16, element byte, color, tcycle int16, template TStat) {
 	if Board.StatCount < MAX_STAT {
 		Board.StatCount = Board.StatCount + 1
 		Board.Stats[Board.StatCount] = template
-		// WITH temp = Board.Stats[Board.StatCount]
-		X = tx
-		Y = ty
-		Cycle = tcycle
-		Under = Board.Tiles[tx][ty]
-		DataPos = 0
+		stat := &Board.Stats[Board.StatCount]
+		stat.X = tx
+		stat.Y = ty
+		stat.Cycle = tcycle
+		stat.Under = Board.Tiles[tx][ty]
+		stat.DataPos = 0
 
 		if template.Data != nil {
 			GetMem(Board.Stats[Board.StatCount].Data, template.DataLen)
@@ -782,23 +782,23 @@ func AddStat(tx, ty int16, element byte, color, tcycle int16, template TStat) {
 
 func RemoveStat(statId int16) {
 	var i int16
-	// WITH temp = Board.Stats[statId]
-	if DataLen != 0 {
+	stat := &Board.Stats[statId]
+	if stat.DataLen != 0 {
 		for i = 1; i <= Board.StatCount; i++ {
-			if (Board.Stats[i].Data == Data) && (i != statId) {
+			if (Board.Stats[i].Data == stat.Data) && (i != statId) {
 				goto StatDataInUse
 			}
 		}
-		FreeMem(Data, DataLen)
+		FreeMem(stat.Data, stat.DataLen)
 	}
 StatDataInUse:
 	if statId < CurrentStatTicked {
 		CurrentStatTicked = CurrentStatTicked - 1
 	}
 
-	Board.Tiles[X][Y] = Under
-	if Y > 0 {
-		BoardDrawTile(X, Y)
+	Board.Tiles[stat.X][stat.Y] = stat.Under
+	if stat.Y > 0 {
+		BoardDrawTile(stat.X, stat.Y)
 	}
 	for i = 1; i <= Board.StatCount; i++ {
 		if Board.Stats[i].Follower >= statId {
@@ -870,31 +870,31 @@ func MoveStat(statId int16, newX, newY int16) {
 		oldX, oldY int16
 		oldBgColor int16
 	)
-	// WITH temp = Board.Stats[statId]
+	stat := &Board.Stats[statId]
 	oldBgColor = Board.Tiles[newX][newY].Color && 0xF0
 	iUnder = Board.Stats[statId].Under
 	Board.Stats[statId].Under = Board.Tiles[newX][newY]
-	if Board.Tiles[X][Y].Element == E_PLAYER {
-		Board.Tiles[newX][newY].Color = Board.Tiles[X][Y].Color
+	if Board.Tiles[stat.X][stat.Y].Element == E_PLAYER {
+		Board.Tiles[newX][newY].Color = Board.Tiles[stat.X][stat.Y].Color
 	} else if Board.Tiles[newX][newY].Element == E_EMPTY {
-		Board.Tiles[newX][newY].Color = Board.Tiles[X][Y].Color && 0x0F
+		Board.Tiles[newX][newY].Color = Board.Tiles[stat.X][stat.Y].Color && 0x0F
 	} else {
-		Board.Tiles[newX][newY].Color = (Board.Tiles[X][Y].Color && 0x0F) + (Board.Tiles[newX][newY].Color && 0x70)
+		Board.Tiles[newX][newY].Color = (Board.Tiles[stat.X][stat.Y].Color && 0x0F) + (Board.Tiles[newX][newY].Color && 0x70)
 	}
 
-	Board.Tiles[newX][newY].Element = Board.Tiles[X][Y].Element
-	Board.Tiles[X][Y] = iUnder
-	oldX = X
-	oldY = Y
-	X = newX
-	Y = newY
-	BoardDrawTile(X, Y)
+	Board.Tiles[newX][newY].Element = Board.Tiles[stat.X][stat.Y].Element
+	Board.Tiles[stat.X][stat.Y] = iUnder
+	oldX = stat.X
+	oldY = stat.Y
+	stat.X = newX
+	stat.Y = newY
+	BoardDrawTile(stat.X, stat.Y)
 	BoardDrawTile(oldX, oldY)
 	if (statId == 0) && Board.Info.IsDark && (World.Info.TorchTicks > 0) {
-		if (Sqr(oldX-X) + Sqr(oldY-Y)) == 1 {
-			for ix = (X - TORCH_DX - 3); ix <= (X + TORCH_DX + 3); ix++ {
+		if (Sqr(oldX-stat.X) + Sqr(oldY-stat.Y)) == 1 {
+			for ix = (stat.X - TORCH_DX - 3); ix <= (stat.X + TORCH_DX + 3); ix++ {
 				if (ix >= 1) && (ix <= BOARD_WIDTH) {
-					for iy = (Y - TORCH_DY - 3); iy <= (Y + TORCH_DY + 3); iy++ {
+					for iy = (stat.Y - TORCH_DY - 3); iy <= (stat.Y + TORCH_DY + 3); iy++ {
 						if (iy >= 1) && (iy <= BOARD_HEIGHT) {
 							if (((Sqr(ix - oldX)) + (Sqr(iy-oldY) * 2)) < TORCH_DIST_SQR) ^ (((Sqr(ix - newX)) + (Sqr(iy-newY) * 2)) < TORCH_DIST_SQR) {
 								BoardDrawTile(ix, iy)
@@ -905,7 +905,7 @@ func MoveStat(statId int16, newX, newY int16) {
 			}
 		} else {
 			DrawPlayerSurroundings(oldX, oldY, 0)
-			DrawPlayerSurroundings(X, Y, 0)
+			DrawPlayerSurroundings(stat.X, stat.Y, 0)
 		}
 	}
 
@@ -1020,25 +1020,25 @@ func DisplayMessage(time int16, message string) {
 
 func DamageStat(attackerStatId int16) {
 	var oldX, oldY int16
-	// WITH temp = Board.Stats[attackerStatId]
+	stat := &Board.Stats[attackerStatId]
 	if attackerStatId == 0 {
 		if World.Info.Health > 0 {
 			World.Info.Health = World.Info.Health - 10
 			GameUpdateSidebar()
 			DisplayMessage(100, "Ouch!")
-			Board.Tiles[X][Y].Color = 0x70 + (ElementDefs[E_PLAYER].Color % 0x10)
+			Board.Tiles[stat.X][stat.Y].Color = 0x70 + (ElementDefs[E_PLAYER].Color % 0x10)
 			if World.Info.Health > 0 {
 				World.Info.BoardTimeSec = 0
 				if Board.Info.ReenterWhenZapped {
 					SoundQueue(4, " \x01#\x01'\x010\x01\x10\x01")
-					Board.Tiles[X][Y].Element = E_EMPTY
-					BoardDrawTile(X, Y)
-					oldX = X
-					oldY = Y
-					X = Board.Info.StartPlayerX
-					Y = Board.Info.StartPlayerY
+					Board.Tiles[stat.X][stat.Y].Element = E_EMPTY
+					BoardDrawTile(stat.X, stat.Y)
+					oldX = stat.X
+					oldY = stat.Y
+					stat.X = Board.Info.StartPlayerX
+					stat.Y = Board.Info.StartPlayerY
 					DrawPlayerSurroundings(oldX, oldY, 0)
-					DrawPlayerSurroundings(X, Y, 0)
+					DrawPlayerSurroundings(stat.X, stat.Y, 0)
 					GamePaused = true
 				}
 				SoundQueue(4, "\x10\x01 \x01\x13\x01#\x01")
@@ -1047,7 +1047,7 @@ func DamageStat(attackerStatId int16) {
 			}
 		}
 	} else {
-		switch Board.Tiles[X][Y].Element {
+		switch Board.Tiles[stat.X][stat.Y].Element {
 		case E_BULLET:
 			SoundQueue(3, " \x01")
 		case E_OBJECT:
@@ -1092,11 +1092,11 @@ func BoardAttack(attackerStatId int16, x, y int16) {
 func BoardShoot(element byte, tx, ty, deltaX, deltaY int16, source int16) (BoardShoot bool) {
 	if ElementDefs[Board.Tiles[tx+deltaX][ty+deltaY].Element].Walkable || (Board.Tiles[tx+deltaX][ty+deltaY].Element == E_WATER) {
 		AddStat(tx+deltaX, ty+deltaY, element, ElementDefs[element].Color, 1, StatTemplateDefault)
-		// WITH temp = Board.Stats[Board.StatCount]
-		P1 = source
-		StepX = deltaX
-		StepY = deltaY
-		P2 = 100
+		stat := &Board.Stats[Board.StatCount]
+		stat.P1 = source
+		stat.StepX = deltaX
+		stat.StepY = deltaY
+		stat.P2 = 100
 
 		BoardShoot = true
 	} else if (Board.Tiles[tx+deltaX][ty+deltaY].Element == E_BREAKABLE) || (ElementDefs[Board.Tiles[tx+deltaX][ty+deltaY].Element].Destructible && ((Board.Tiles[tx+deltaX][ty+deltaY].Element == E_PLAYER) == bool(source)) && (World.Info.EnergizerTicks <= 0)) {
@@ -1382,9 +1382,9 @@ func GamePlayLoop(boardChanged bool) {
 			}
 		} else {
 			if CurrentStatTicked <= Board.StatCount {
-				// WITH temp = Board.Stats[CurrentStatTicked]
-				if (Cycle != 0) && ((CurrentTick % Cycle) == (CurrentStatTicked % Cycle)) {
-					ElementDefs[Board.Tiles[X][Y].Element].TickProc(CurrentStatTicked)
+				stat := &Board.Stats[CurrentStatTicked]
+				if (stat.Cycle != 0) && ((CurrentTick % stat.Cycle) == (CurrentStatTicked % stat.Cycle)) {
+					ElementDefs[Board.Tiles[stat.X][stat.Y].Element].TickProc(CurrentStatTicked)
 				}
 				CurrentStatTicked = CurrentStatTicked + 1
 
