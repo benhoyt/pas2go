@@ -712,12 +712,11 @@ func (c *converter) expr(expr Expr) {
 
 				c.print("[")
 				if min != 0 {
-					// TODO: need suffix.Indexes to be multiple indexes?
 					// TODO: if index is ConstExpr, add 1 as const, if VarExpr then +1, else add parens and +1
-					c.exprs(suffix.Indexes)
+					c.expr(suffix.Index)
 					c.printf(" + %d", min)
 				} else {
-					c.exprs(suffix.Indexes)
+					c.expr(suffix.Index)
 				}
 				c.print("]")
 			case *DotSuffix:

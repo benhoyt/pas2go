@@ -789,15 +789,11 @@ func (s *DotSuffix) varSuffix()     {}
 func (s *PointerSuffix) varSuffix() {}
 
 type IndexSuffix struct {
-	Indexes []Expr
+	Index Expr
 }
 
 func (s *IndexSuffix) String() string {
-	strs := make([]string, len(s.Indexes))
-	for i, index := range s.Indexes {
-		strs[i] = index.String()
-	}
-	return "[" + strings.Join(strs, ", ") + "]"
+	return "[" + s.Index.String() + "]"
 }
 
 type DotSuffix struct {

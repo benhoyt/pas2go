@@ -588,13 +588,9 @@ func (p *parser) varExpr() *VarExpr {
 		switch p.tok {
 		case LBRACKET:
 			p.next()
-			indexes := []Expr{p.expr()}
-			for p.tok == COMMA {
-				p.next()
-				indexes = append(indexes, p.expr())
-			}
+			index := p.expr()
 			p.expect(RBRACKET)
-			part = &IndexSuffix{indexes}
+			part = &IndexSuffix{index}
 		case DOT:
 			p.next()
 			field := p.val
