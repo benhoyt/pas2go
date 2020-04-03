@@ -389,13 +389,8 @@ func (c *converter) params(params []*ParamGroup) {
 			c.print(", ")
 		}
 		c.print(strings.Join(param.Names, ", "), " ")
-		switch param.Prefix {
-		case VAR:
+		if param.IsVar {
 			c.print("*")
-		case ILLEGAL:
-			// no prefix
-		default:
-			panic(fmt.Sprintf("unhandled ParamGroup.Prefix: %s", param.Prefix))
 		}
 		c.typeIdent(param.Type)
 	}
@@ -787,7 +782,6 @@ func (c *converter) typeSpec(spec TypeSpec) {
 		// TODO: how to handle string sizes? should we use [Size]byte
 		c.print("string")
 	case *ArraySpec:
-		// TODO2: record Min and adjust in code that indexes into array
 		min := spec.Min.(*ConstExpr).Value.(int)
 		maxConstExpr, maxIsConst := spec.Max.(*ConstExpr)
 		if maxIsConst {

@@ -156,15 +156,15 @@ func (t *TypeIdent) String() string {
 }
 
 type ParamGroup struct {
-	Prefix Token // ILLEGAL (meaning no prefix), VAR, FUNCTION, PROCEDURE
-	Names  []string
-	Type   *TypeIdent
+	IsVar bool
+	Names []string
+	Type  *TypeIdent
 }
 
 func (g *ParamGroup) String() string {
 	prefix := ""
-	if g.Prefix != ILLEGAL {
-		prefix = strings.ToLower(g.Prefix.String()) + " "
+	if g.IsVar {
+		prefix = "var "
 	}
 	return fmt.Sprintf("%s%s: %s", prefix, strings.Join(g.Names, ", "), g.Type)
 }

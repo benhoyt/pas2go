@@ -248,15 +248,15 @@ func (p *parser) optionalParamList() []*ParamGroup {
 }
 
 func (p *parser) paramGroup() *ParamGroup {
-	prefix := ILLEGAL
-	if p.matches(VAR, FUNCTION, PROCEDURE) {
-		prefix = p.tok
+	isVar := false
+	if p.matches(VAR) {
+		isVar = true
 		p.next()
 	}
 	names := p.identList()
 	p.expect(COLON)
 	typ := p.typeIdent()
-	return &ParamGroup{prefix, names, typ}
+	return &ParamGroup{isVar, names, typ}
 }
 
 func (p *parser) typeIdent() *TypeIdent {
