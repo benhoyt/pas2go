@@ -555,7 +555,7 @@ func (s *WhileStmt) String() string {
 }
 
 type WithStmt struct {
-	Var *VarExpr
+	Var  *VarExpr
 	Stmt Stmt
 }
 

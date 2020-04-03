@@ -1379,30 +1379,30 @@ func ResetMessageNotShownFlags() {
 func InitElementDefs() {
 	var i int16
 	for i = 0; i <= MAX_ELEMENT; i++ {
-		elementdef := &ElementDefs[i]
-		elementdef.Character = ' '
-		elementdef.Color = COLOR_CHOICE_ON_BLACK
-		elementdef.Destructible = false
-		elementdef.Pushable = false
-		elementdef.VisibleInDark = false
-		elementdef.PlaceableOnTop = false
-		elementdef.Walkable = false
-		elementdef.HasDrawProc = false
-		elementdef.Cycle = -1
-		elementdef.TickProc = ElementDefaultTick
-		elementdef.DrawProc = ElementDefaultDraw
-		elementdef.TouchProc = ElementDefaultTouch
-		elementdef.EditorCategory = 0
-		elementdef.EditorShortcut = '\x00'
-		elementdef.Name = ""
-		elementdef.CategoryName = ""
-		elementdef.Param1Name = ""
-		elementdef.Param2Name = ""
-		elementdef.ParamBulletTypeName = ""
-		elementdef.ParamBoardName = ""
-		elementdef.ParamDirName = ""
-		elementdef.ParamTextName = ""
-		elementdef.ScoreValue = 0
+		def := &ElementDefs[i]
+		def.Character = ' '
+		def.Color = COLOR_CHOICE_ON_BLACK
+		def.Destructible = false
+		def.Pushable = false
+		def.VisibleInDark = false
+		def.PlaceableOnTop = false
+		def.Walkable = false
+		def.HasDrawProc = false
+		def.Cycle = -1
+		def.TickProc = ElementDefaultTick
+		def.DrawProc = ElementDefaultDraw
+		def.TouchProc = ElementDefaultTouch
+		def.EditorCategory = 0
+		def.EditorShortcut = '\x00'
+		def.Name = ""
+		def.CategoryName = ""
+		def.Param1Name = ""
+		def.Param2Name = ""
+		def.ParamBulletTypeName = ""
+		def.ParamBoardName = ""
+		def.ParamDirName = ""
+		def.ParamTextName = ""
+		def.ScoreValue = 0
 
 	}
 	ElementDefs[0].Character = ' '
@@ -1779,12 +1779,12 @@ func InitEditorStatSettings() {
 	PlayerDirX = 0
 	PlayerDirY = 0
 	for i = 0; i <= MAX_ELEMENT; i++ {
-		editorstatsetting := &World.EditorStatSettings[i]
-		editorstatsetting.P1 = 4
-		editorstatsetting.P2 = 4
-		editorstatsetting.P3 = 0
-		editorstatsetting.StepX = 0
-		editorstatsetting.StepY = -1
+		setting := &World.EditorStatSettings[i]
+		setting.P1 = 4
+		setting.P2 = 4
+		setting.P3 = 0
+		setting.StepX = 0
+		setting.StepY = -1
 
 	}
 	World.EditorStatSettings[E_OBJECT].P1 = 1

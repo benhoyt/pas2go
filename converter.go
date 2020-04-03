@@ -6,7 +6,6 @@ ISSUES:
 - uses operator precedence rather than ParenExpr
 - "exit" -> break or return (should EXIT be a keyword in lexer?)
 - output Go x+=y for Pascal x=x+y?
-- better names for with statement var? eg: elementdef, editorstatsetting, transitiontable
 */
 
 package main
@@ -521,8 +520,25 @@ func (c *converter) stmt(stmt Stmt) {
 	c.print("\n")
 }
 
-func (c *converter) makeWithName(fieldName string) string {
-	return strings.ToLower(strings.TrimSuffix(fieldName, "s"))
+func (c *converter) makeWithName(name string) string {
+	parts := splitCamel(name)
+	lastPart := parts[len(parts)-1]
+	return strings.ToLower(strings.TrimSuffix(lastPart, "s"))
+}
+
+func splitCamel(name string) []string {
+	parts := []string{}
+	hadCap := false
+	start := 0
+	for i, c := range name {
+		if hadCap && c >= 'a' && c <= 'z' && i > 1 {
+			parts = append(parts, name[start:i-1])
+			start = i - 1
+		}
+		hadCap = c >= 'A' && c <= 'Z'
+	}
+	parts = append(parts, name[start:])
+	return parts
 }
 
 func (c *converter) exprs(exprs []Expr) {

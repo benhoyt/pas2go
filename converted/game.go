@@ -304,8 +304,8 @@ func TransitionDrawToBoard() {
 	var i int16
 	BoardDrawBorder()
 	for i = 1; i <= TransitionTableSize; i++ {
-		transitiontable := &TransitionTable[i]
-		BoardDrawTile(transitiontable.X, transitiontable.Y)
+		table := &TransitionTable[i]
+		BoardDrawTile(table.X, table.Y)
 
 	}
 }
