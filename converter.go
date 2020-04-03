@@ -26,11 +26,15 @@ func Convert(file File, units []*Unit, w io.Writer) {
 	c.types = make(map[string]TypeSpec)
 	c.pushScope(ScopeGlobal, nil)
 
-	// TODO: hacks - Port is predefined by Turbo Pascal; TVideoLine is defined in VIDEO.PAS
+	// Port is predefined by Turbo Pascal, fake it
 	min := &ConstExpr{0, false}
 	max := &ConstExpr{1000, false}
 	c.defineVar("Port", &ArraySpec{min, max, &IdentSpec{&TypeIdent{"", INTEGER}}})
-	c.types["TVideoLine"] = &StringSpec{80}
+
+	// TODO: hack - TVideoLine is defined in VIDEO.PAS - do this in separate file
+	c.defineType("TVideoLine", &StringSpec{80})
+
+	// TODO: turn panics into ConvertError and catch
 
 	switch file := file.(type) {
 	case *Program:
@@ -75,10 +79,19 @@ func (c *converter) popScope() {
 
 func (c *converter) defineVar(name string, spec TypeSpec) {
 	scope := c.scopes[len(c.scopes)-1]
-	scope.Vars[name] = spec // TODO: ToLower, also on lookup?
+	scope.Vars[strings.ToLower(name)] = spec
+}
+
+func (c *converter) defineType(name string, spec TypeSpec) {
+	c.types[strings.ToLower(name)] = spec
+}
+
+func (c *converter) lookupType(name string) TypeSpec {
+	return c.types[strings.ToLower(name)]
 }
 
 func (c *converter) lookupVarType(name string) (Scope, TypeSpec) {
+	name = strings.ToLower(name)
 	for i := len(c.scopes) - 1; i >= 0; i-- {
 		scope := c.scopes[i]
 		spec := scope.Vars[name]
@@ -130,9 +143,8 @@ func (c *converter) lookupIdentSpec(spec TypeSpec) TypeSpec {
 	if ident.Name == "" {
 		return spec // builtin type
 	}
-	var found bool
-	spec, found = c.types[ident.Name]
-	if !found {
+	spec = c.lookupType(ident.Name)
+	if spec == nil {
 		panic(fmt.Sprintf("named type not found: %q", ident.Name))
 	}
 	return spec
@@ -143,8 +155,8 @@ func (c *converter) lookupNamedType(spec TypeSpec) TypeSpec {
 		spec = a.Of
 	}
 	typeName := spec.(*IdentSpec).Name
-	spec, ok := c.types[typeName]
-	if !ok {
+	spec = c.lookupType(typeName)
+	if spec == nil {
 		panic(fmt.Sprintf("named type not found: %q", typeName))
 	}
 	return spec
@@ -197,7 +209,7 @@ func (c *converter) defineDecls(decls []DeclPart) {
 		switch decl := decl.(type) {
 		case *TypeDefs:
 			for _, d := range decl.Defs {
-				c.types[d.Name] = d.Type
+				c.defineType(d.Name, d.Type)
 			}
 		case *VarDecls:
 			for _, d := range decl.Decls {
