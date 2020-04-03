@@ -6,6 +6,12 @@ package main // unit: Editor
 
 type TDrawMode uint8
 
+const (
+	DrawingOff TDrawMode = iota + 1
+	DrawingOn
+	TextEntry
+)
+
 const NeighborBoardStrs [4]string = [...]string{"       Board \x18", "       Board \x19", "       Board \x1b", "       Board \x1a"}
 
 func EditorAppendBoard() {

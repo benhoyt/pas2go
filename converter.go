@@ -300,13 +300,33 @@ func (c *converter) decl(decl DeclPart, isMain bool) {
 		} else {
 			c.print("type (\n")
 		}
+		var scalarType string
+		var scalarConsts []string
 		for _, d := range decl.Defs {
 			c.printf("%s ", d.Name)
+			if spec, ok := d.Type.(*ScalarSpec); ok {
+				scalarType = d.Name
+				scalarConsts = spec.Names
+			}
 			c.typeSpec(d.Type)
 			c.print("\n")
 		}
 		if len(decl.Defs) != 1 {
 			c.print(")\n")
+		}
+		if scalarConsts != nil {
+			// Add constants from last ScalarSpec "enum". Bit of a
+			// hack, as it only supports one "enum" per defs, but
+			// that's all we need for ZZT source.
+			c.print("const (\n")
+			for i, name := range scalarConsts {
+				c.printf("%s", name)
+				if i == 0 {
+					c.printf(" %s = iota + 1", scalarType)
+				}
+				c.print("\n")
+			}
+			c.print(")\n\n")
 		}
 	case *VarDecls:
 		if len(decl.Decls) == 1 {
@@ -694,7 +714,7 @@ func (c *converter) typeSpec(spec TypeSpec) {
 		c.params(spec.Params)
 		c.print(")")
 	case *ScalarSpec:
-		// TODO: also define constants, see EDITOR.PAS: TDrawMode = (DrawingOff, DrawingOn, TextEntry);
+		// spec.Names are defined by TypeDefs handling
 		c.print("uint8")
 	case *IdentSpec:
 		c.typeIdent(spec.TypeIdent)
