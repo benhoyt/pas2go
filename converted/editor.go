@@ -95,7 +95,7 @@ func EditorLoop() {
 			VideoWriteText(61+i, 22, 0x0F, ElementDefs[EditorPatterns[i+1]].Character)
 		}
 		if ElementDefs[copiedTile.Element].HasDrawProc {
-			ElementDefs[copiedTile.Element].DrawProc(copiedX, copiedY, copiedChr)
+			ElementDefs[copiedTile.Element].DrawProc(copiedX, copiedY, &copiedChr)
 		} else {
 			copiedChr = Ord(ElementDefs[copiedTile.Element].Character)
 		}
@@ -157,7 +157,7 @@ func EditorLoop() {
 		if wasModified {
 			if SidebarPromptYesNo("Save first? ", true) {
 				if InputKeyPressed != KEY_ESCAPE {
-					GameWorldSave("Save world", LoadedGameFileName, ".ZZT")
+					GameWorldSave("Save world", &LoadedGameFileName, ".ZZT")
 				}
 			}
 		}
@@ -218,7 +218,7 @@ func EditorLoop() {
 		}
 
 		state.Title = "Board Information"
-		TextWindowDrawOpen(state)
+		TextWindowDrawOpen(&state)
 		state.LinePos = 1
 		state.LineCount = 9
 		state.Selectable = true
@@ -243,7 +243,7 @@ func EditorLoop() {
 			numStr = fmt.Sprint(Board.Info.TimeLimitSec)
 			state.Lines[10] = "  Time limit, 0=None: " + numStr + " sec."
 			state.Lines[11] = "          Quit!"
-			TextWindowSelect(state, false, false)
+			TextWindowSelect(&state, false, false)
 			if (InputKeyPressed == KEY_ENTER) && (state.LinePos >= 1) && (state.LinePos <= 8) {
 				wasModified = true
 			}
@@ -252,10 +252,10 @@ func EditorLoop() {
 				case 1:
 					PopupPromptString("New title for board:", Board.Name)
 					exitRequested = true
-					TextWindowDrawClose(state)
+					TextWindowDrawClose(&state)
 				case 2:
 					numStr = fmt.Sprint(Board.Info.MaxShots)
-					SidebarPromptString("Maximum shots?", "", numStr, PROMPT_NUMERIC)
+					SidebarPromptString("Maximum shots?", "", &numStr, PROMPT_NUMERIC)
 					if Length(numStr) != 0 {
 						Val(numStr, Board.Info.MaxShots, i)
 					}
@@ -272,24 +272,24 @@ func EditorLoop() {
 					Board.Info.ReenterWhenZapped = !Board.Info.ReenterWhenZapped
 				case 9:
 					numStr = fmt.Sprint(Board.Info.TimeLimitSec)
-					SidebarPromptString("Time limit?", " Sec", numStr, PROMPT_NUMERIC)
+					SidebarPromptString("Time limit?", " Sec", &numStr, PROMPT_NUMERIC)
 					if Length(numStr) != 0 {
 						Val(numStr, Board.Info.TimeLimitSec, i)
 					}
 					EditorDrawSidebar()
 				case 10:
 					exitRequested = true
-					TextWindowDrawClose(state)
+					TextWindowDrawClose(&state)
 				}
 			} else {
 				exitRequested = true
-				TextWindowDrawClose(state)
+				TextWindowDrawClose(&state)
 			}
 			if exitRequested {
 				break
 			}
 		}
-		TextWindowFree(state)
+		TextWindowFree(&state)
 	}
 
 	EditorEditStatText := func(statId int16, prompt string) {
@@ -302,14 +302,14 @@ func EditorLoop() {
 		)
 		stat := &Board.Stats[statId]
 		state.Title = prompt
-		TextWindowDrawOpen(state)
+		TextWindowDrawOpen(&state)
 		state.Selectable = false
-		CopyStatDataToTextWindow(statId, state)
+		CopyStatDataToTextWindow(statId, &state)
 		if stat.DataLen > 0 {
 			FreeMem(stat.Data, stat.DataLen)
 			stat.DataLen = 0
 		}
-		EditorOpenEditTextWindow(state)
+		EditorOpenEditTextWindow(&state)
 		for iLine = 1; iLine <= state.LineCount; iLine++ {
 			stat.DataLen = stat.DataLen + Length(state.Lines[iLine+1]) + 1
 		}
@@ -319,14 +319,14 @@ func EditorLoop() {
 			for iChar = 1; iChar <= Length(state.Lines[iLine+1]); iChar++ {
 				dataChar = state.Lines[iLine+1][iChar]
 				Move(dataChar, dataPtr, 1)
-				AdvancePointer(dataPtr, 1)
+				AdvancePointer(&dataPtr, 1)
 			}
 			dataChar = '\r'
 			Move(dataChar, dataPtr, 1)
-			AdvancePointer(dataPtr, 1)
+			AdvancePointer(&dataPtr, 1)
 		}
-		TextWindowFree(state)
-		TextWindowDrawClose(state)
+		TextWindowFree(&state)
+		TextWindowDrawClose(&state)
 		InputKeyPressed = '\x00'
 
 	}
@@ -346,13 +346,13 @@ func EditorLoop() {
 			iy = 9
 			if Length(ElementDefs[element].Param1Name) != 0 {
 				if Length(ElementDefs[element].ParamTextName) == 0 {
-					SidebarPromptSlider(selected, 63, iy, ElementDefs[element].Param1Name, stat.P1)
+					SidebarPromptSlider(selected, 63, iy, ElementDefs[element].Param1Name, &stat.P1)
 				} else {
 					if stat.P1 == 0 {
 						stat.P1 = World.EditorStatSettings[element].P1
 					}
 					BoardDrawTile(stat.X, stat.Y)
-					SidebarPromptCharacter(selected, 63, iy, ElementDefs[element].Param1Name, stat.P1)
+					SidebarPromptCharacter(selected, 63, iy, ElementDefs[element].Param1Name, &stat.P1)
 					BoardDrawTile(stat.X, stat.Y)
 				}
 				if selected {
@@ -367,7 +367,7 @@ func EditorLoop() {
 			}
 			if (InputKeyPressed != KEY_ESCAPE) && (Length(ElementDefs[element].Param2Name) != 0) {
 				promptByte = (stat.P2 % 0x80)
-				SidebarPromptSlider(selected, 63, iy, ElementDefs[element].Param2Name, promptByte)
+				SidebarPromptSlider(selected, 63, iy, ElementDefs[element].Param2Name, &promptByte)
 				if selected {
 					stat.P2 = (stat.P2 && 0x80) + promptByte
 					World.EditorStatSettings[element].P2 = stat.P2
@@ -376,7 +376,7 @@ func EditorLoop() {
 			}
 			if (InputKeyPressed != KEY_ESCAPE) && (Length(ElementDefs[element].ParamBulletTypeName) != 0) {
 				promptByte = (stat.P2) / 0x80
-				SidebarPromptChoice(selected, iy, ElementDefs[element].ParamBulletTypeName, "Bullets Stars", promptByte)
+				SidebarPromptChoice(selected, iy, ElementDefs[element].ParamBulletTypeName, "Bullets Stars", &promptByte)
 				if selected {
 					stat.P2 = (stat.P2 % 0x80) + (promptByte * 0x80)
 					World.EditorStatSettings[element].P2 = stat.P2
@@ -384,7 +384,7 @@ func EditorLoop() {
 				iy = iy + 4
 			}
 			if (InputKeyPressed != KEY_ESCAPE) && (Length(ElementDefs[element].ParamDirName) != 0) {
-				SidebarPromptDirection(selected, iy, ElementDefs[element].ParamDirName, stat.StepX, stat.StepY)
+				SidebarPromptDirection(selected, iy, ElementDefs[element].ParamDirName, &stat.StepX, &stat.StepY)
 				if selected {
 					World.EditorStatSettings[element].StepX = stat.StepX
 					World.EditorStatSettings[element].StepY = stat.StepY
@@ -445,10 +445,10 @@ func EditorLoop() {
 			f FILE
 		)
 		i = 1
-		SidebarPromptChoice(true, 3, "Transfer board:", "Import Export", i)
+		SidebarPromptChoice(true, 3, "Transfer board:", "Import Export", &i)
 		if InputKeyPressed != KEY_ESCAPE {
 			if i == 0 {
-				SidebarPromptString("Import board", ".BRD", SavedBoardFileName, PROMPT_ALPHANUM)
+				SidebarPromptString("Import board", ".BRD", &SavedBoardFileName, PROMPT_ALPHANUM)
 				if (InputKeyPressed != KEY_ESCAPE) && (Length(SavedBoardFileName) != 0) {
 					Assign(f, SavedBoardFileName+".BRD")
 					Reset(f, 1)
@@ -475,7 +475,7 @@ func EditorLoop() {
 					}
 				}
 			} else if i == 1 {
-				SidebarPromptString("Export board", ".BRD", SavedBoardFileName, PROMPT_ALPHANUM)
+				SidebarPromptString("Export board", ".BRD", &SavedBoardFileName, PROMPT_ALPHANUM)
 				if (InputKeyPressed != KEY_ESCAPE) && (Length(SavedBoardFileName) != 0) {
 					Assign(f, SavedBoardFileName+".BRD")
 					Rewrite(f, 1)
@@ -559,7 +559,7 @@ func EditorLoop() {
 		}
 		InputUpdate()
 		if (InputKeyPressed == '\x00') && (InputDeltaX == 0) && (InputDeltaY == 0) && !InputShiftPressed {
-			if SoundHasTimeElapsed(TickTimeCounter, 15) {
+			if SoundHasTimeElapsed(&TickTimeCounter, 15) {
 				cursorBlinker = (cursorBlinker + 1) % 3
 			}
 			if cursorBlinker == 0 {
@@ -664,7 +664,7 @@ func EditorLoop() {
 			}
 			EditorDrawSidebar()
 		case 'S':
-			GameWorldSave("Save world:", LoadedGameFileName, ".ZZT")
+			GameWorldSave("Save world:", &LoadedGameFileName, ".ZZT")
 			if InputKeyPressed != KEY_ESCAPE {
 				wasModified = false
 			}
@@ -894,14 +894,14 @@ func HighScoresInitTextWindow(state *TTextWindowState) {
 func HighScoresDisplay(linePos int16) {
 	var state TTextWindowState
 	state.LinePos = linePos
-	HighScoresInitTextWindow(state)
+	HighScoresInitTextWindow(&state)
 	if state.LineCount > 2 {
 		state.Title = "High scores for " + World.Info.Name
-		TextWindowDrawOpen(state)
-		TextWindowSelect(state, false, true)
-		TextWindowDrawClose(state)
+		TextWindowDrawOpen(&state)
+		TextWindowSelect(&state, false, true)
+		TextWindowDrawClose(&state)
 	}
-	TextWindowFree(state)
+	TextWindowFree(&state)
 }
 
 func EditorOpenEditTextWindow(state *TTextWindowState) {
@@ -927,15 +927,15 @@ func EditorEditHelpFile() {
 		filename   string
 	)
 	filename = ""
-	SidebarPromptString("File to edit", ".HLP", filename, PROMPT_ALPHANUM)
+	SidebarPromptString("File to edit", ".HLP", &filename, PROMPT_ALPHANUM)
 	if Length(filename) != 0 {
-		TextWindowOpenFile('*'+filename+".HLP", textWindow)
+		TextWindowOpenFile('*'+filename+".HLP", &textWindow)
 		textWindow.Title = "Editing " + filename
-		TextWindowDrawOpen(textWindow)
-		EditorOpenEditTextWindow(textWindow)
-		TextWindowSaveFile(filename+".HLP", textWindow)
-		TextWindowFree(textWindow)
-		TextWindowDrawClose(textWindow)
+		TextWindowDrawOpen(&textWindow)
+		EditorOpenEditTextWindow(&textWindow)
+		TextWindowSaveFile(filename+".HLP", &textWindow)
+		TextWindowFree(&textWindow)
+		TextWindowDrawClose(&textWindow)
 	}
 }
 
@@ -955,18 +955,18 @@ func HighScoresAdd(score int16) {
 		}
 		HighScoreList[listPos+1].Score = score
 		HighScoreList[listPos+1].Name = "-- You! --"
-		HighScoresInitTextWindow(textWindow)
+		HighScoresInitTextWindow(&textWindow)
 		textWindow.LinePos = listPos
 		textWindow.Title = "New high score for " + World.Info.Name
-		TextWindowDrawOpen(textWindow)
-		TextWindowDraw(textWindow, false, false)
+		TextWindowDrawOpen(&textWindow)
+		TextWindowDraw(&textWindow, false, false)
 		name = ""
-		PopupPromptString("Congratulations!  Enter your name:", name)
+		PopupPromptString("Congratulations!  Enter your name:", &name)
 		HighScoreList[listPos+1].Name = name
 		HighScoresSave()
-		TextWindowDrawClose(textWindow)
+		TextWindowDrawClose(&textWindow)
 		TransitionDrawToBoard()
-		TextWindowFree(textWindow)
+		TextWindowFree(&textWindow)
 	}
 }
 
@@ -1000,13 +1000,13 @@ func EditorSelectBoard(title string, currentBoard int16, titleScreenIsNone bool)
 	textWindow.Selectable = true
 	textWindow.LineCount = 0
 	for i = 0; i <= World.BoardCount; i++ {
-		TextWindowAppend(textWindow, EditorGetBoardName(i, titleScreenIsNone))
+		TextWindowAppend(&textWindow, EditorGetBoardName(i, titleScreenIsNone))
 	}
-	TextWindowAppend(textWindow, "Add new board")
-	TextWindowDrawOpen(textWindow)
-	TextWindowSelect(textWindow, false, false)
-	TextWindowDrawClose(textWindow)
-	TextWindowFree(textWindow)
+	TextWindowAppend(&textWindow, "Add new board")
+	TextWindowDrawOpen(&textWindow)
+	TextWindowSelect(&textWindow, false, false)
+	TextWindowDrawClose(&textWindow)
+	TextWindowFree(&textWindow)
 	if InputKeyPressed == KEY_ESCAPE {
 		EditorSelectBoard = 0
 	} else {

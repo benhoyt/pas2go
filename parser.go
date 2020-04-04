@@ -704,6 +704,7 @@ func (p *parser) factor() Expr {
 			}
 			return expr
 		default:
+			// TODO: should handle POINTER here as well? eg: EDITOR.PAS:278
 			return varExpr
 		}
 	default:

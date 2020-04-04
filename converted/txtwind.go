@@ -551,14 +551,14 @@ func TextWindowSaveFile(filename TTextWindowLine, state *TTextWindowState) {
 func TextWindowDisplayFile(filename, title string) {
 	var state TTextWindowState
 	state.Title = title
-	TextWindowOpenFile(filename, state)
+	TextWindowOpenFile(filename, &state)
 	state.Selectable = false
 	if state.LineCount > 0 {
-		TextWindowDrawOpen(state)
-		TextWindowSelect(state, false, true)
-		TextWindowDrawClose(state)
+		TextWindowDrawOpen(&state)
+		TextWindowSelect(&state, false, true)
+		TextWindowDrawClose(&state)
 	}
-	TextWindowFree(state)
+	TextWindowFree(&state)
 }
 
 func TextWindowInit(x, y, width, height int16) {

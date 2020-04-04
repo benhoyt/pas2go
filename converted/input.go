@@ -61,21 +61,21 @@ func InputIsJoystickButtonPressed() (InputIsJoystickButtonPressed bool) {
 
 func InputJoystickGetCoords(x, y *int16) {
 	var startTicks uint16
-	x = 0
-	y = 0
+	*x = 0
+	*y = 0
 	startTicks = TimerTicks
 	Port[PORT_JOYSTICK] = 0
 	for {
-		x = x + (Port[PORT_JOYSTICK] && 1)
-		y = y + (Port[PORT_JOYSTICK] && 2)
+		*x = *x + (Port[PORT_JOYSTICK] && 1)
+		*y = *y + (Port[PORT_JOYSTICK] && 2)
 		if ((Port[PORT_JOYSTICK] && 3) == 0) || ((TimerTicks - startTicks) > 3) {
 			break
 		}
 	}
-	y = y / 2
+	*y = *y / 2
 	if (TimerTicks - startTicks) > 3 {
-		x = -1
-		y = -1
+		*x = -1
+		*y = -1
 	}
 }
 
@@ -115,7 +115,7 @@ func InputCalibrateJoystickPosition(msg string, x, y *int16) (InputCalibrateJoys
 
 func InputInitJoystick() (InputInitJoystick bool) {
 	var joyX, joyY int16
-	InputJoystickGetCoords(joyX, joyY)
+	InputJoystickGetCoords(&joyX, &joyY)
 	if (joyX > 0) && (joyY > 0) {
 		JoystickXInitial = joyX
 		JoystickYInitial = joyY
@@ -134,13 +134,13 @@ CalibrationStart:
 	WriteLn()
 	WriteLn("  Joystick calibration:  Press ESCAPE to abort.")
 	WriteLn()
-	if !InputCalibrateJoystickPosition("  Center joystick and press button: ", JoystickXCenter, JoystickYCenter) {
+	if !InputCalibrateJoystickPosition("  Center joystick and press button: ", &JoystickXCenter, &JoystickYCenter) {
 		exit()
 	}
-	if !InputCalibrateJoystickPosition("  Move joystick to UPPER LEFT corner and press button: ", JoystickXMin, JoystickYMin) {
+	if !InputCalibrateJoystickPosition("  Move joystick to UPPER LEFT corner and press button: ", &JoystickXMin, &JoystickYMin) {
 		exit()
 	}
-	if !InputCalibrateJoystickPosition("  Move joystick to LOWER RIGHT corner and press button: ", JoystickXMax, JoystickYMax) {
+	if !InputCalibrateJoystickPosition("  Move joystick to LOWER RIGHT corner and press button: ", &JoystickXMax, &JoystickYMax) {
 		exit()
 	}
 	JoystickXMin = JoystickXMin - JoystickXCenter
@@ -210,7 +210,7 @@ func InputUpdate() {
 		KeysUpdateModifiers()
 		InputShiftPressed = KeysShiftHeld
 	} else if InputJoystickEnabled {
-		InputJoystickGetCoords(joyXraw, joyYraw)
+		InputJoystickGetCoords(&joyXraw, &joyYraw)
 		joyX = joyXraw - JoystickXCenter
 		joyY = joyYraw - JoystickYCenter
 		if Abs(joyX) > Abs(joyY) {

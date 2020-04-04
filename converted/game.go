@@ -56,7 +56,7 @@ func GenerateTransitionTable() {
 }
 
 func AdvancePointer(address *uintptr, count int16) {
-	address = Ptr(Seg(address), Ofs(address)+count)
+	*address = Ptr(Seg(address), Ofs(address)+count)
 }
 
 func BoardClose() {
@@ -67,7 +67,7 @@ func BoardClose() {
 	)
 	ptr = IoTmpBuf
 	Move(Board.Name, ptr, SizeOf(Board.Name))
-	AdvancePointer(ptr, SizeOf(Board.Name))
+	AdvancePointer(&ptr, SizeOf(Board.Name))
 	ix = 1
 	iy = 1
 	rle.Count = 1
@@ -82,7 +82,7 @@ func BoardClose() {
 			rle.Count = rle.Count + 1
 		} else {
 			Move(rle, ptr, SizeOf(rle))
-			AdvancePointer(ptr, SizeOf(rle))
+			AdvancePointer(&ptr, SizeOf(rle))
 			rle.Tile = Board.Tiles[ix][iy]
 			rle.Count = 1
 		}
@@ -91,9 +91,9 @@ func BoardClose() {
 		}
 	}
 	Move(Board.Info, ptr, SizeOf(Board.Info))
-	AdvancePointer(ptr, SizeOf(Board.Info))
+	AdvancePointer(&ptr, SizeOf(Board.Info))
 	Move(Board.StatCount, ptr, SizeOf(Board.StatCount))
-	AdvancePointer(ptr, SizeOf(Board.StatCount))
+	AdvancePointer(&ptr, SizeOf(Board.StatCount))
 	for ix = 0; ix <= Board.StatCount; ix++ {
 		stat := &Board.Stats[ix]
 		if stat.DataLen > 0 {
@@ -104,11 +104,11 @@ func BoardClose() {
 			}
 		}
 		Move(Board.Stats[ix], ptr, SizeOf(TStat))
-		AdvancePointer(ptr, SizeOf(TStat))
+		AdvancePointer(&ptr, SizeOf(TStat))
 		if stat.DataLen > 0 {
 			Move(Data, ptr, stat.DataLen)
 			FreeMem(stat.Data, stat.DataLen)
-			AdvancePointer(ptr, stat.DataLen)
+			AdvancePointer(&ptr, stat.DataLen)
 		}
 
 	}
@@ -129,14 +129,14 @@ func BoardOpen(boardId int16) {
 	}
 	ptr = World.BoardData[boardId]
 	Move(ptr, Board.Name, SizeOf(Board.Name))
-	AdvancePointer(ptr, SizeOf(Board.Name))
+	AdvancePointer(&ptr, SizeOf(Board.Name))
 	ix = 1
 	iy = 1
 	rle.Count = 0
 	for {
 		if rle.Count <= 0 {
 			Move(ptr, rle, SizeOf(rle))
-			AdvancePointer(ptr, SizeOf(rle))
+			AdvancePointer(&ptr, SizeOf(rle))
 		}
 		Board.Tiles[ix][iy] = rle.Tile
 		ix = ix + 1
@@ -150,17 +150,17 @@ func BoardOpen(boardId int16) {
 		}
 	}
 	Move(ptr, Board.Info, SizeOf(Board.Info))
-	AdvancePointer(ptr, SizeOf(Board.Info))
+	AdvancePointer(&ptr, SizeOf(Board.Info))
 	Move(ptr, Board.StatCount, SizeOf(Board.StatCount))
-	AdvancePointer(ptr, SizeOf(Board.StatCount))
+	AdvancePointer(&ptr, SizeOf(Board.StatCount))
 	for ix = 0; ix <= Board.StatCount; ix++ {
 		stat := &Board.Stats[ix]
 		Move(ptr, Board.Stats[ix], SizeOf(TStat))
-		AdvancePointer(ptr, SizeOf(TStat))
+		AdvancePointer(&ptr, SizeOf(TStat))
 		if stat.DataLen > 0 {
 			GetMem(stat.Data, stat.DataLen)
 			Move(ptr, Data, stat.DataLen)
-			AdvancePointer(ptr, stat.DataLen)
+			AdvancePointer(&ptr, stat.DataLen)
 		} else if stat.DataLen < 0 {
 			stat.Data = Board.Stats[-stat.DataLen].Data
 			stat.DataLen = Board.Stats[-stat.DataLen].DataLen
@@ -267,7 +267,7 @@ func BoardDrawTile(x, y int16) {
 		if tile.Element == E_EMPTY {
 			VideoWriteText(x-1, y-1, 0x0F, ' ')
 		} else if ElementDefs[tile.Element].HasDrawProc {
-			ElementDefs[tile.Element].DrawProc(x, y, ch)
+			ElementDefs[tile.Element].DrawProc(x, y, &ch)
 			VideoWriteText(x-1, y-1, tile.Color, Chr(ch))
 		} else if tile.Element < E_TEXT_MIN {
 			VideoWriteText(x-1, y-1, tile.Color, ElementDefs[tile.Element].Character)
@@ -318,8 +318,8 @@ func SidebarPromptCharacter(editable bool, x, y int16, prompt TString50, value *
 	VideoWriteText(x+5, y+1, 0x9F, '\x1f')
 	SidebarClearLine(y + 2)
 	for {
-		for i = (value - 4); i <= (value + 4); i++ {
-			VideoWriteText(((x+i)-value)+5, y+2, 0x1E, Chr((i+0x100)%0x100))
+		for i = (*value - 4); i <= (*value + 4); i++ {
+			VideoWriteText(((x+i)-*value)+5, y+2, 0x1E, Chr((i+0x100)%0x100))
 		}
 		if editable {
 			Delay(25)
@@ -327,9 +327,9 @@ func SidebarPromptCharacter(editable bool, x, y int16, prompt TString50, value *
 			if InputKeyPressed == KEY_TAB {
 				InputDeltaX = 9
 			}
-			newValue = value + InputDeltaX
-			if value != newValue {
-				value = (newValue + 0x100) % 0x100
+			newValue = *value + InputDeltaX
+			if *value != newValue {
+				*value = (newValue + 0x100) % 0x100
 				SidebarClearLine(y + 2)
 			}
 		}
@@ -363,15 +363,15 @@ func SidebarPromptSlider(editable bool, x, y int16, prompt string, value *byte) 
 			if InputJoystickMoved {
 				Delay(45)
 			}
-			VideoWriteText(x+value+1, y+1, 0x9F, '\x1f')
+			VideoWriteText(x+*value+1, y+1, 0x9F, '\x1f')
 			InputUpdate()
 			if (InputKeyPressed >= '1') && (InputKeyPressed <= '9') {
-				value = Ord(InputKeyPressed) - 49
+				*value = Ord(InputKeyPressed) - 49
 				SidebarClearLine(y + 1)
 			} else {
-				newValue = value + InputDeltaX
-				if (value != newValue) && (newValue >= 0) && (newValue <= 8) {
-					value = newValue
+				newValue = *value + InputDeltaX
+				if (*value != newValue) && (newValue >= 0) && (newValue <= 8) {
+					*value = newValue
 					SidebarClearLine(y + 1)
 				}
 			}
@@ -380,7 +380,7 @@ func SidebarPromptSlider(editable bool, x, y int16, prompt string, value *byte) 
 			break
 		}
 	}
-	VideoWriteText(x+value+1, y+1, 0x1F, '\x1f')
+	VideoWriteText(x+*value+1, y+1, 0x1F, '\x1f')
 }
 
 func SidebarPromptChoice(editable bool, y int16, prompt, choiceStr string, result *byte) {
@@ -402,7 +402,7 @@ func SidebarPromptChoice(editable bool, y int16, prompt, choiceStr string, resul
 	for {
 		j = 0
 		i = 1
-		for (j < result) && (i < Length(choiceStr)) {
+		for (j < *result) && (i < Length(choiceStr)) {
 			if choiceStr[i] == ' ' {
 				j = j + 1
 			}
@@ -412,9 +412,9 @@ func SidebarPromptChoice(editable bool, y int16, prompt, choiceStr string, resul
 			VideoWriteText(62+i, y+1, 0x9F, '\x1f')
 			Delay(35)
 			InputUpdate()
-			newResult = result + InputDeltaX
-			if (result != newResult) && (newResult >= 0) && (newResult <= (choiceCount - 1)) {
-				result = newResult
+			newResult = *result + InputDeltaX
+			if (*result != newResult) && (newResult >= 0) && (newResult <= (choiceCount - 1)) {
+				*result = newResult
 				SidebarClearLine(y + 1)
 			}
 		}
@@ -427,19 +427,19 @@ func SidebarPromptChoice(editable bool, y int16, prompt, choiceStr string, resul
 
 func SidebarPromptDirection(editable bool, y int16, prompt string, deltaX, deltaY *int16) {
 	var choice byte
-	if deltaY == -1 {
+	if *deltaY == -1 {
 		choice = 0
-	} else if deltaY == 1 {
+	} else if *deltaY == 1 {
 		choice = 1
-	} else if deltaX == -1 {
+	} else if *deltaX == -1 {
 		choice = 2
 	} else {
 		choice = 3
 	}
 
-	SidebarPromptChoice(editable, y, prompt, "\x18 \x19 \x1b \x1a", choice)
-	deltaX = NeighborDeltaX[choice]
-	deltaY = NeighborDeltaY[choice]
+	SidebarPromptChoice(editable, y, prompt, "\x18 \x19 \x1b \x1a", &choice)
+	*deltaX = NeighborDeltaX[choice]
+	*deltaY = NeighborDeltaY[choice]
 }
 
 func PromptString(x, y, arrowColor, color, width int16, mode byte, buffer *TString50) {
@@ -448,7 +448,7 @@ func PromptString(x, y, arrowColor, color, width int16, mode byte, buffer *TStri
 		oldBuffer     string
 		firstKeyPress bool
 	)
-	oldBuffer = buffer
+	oldBuffer = *buffer
 	firstKeyPress = true
 	for {
 		for i = 0; i <= (width - 1); i++ {
@@ -456,27 +456,27 @@ func PromptString(x, y, arrowColor, color, width int16, mode byte, buffer *TStri
 			VideoWriteText(x+i, y-1, arrowColor, ' ')
 		}
 		VideoWriteText(x+width, y-1, arrowColor, ' ')
-		VideoWriteText(x+Length(buffer), y-1, (arrowColor/0x10)*16+0x0F, '\x1f')
-		VideoWriteText(x, y, color, buffer)
+		VideoWriteText(x+Length(*buffer), y-1, (arrowColor/0x10)*16+0x0F, '\x1f')
+		VideoWriteText(x, y, color, *buffer)
 		InputReadWaitKey()
-		if (Length(buffer) < width) && (InputKeyPressed >= ' ') && (InputKeyPressed < '\u0080') {
+		if (Length(*buffer) < width) && (InputKeyPressed >= ' ') && (InputKeyPressed < '\u0080') {
 			if firstKeyPress {
-				buffer = ""
+				*buffer = ""
 			}
 			switch mode {
 			case PROMPT_NUMERIC:
 				if InputKeyPressed >= '0' && InputKeyPressed <= '9' {
-					buffer = buffer + InputKeyPressed
+					*buffer = *buffer + InputKeyPressed
 				}
 			case PROMPT_ANY:
-				buffer = buffer + InputKeyPressed
+				*buffer = *buffer + InputKeyPressed
 			case PROMPT_ALPHANUM:
 				if (UpCase(InputKeyPressed) >= 'A' && UpCase(InputKeyPressed) <= 'Z') || (InputKeyPressed >= '0' && InputKeyPressed <= '9') || (InputKeyPressed == '-') {
-					buffer = buffer + UpCase(InputKeyPressed)
+					*buffer = *buffer + UpCase(InputKeyPressed)
 				}
 			}
 		} else if (InputKeyPressed == KEY_LEFT) || (InputKeyPressed == KEY_BACKSPACE) {
-			buffer = Copy(buffer, 1, Length(buffer)-1)
+			*buffer = Copy(*buffer, 1, Length(*buffer)-1)
 		}
 
 		firstKeyPress = false
@@ -485,7 +485,7 @@ func PromptString(x, y, arrowColor, color, width int16, mode byte, buffer *TStri
 		}
 	}
 	if InputKeyPressed == KEY_ESCAPE {
-		buffer = oldBuffer
+		*buffer = oldBuffer
 	}
 }
 
@@ -540,19 +540,19 @@ func DisplayIOError() (DisplayIOError bool) {
 	DisplayIOError = true
 	textWindow.Title = fmt.Sprint(IOResult)
 	textWindow.Title = "Error # " + textWindow.Title
-	TextWindowInitState(textWindow)
-	TextWindowAppend(textWindow, "$DOS Error: ")
-	TextWindowAppend(textWindow, "")
-	TextWindowAppend(textWindow, "This may be caused by missing")
-	TextWindowAppend(textWindow, "ZZT files or a bad disk.  If")
-	TextWindowAppend(textWindow, "you are trying to save a game,")
-	TextWindowAppend(textWindow, "your disk may be full -- try")
-	TextWindowAppend(textWindow, "using a blank, formatted disk")
-	TextWindowAppend(textWindow, "for saving the game!")
-	TextWindowDrawOpen(textWindow)
-	TextWindowSelect(textWindow, false, false)
-	TextWindowDrawClose(textWindow)
-	TextWindowFree(textWindow)
+	TextWindowInitState(&textWindow)
+	TextWindowAppend(&textWindow, "$DOS Error: ")
+	TextWindowAppend(&textWindow, "")
+	TextWindowAppend(&textWindow, "This may be caused by missing")
+	TextWindowAppend(&textWindow, "ZZT files or a bad disk.  If")
+	TextWindowAppend(&textWindow, "you are trying to save a game,")
+	TextWindowAppend(&textWindow, "your disk may be full -- try")
+	TextWindowAppend(&textWindow, "using a blank, formatted disk")
+	TextWindowAppend(&textWindow, "for saving the game!")
+	TextWindowDrawOpen(&textWindow)
+	TextWindowSelect(&textWindow, false, false)
+	TextWindowDrawClose(&textWindow)
+	TextWindowFree(&textWindow)
 	return
 }
 
@@ -590,7 +590,7 @@ func WorldLoad(filename, extension TString50, titleOnly bool) (WorldLoad bool) {
 		if !DisplayIOError {
 			ptr = IoTmpBuf
 			Move(ptr, World.BoardCount, SizeOf(World.BoardCount))
-			AdvancePointer(ptr, SizeOf(World.BoardCount))
+			AdvancePointer(&ptr, SizeOf(World.BoardCount))
 			if World.BoardCount < 0 {
 				if World.BoardCount != -1 {
 					VideoWriteText(63, 5, 0x1E, "You need a newer")
@@ -598,11 +598,11 @@ func WorldLoad(filename, extension TString50, titleOnly bool) (WorldLoad bool) {
 					exit()
 				} else {
 					Move(ptr, World.BoardCount, SizeOf(World.BoardCount))
-					AdvancePointer(ptr, SizeOf(World.BoardCount))
+					AdvancePointer(&ptr, SizeOf(World.BoardCount))
 				}
 			}
 			Move(ptr, World.Info, SizeOf(World.Info))
-			AdvancePointer(ptr, SizeOf(World.Info))
+			AdvancePointer(&ptr, SizeOf(World.Info))
 			if titleOnly {
 				World.BoardCount = 0
 				World.Info.CurrentBoard = 0
@@ -642,11 +642,11 @@ func WorldSave(filename, extension TString50) {
 		FillChar(IoTmpBuf, 512, 0)
 		version = -1
 		Move(version, ptr, SizeOf(version))
-		AdvancePointer(ptr, SizeOf(version))
+		AdvancePointer(&ptr, SizeOf(version))
 		Move(World.BoardCount, ptr, SizeOf(World.BoardCount))
-		AdvancePointer(ptr, SizeOf(World.BoardCount))
+		AdvancePointer(&ptr, SizeOf(World.BoardCount))
 		Move(World.Info, ptr, SizeOf(World.Info))
-		AdvancePointer(ptr, SizeOf(World.Info))
+		AdvancePointer(&ptr, SizeOf(World.Info))
 		BlockWrite(f, IoTmpBuf, 512)
 		if DisplayIOError {
 			goto OnError
@@ -676,14 +676,14 @@ OnError:
 
 func GameWorldSave(prompt TString50, filename *TString50, extension TString50) {
 	var newFilename TString50
-	newFilename = filename
-	SidebarPromptString(prompt, extension, newFilename, PROMPT_ALPHANUM)
+	newFilename = *filename
+	SidebarPromptString(prompt, extension, &newFilename, PROMPT_ALPHANUM)
 	if (InputKeyPressed != KEY_ESCAPE) && (Length(newFilename) != 0) {
-		filename = newFilename
+		*filename = newFilename
 		if extension == ".ZZT" {
-			World.Info.Name = filename
+			World.Info.Name = *filename
 		}
-		WorldSave(filename, extension)
+		WorldSave(*filename, extension)
 	}
 }
 
@@ -694,7 +694,7 @@ func GameWorldLoad(extension TString50) (GameWorldLoad bool) {
 		entryName     string
 		i             int16
 	)
-	TextWindowInitState(textWindow)
+	TextWindowInitState(&textWindow)
 	if extension == ".ZZT" {
 		textWindow.Title = "ZZT Worlds"
 	} else {
@@ -710,13 +710,13 @@ func GameWorldLoad(extension TString50) (GameWorldLoad bool) {
 				entryName = WorldFileDescValues[i+1]
 			}
 		}
-		TextWindowAppend(textWindow, entryName)
+		TextWindowAppend(&textWindow, entryName)
 		FindNext(fileSearchRec)
 	}
-	TextWindowAppend(textWindow, "Exit")
-	TextWindowDrawOpen(textWindow)
-	TextWindowSelect(textWindow, false, false)
-	TextWindowDrawClose(textWindow)
+	TextWindowAppend(&textWindow, "Exit")
+	TextWindowDrawOpen(&textWindow)
+	TextWindowSelect(&textWindow, false, false)
+	TextWindowDrawClose(&textWindow)
 	if (textWindow.LinePos < textWindow.LineCount) && !TextWindowRejected {
 		entryName = textWindow.Lines[textWindow.LinePos+1]
 		if Pos(' ', entryName) != 0 {
@@ -725,7 +725,7 @@ func GameWorldLoad(extension TString50) (GameWorldLoad bool) {
 		GameWorldLoad = WorldLoad(entryName, extension, false)
 		TransitionDrawToFill('Û', 0x44)
 	}
-	TextWindowFree(textWindow)
+	TextWindowFree(&textWindow)
 	return
 }
 
@@ -748,7 +748,7 @@ func CopyStatDataToTextWindow(statId int16, state *TTextWindowState) {
 		} else {
 			dataStr = dataStr + dataChr
 		}
-		AdvancePointer(dataPtr, 1)
+		AdvancePointer(&dataPtr, 1)
 	}
 
 }
@@ -920,7 +920,7 @@ func PopupPromptString(question string, buffer *TString50) {
 	VideoWriteText(3, 22, 0x4F, TextWindowStrText)
 	VideoWriteText(3, 23, 0x4F, TextWindowStrBottom)
 	VideoWriteText(4+(TextWindowWidth-Length(question))/2, 19, 0x4F, question)
-	buffer = ""
+	*buffer = ""
 	PromptString(10, 22, 0x4F, 0x4E, TextWindowWidth-16, PROMPT_ANY, buffer)
 	for y = 18; y <= 23; y++ {
 		for x = 3; x <= (TextWindowWidth + 3); x++ {
@@ -1111,26 +1111,26 @@ func BoardShoot(element byte, tx, ty, deltaX, deltaY int16, source int16) (Board
 }
 
 func CalcDirectionRnd(deltaX, deltaY *int16) {
-	deltaX = Random(3) - 1
-	if deltaX == 0 {
-		deltaY = Random(2)*2 - 1
+	*deltaX = Random(3) - 1
+	if *deltaX == 0 {
+		*deltaY = Random(2)*2 - 1
 	} else {
-		deltaY = 0
+		*deltaY = 0
 	}
 }
 
 func CalcDirectionSeek(x, y int16, deltaX, deltaY *int16) {
-	deltaX = 0
-	deltaY = 0
+	*deltaX = 0
+	*deltaY = 0
 	if (Random(2) < 1) || (Board.Stats[0].Y == y) {
-		deltaX = Signum(Board.Stats[0].X - x)
+		*deltaX = Signum(Board.Stats[0].X - x)
 	}
-	if deltaX == 0 {
-		deltaY = Signum(Board.Stats[0].Y - y)
+	if *deltaX == 0 {
+		*deltaY = Signum(Board.Stats[0].Y - y)
 	}
 	if World.Info.EnergizerTicks > 0 {
-		deltaX = -deltaX
-		deltaY = -deltaY
+		*deltaX = -*deltaX
+		*deltaY = -*deltaY
 	}
 }
 
@@ -1190,7 +1190,7 @@ func GameDebugPrompt() {
 	input = ""
 	SidebarClearLine(4)
 	SidebarClearLine(5)
-	PromptString(63, 5, 0x1E, 0x0F, 11, PROMPT_ANY, input)
+	PromptString(63, 5, 0x1E, 0x0F, 11, PROMPT_ANY, &input)
 	for i = 1; i <= Length(input); i++ {
 		input[i] = UpCase(input[i])
 	}
@@ -1283,7 +1283,7 @@ func GamePlayLoop(boardChanged bool) {
 			VideoWriteText(62, 23, 0x70, " Q ")
 			VideoWriteText(65, 23, 0x1F, " Quit")
 		} else if GameStateElement == E_MONITOR {
-			SidebarPromptSlider(false, 66, 21, "Game speed:;FS", TickSpeed)
+			SidebarPromptSlider(false, 66, 21, "Game speed:;FS", &TickSpeed)
 			VideoWriteText(62, 21, 0x70, " S ")
 			VideoWriteText(62, 7, 0x30, " W ")
 			VideoWriteText(65, 7, 0x1E, " World:")
@@ -1341,7 +1341,7 @@ func GamePlayLoop(boardChanged bool) {
 	CurrentStatTicked = Board.StatCount + 1
 	for {
 		if GamePaused {
-			if SoundHasTimeElapsed(TickTimeCounter, 25) {
+			if SoundHasTimeElapsed(&TickTimeCounter, 25) {
 				pauseBlink = !pauseBlink
 			}
 			if pauseBlink {
@@ -1359,7 +1359,7 @@ func GamePlayLoop(boardChanged bool) {
 				GamePromptEndPlay()
 			}
 			if (InputDeltaX != 0) || (InputDeltaY != 0) {
-				ElementDefs[Board.Tiles[Board.Stats[0].X+InputDeltaX][Board.Stats[0].Y+InputDeltaY].Element].TouchProc(Board.Stats[0].X+InputDeltaX, Board.Stats[0].Y+InputDeltaY, 0, InputDeltaX, InputDeltaY)
+				ElementDefs[Board.Tiles[Board.Stats[0].X+InputDeltaX][Board.Stats[0].Y+InputDeltaY].Element].TouchProc(Board.Stats[0].X+InputDeltaX, Board.Stats[0].Y+InputDeltaY, 0, &InputDeltaX, &InputDeltaY)
 			}
 			if ((InputDeltaX != 0) || (InputDeltaY != 0)) && ElementDefs[Board.Tiles[Board.Stats[0].X+InputDeltaX][Board.Stats[0].Y+InputDeltaY].Element].Walkable {
 				if Board.Tiles[Board.Stats[0].X][Board.Stats[0].Y].Element == E_PLAYER {
@@ -1391,7 +1391,7 @@ func GamePlayLoop(boardChanged bool) {
 			}
 		}
 		if (CurrentStatTicked > Board.StatCount) && !GamePlayExitRequested {
-			if SoundHasTimeElapsed(TickTimeCounter, TickTimeDuration) {
+			if SoundHasTimeElapsed(&TickTimeCounter, TickTimeDuration) {
 				CurrentTick = CurrentTick + 1
 				if CurrentTick > 420 {
 					CurrentTick = 1
@@ -1461,7 +1461,7 @@ func GameTitleLoop() {
 					boardChanged = true
 				}
 			case 'S':
-				SidebarPromptSlider(true, 66, 21, "Game speed:;FS", TickSpeed)
+				SidebarPromptSlider(true, 66, 21, "Game speed:;FS", &TickSpeed)
 				InputKeyPressed = '\x00'
 			case 'R':
 				if GameWorldLoad(".SAV") {

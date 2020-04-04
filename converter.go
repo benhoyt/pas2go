@@ -54,9 +54,10 @@ type converter struct {
 }
 
 type Scope struct {
-	Type     ScopeType
-	WithExpr *VarExpr
-	Vars     map[string]TypeSpec
+	Type      ScopeType
+	WithExpr  *VarExpr
+	Vars      map[string]TypeSpec
+	VarParams map[string]struct{}
 }
 
 type ScopeType int
@@ -69,7 +70,7 @@ const (
 )
 
 func (c *converter) pushScope(typ ScopeType, withExpr *VarExpr) {
-	scope := Scope{typ, withExpr, make(map[string]TypeSpec)}
+	scope := Scope{typ, withExpr, make(map[string]TypeSpec), make(map[string]struct{})}
 	c.scopes = append(c.scopes, scope)
 }
 
@@ -102,13 +103,30 @@ func (c *converter) lookupVarType(name string) (Scope, TypeSpec) {
 	return Scope{}, nil
 }
 
+func (c *converter) setVarParam(name string) {
+	scope := c.scopes[len(c.scopes)-1]
+	scope.VarParams[strings.ToLower(name)] = struct{}{}
+}
+
+func (c *converter) isVarParam(name string) bool {
+	name = strings.ToLower(name)
+	for i := len(c.scopes) - 1; i >= 0; i-- {
+		scope := c.scopes[i]
+		_, isVar := scope.VarParams[name]
+		if isVar {
+			return true
+		}
+	}
+	return false
+}
+
 func (c *converter) lookupVarExprType(varExpr *VarExpr) (TypeSpec, string) {
 	if varExpr.HasAt {
 		panic(fmt.Sprintf("unexpected HasAt in VarExpr: %q", varExpr))
 	}
 	_, spec := c.lookupVarType(varExpr.Name)
 	if spec == nil {
-		panic(fmt.Sprintf("var not found: %q", varExpr.Name))
+		return nil, ""
 	}
 	spec = c.lookupIdentSpec(spec)
 
@@ -221,6 +239,10 @@ func (c *converter) defineDecls(decls []DeclPart) {
 			for _, d := range decl.Decls {
 				c.defineVar(d.Name, d.Type)
 			}
+		case *ProcDecl:
+			c.defineVar(decl.Name, &ProcSpec{decl.Params})
+		case *FuncDecl:
+			c.defineVar(decl.Name, &FuncSpec{decl.Params, decl.Result})
 		}
 	}
 }
@@ -229,6 +251,9 @@ func (c *converter) defineParams(params []*ParamGroup) {
 	for _, group := range params {
 		for _, name := range group.Names {
 			c.defineVar(name, &IdentSpec{group.Type})
+			if group.IsVar {
+				c.setVarParam(name)
+			}
 		}
 	}
 }
@@ -412,7 +437,7 @@ func (c *converter) typeIdent(typ *TypeIdent) {
 	default:
 		switch strings.ToLower(typ.Name) {
 		case "pointer":
-			s = "uintptr" // TODO: hmmm
+			s = "uintptr" // TODO: change to *byte?
 		case "word":
 			s = "uint16"
 		case "longint":
@@ -526,12 +551,17 @@ func (c *converter) stmt(stmt Stmt) {
 			} else {
 				c.print(" = fmt.Sprint(")
 			}
-			c.expr(stmt.Args[0])
+			c.procArg(false, stmt.Args[0])
 			c.print(")")
 		default:
 			c.expr(stmt.Proc)
+			spec, _ := c.lookupVarExprType(stmt.Proc)
+			var params []*ParamGroup
+			if spec != nil {
+				params = spec.(*ProcSpec).Params
+			}
 			c.print("(")
-			c.exprs(stmt.Args)
+			c.procArgs(params, stmt.Args)
 			c.print(")")
 		}
 	case *RepeatStmt:
@@ -548,6 +578,9 @@ func (c *converter) stmt(stmt Stmt) {
 		c.print("}")
 	case *WithStmt:
 		spec, fieldName := c.lookupVarExprType(stmt.Var)
+		if spec == nil {
+			panic(fmt.Sprintf("'with' statement var not found: %s", stmt.Var))
+		}
 		record := spec.(*RecordSpec)
 		var withName string
 		if len(stmt.Var.Suffixes) == 0 && strings.ToLower(fieldName) == strings.ToLower(stmt.Var.Name) {
@@ -570,6 +603,56 @@ func (c *converter) stmt(stmt Stmt) {
 		panic(fmt.Sprintf("unhandled Stmt: %T", stmt))
 	}
 	c.print("\n")
+}
+
+func (c *converter) procArgs(params []*ParamGroup, args []Expr) {
+	isVars := []bool{}
+	for _, group := range params {
+		for range group.Names {
+			isVars = append(isVars, group.IsVar)
+		}
+	}
+	for i, arg := range args {
+		if i > 0 {
+			c.print(", ")
+		}
+		if params != nil {
+			// TODO: this means builtin functions will have targetIsVar=false,
+			// but that's not true of some, eg: Dec() -- need to define these manually?
+			c.procArg(isVars[i], arg)
+		} else {
+			c.procArg(false, arg)
+		}
+	}
+}
+
+func (c *converter) procArg(targetIsVar bool, arg Expr) {
+	switch arg := arg.(type) {
+	case *VarExpr:
+		if len(arg.Suffixes) == 0 {
+			if arg.HasAt {
+				panic(fmt.Sprintf("unexpected HasAt: %q", arg.Name))
+			}
+			isVar := c.isVarParam(arg.Name)
+			switch {
+			case isVar && targetIsVar:
+				c.varExpr(arg, true) // pass pointer straight through
+			case isVar && !targetIsVar:
+				c.print("*")
+				c.varExpr(arg, true)
+			case !isVar && targetIsVar:
+				c.print("&")
+				c.varExpr(arg, true)
+			default: // !isVar && !targetIsVar
+				c.varExpr(arg, true)
+			}
+		} else {
+			// TODO: do we ever need * or & in these cases?
+			c.expr(arg)
+		}
+	default:
+		c.expr(arg)
+	}
 }
 
 func (c *converter) makeWithName(name string) string {
@@ -653,15 +736,20 @@ func (c *converter) expr(expr Expr) {
 		c.print("}")
 	case *FuncExpr:
 		c.expr(expr.Func)
+		spec, _ := c.lookupVarExprType(expr.Func)
+		var params []*ParamGroup
+		if spec != nil {
+			params = spec.(*FuncSpec).Params
+		}
 		c.print("(")
-		c.exprs(expr.Args)
+		c.procArgs(params, expr.Args)
 		c.print(")")
 	case *ParenExpr:
 		c.print("(")
 		c.expr(expr.Expr)
 		c.print(")")
 	case *PointerExpr:
-		c.print("&")
+		c.print("&") // TODO: hmmm, should this be & or *?
 		c.expr(expr.Expr)
 	case *RangeExpr:
 		panic("unexpected RangeExpr: should be handled by 'case' and 'in'")
@@ -676,60 +764,7 @@ func (c *converter) expr(expr Expr) {
 		c.print(operatorStr(expr.Op))
 		c.expr(expr.Expr)
 	case *VarExpr:
-		// TODO2: handle func/proc "var" parameters
-		if expr.HasAt {
-			c.printf("*")
-		}
-		if len(expr.Suffixes) == 0 {
-			// If record field name is being used inside "with"
-			// statement, prefix it with the with expression and ".".
-			scope, spec := c.lookupVarType(expr.Name)
-			if spec != nil && scope.Type == ScopeWith {
-				c.expr(scope.WithExpr)
-				c.print(".")
-			}
-		}
-		c.printf(expr.Name)
-		for i, suffix := range expr.Suffixes {
-			switch suffix := suffix.(type) {
-			case *IndexSuffix:
-				// Look up var + suffixes so far and add Min array index if not 0
-				varExprSoFar := &VarExpr{false, expr.Name, expr.Suffixes[:i]}
-				spec, _ := c.lookupVarExprType(varExprSoFar)
-
-				var min int
-				switch spec := spec.(type) {
-				case *ArraySpec:
-					min = spec.Min.(*ConstExpr).Value.(int)
-				case *StringSpec:
-					min = 0
-				}
-
-				c.print("[")
-				if min != 0 {
-					switch index := suffix.Index.(type) {
-					case *ConstExpr:
-						val := index.Value.(int)
-						c.printf("%d", val+min)
-					case *FuncExpr, *ParenExpr, *PointerExpr, *TypeConvExpr, *UnaryExpr, *VarExpr:
-						c.expr(suffix.Index)
-						c.printf(" + %d", min)
-					default:
-						c.print("(")
-						c.expr(suffix.Index)
-						c.printf(") + %d", min)
-					}
-				} else {
-					c.expr(suffix.Index)
-				}
-				c.print("]")
-			case *DotSuffix:
-				c.print(".", suffix.Field)
-			case *PointerSuffix:
-			default:
-				panic(fmt.Sprintf("unhandled VarSuffix: %T", suffix))
-			}
-		}
+		c.varExpr(expr, false)
 	case *WidthExpr:
 		// Width itself is handled in ProcStmt "str" case
 		c.expr(expr.Expr)
@@ -738,6 +773,68 @@ func (c *converter) expr(expr Expr) {
 	}
 }
 
+func (c *converter) varExpr(expr *VarExpr, suppressStar bool) {
+	isVar := len(expr.Suffixes) == 0 && c.isVarParam(expr.Name)
+	if expr.HasAt && isVar {
+		panic(fmt.Sprintf("unexpected @ with var param: %s", expr))
+	}
+	if (expr.HasAt || isVar) && !suppressStar {
+		c.printf("*")
+	}
+	if len(expr.Suffixes) == 0 {
+		// If record field name is being used inside "with"
+		// statement, prefix it with the with expression and ".".
+		scope, spec := c.lookupVarType(expr.Name)
+		if spec != nil && scope.Type == ScopeWith {
+			c.varExpr(scope.WithExpr, true)
+			c.print(".")
+		}
+	}
+	c.printf(expr.Name)
+	for i, suffix := range expr.Suffixes {
+		switch suffix := suffix.(type) {
+		case *IndexSuffix:
+			// Look up var + suffixes so far and add Min array index if not 0
+			varExprSoFar := &VarExpr{false, expr.Name, expr.Suffixes[:i]}
+			spec, _ := c.lookupVarExprType(varExprSoFar)
+			if spec == nil {
+				panic(fmt.Sprintf("array not found: %s", varExprSoFar))
+			}
+
+			var min int
+			switch spec := spec.(type) {
+			case *ArraySpec:
+				min = spec.Min.(*ConstExpr).Value.(int)
+			case *StringSpec:
+				min = 0
+			}
+
+			c.print("[")
+			if min != 0 {
+				switch index := suffix.Index.(type) {
+				case *ConstExpr:
+					val := index.Value.(int)
+					c.printf("%d", val+min)
+				case *FuncExpr, *ParenExpr, *PointerExpr, *TypeConvExpr, *UnaryExpr, *VarExpr:
+					c.expr(suffix.Index)
+					c.printf(" + %d", min)
+				default:
+					c.print("(")
+					c.expr(suffix.Index)
+					c.printf(") + %d", min)
+				}
+			} else {
+				c.expr(suffix.Index)
+			}
+			c.print("]")
+		case *DotSuffix:
+			c.print(".", suffix.Field)
+		case *PointerSuffix:
+		default:
+			panic(fmt.Sprintf("unhandled VarSuffix: %T", suffix))
+		}
+	}
+}
 func (c *converter) inExpr(expr *BinaryExpr) {
 	c.print("(")
 	values := expr.Right.(*SetExpr)
