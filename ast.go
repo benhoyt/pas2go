@@ -591,7 +591,7 @@ type BinaryExpr struct {
 }
 
 func (e *BinaryExpr) String() string {
-	return fmt.Sprintf("%s %s %s", e.Left, strings.ToLower(e.Op.String()), e.Right) // TODO: handle precedence
+	return fmt.Sprintf("%s %s %s", e.Left, strings.ToLower(e.Op.String()), e.Right)
 }
 
 type ConstExpr struct {

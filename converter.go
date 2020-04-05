@@ -2,9 +2,24 @@
 
 /*
 ISSUES:
-- distinguishing string constants vs char, eg: pArg[1] == "/"
-- uses operator precedence rather than ParenExpr
+- handle two with statements with same var name in one function, eg: ELEMENTS.PAS:1138
 - "exit" -> break or return (should EXIT be a keyword in lexer?)
+- proper handling of @, eg: OOP.PAS:660 - should it just be '&'?
+- can't have const array of string, eg: EDITOR.PAS:48
+- string issues: String, TString50, etc
+- pointer issues
+- handle FILE and FILE OF
+- scalar type casting issues: eg i in: EDITOR.PAS:130: VideoWriteText(61+i, 22, i, #219)
+- Str() uses fmt.Sprint() so we need to import "fmt"
+- function call with no () should turn into a Go call, eg: EDITOR.PAS:234
+- handling of New(), eg: EDITOR.PAS:270 New(state.Lines[i]) -> state.Lines[i+1] = new(TTextWindowLine)
+- handling of other builtins, like Val, Move, GetMem, etc
+- handle bitwise 'and' and 'or' as & instead of &&, eg: EDITOR.PAS:439 -- may be able to cheat by check if RHS if ConstExpr
+- handle boolean 'xor' ('^' in Go), eg: GAME.PAS:1043
+- distinguishing string constants vs char, eg: pArg[1] == "/"
+
+NICE TO HAVES:
+- uses operator precedence rather than ParenExpr
 - output Go x+=y for Pascal x=x+y?
 */
 
@@ -688,7 +703,6 @@ func (c *converter) exprs(exprs []Expr) {
 func (c *converter) expr(expr Expr) {
 	switch expr := expr.(type) {
 	case *BinaryExpr:
-		// TODO: handle precedence instead of ParenExpr?
 		if expr.Op == IN {
 			c.inExpr(expr)
 			return
