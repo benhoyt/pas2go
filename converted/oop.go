@@ -15,7 +15,7 @@ func OopError(statId int16, message string) {
 func OopReadChar(statId int16, position *int16) {
 	stat := &Board.Stats[statId]
 	if (*position >= 0) && (*position < stat.DataLen) {
-		Move(&Ptr(Seg(Data), Ofs(Data)+*position), OopChar, 1)
+		Move(Ptr(Seg(Data), Ofs(Data)+*position), OopChar, 1)
 		Inc(*position)
 	} else {
 		OopChar = '\x00'
@@ -623,17 +623,17 @@ StartParsing:
 					}
 					OopReadWord(statId, position)
 					if OopWord == "HEALTH" {
-						counterPtr = *World.Info.Health
+						counterPtr = &World.Info.Health
 					} else if OopWord == "AMMO" {
-						counterPtr = *World.Info.Ammo
+						counterPtr = &World.Info.Ammo
 					} else if OopWord == "GEMS" {
-						counterPtr = *World.Info.Gems
+						counterPtr = &World.Info.Gems
 					} else if OopWord == "TORCHES" {
-						counterPtr = *World.Info.Torches
+						counterPtr = &World.Info.Torches
 					} else if OopWord == "SCORE" {
-						counterPtr = *World.Info.Score
+						counterPtr = &World.Info.Score
 					} else if OopWord == "TIME" {
-						counterPtr = *World.Info.BoardTimeSec
+						counterPtr = &World.Info.BoardTimeSec
 					} else {
 						counterPtr = nil
 					}

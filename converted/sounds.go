@@ -295,7 +295,7 @@ func init() {
 	SoundDurationMultiplier = 1
 	SoundIsPlaying = false
 	TimerTicks = 0
-	SoundNewVector = *SoundTimerHandler
+	SoundNewVector = &SoundTimerHandler
 	GetIntVec(0x1C, SoundOldVector)
 	SetIntVec(0x1C, SoundNewVector)
 }

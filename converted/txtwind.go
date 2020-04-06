@@ -69,7 +69,7 @@ func TextWindowDrawTitle(color int16, title TTextWindowLine) {
 func TextWindowDrawOpen(state *TTextWindowState) {
 	var ix, iy int16
 	for iy = 1; iy <= (TextWindowHeight + 1); iy++ {
-		VideoMove(TextWindowX, iy+TextWindowY-1, TextWindowWidth, *ScreenCopy[iy+1], false)
+		VideoMove(TextWindowX, iy+TextWindowY-1, TextWindowWidth, &ScreenCopy[iy+1], false)
 	}
 	for iy = (TextWindowHeight / 2); iy >= 0; iy-- {
 		VideoWriteText(TextWindowX, TextWindowY+iy+1, 0x0F, TextWindowStrText)
@@ -92,8 +92,8 @@ func TextWindowDrawClose(state *TTextWindowState) {
 		VideoWriteText(TextWindowX, TextWindowY+iy, 0x0F, TextWindowStrTop)
 		VideoWriteText(TextWindowX, TextWindowY+TextWindowHeight-iy, 0x0F, TextWindowStrBottom)
 		Delay(18)
-		VideoMove(TextWindowX, TextWindowY+iy, TextWindowWidth, *ScreenCopy[(iy+1)+1], true)
-		VideoMove(TextWindowX, TextWindowY+TextWindowHeight-iy, TextWindowWidth, *ScreenCopy[((TextWindowHeight-iy)+1)+1], true)
+		VideoMove(TextWindowX, TextWindowY+iy, TextWindowWidth, &ScreenCopy[(iy+1)+1], true)
+		VideoMove(TextWindowX, TextWindowY+TextWindowHeight-iy, TextWindowWidth, &ScreenCopy[((TextWindowHeight-iy)+1)+1], true)
 	}
 
 }

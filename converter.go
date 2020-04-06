@@ -2,7 +2,6 @@
 
 /*
 ISSUES:
-- proper handling of @, eg: OOP.PAS:660 - should it just be '&'?
 - can't have const array of string, eg: EDITOR.PAS:48
 - string issues: String, TString50, etc
 - pointer issues
@@ -784,7 +783,6 @@ func (c *converter) expr(expr Expr) {
 		c.expr(expr.Expr)
 		c.print(")")
 	case *PointerExpr:
-		c.print("&") // TODO: hmmm, should this be & or *?
 		c.expr(expr.Expr)
 	case *RangeExpr:
 		panic("unexpected RangeExpr: should be handled by 'case' and 'in'")
@@ -813,8 +811,10 @@ func (c *converter) varExpr(expr *VarExpr, suppressStar bool) {
 	if expr.HasAt && isVar {
 		panic(fmt.Sprintf("unexpected @ with var param: %s", expr))
 	}
-	if (expr.HasAt || isVar) && !suppressStar {
+	if isVar && !suppressStar {
 		c.printf("*")
+	} else if expr.HasAt {
+		c.printf("&")
 	}
 	if len(expr.Suffixes) == 0 {
 		// If record field name is being used inside "with"

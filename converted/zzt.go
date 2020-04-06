@@ -125,7 +125,7 @@ func main() {
 	ParseArguments()
 	if !GameTitleExitRequested {
 		VideoInstall(80, Blue)
-		OrderPrintId = *GameVersion
+		OrderPrintId = &GameVersion
 		TextWindowInit(5, 3, 50, 18)
 		New(IoTmpBuf)
 		VideoHideCursor()
