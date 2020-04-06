@@ -204,30 +204,30 @@ func ElementCentipedeHeadTick(statId int16) {
 		ix = stat.StepX
 		iy = stat.StepY
 		for {
-			stat := &Board.Stats[statId]
-			tx = stat.X - stat.StepX
-			ty = stat.Y - stat.StepY
-			ix = stat.StepX
-			iy = stat.StepY
-			if stat.Follower < 0 {
+			stat2 := &Board.Stats[statId]
+			tx = stat2.X - stat2.StepX
+			ty = stat2.Y - stat2.StepY
+			ix = stat2.StepX
+			iy = stat2.StepY
+			if stat2.Follower < 0 {
 				if (Board.Tiles[tx-ix][ty-iy].Element == E_CENTIPEDE_SEGMENT) && (Board.Stats[GetStatIdAt(tx-ix, ty-iy)].Leader < 0) {
-					stat.Follower = GetStatIdAt(tx-ix, ty-iy)
+					stat2.Follower = GetStatIdAt(tx-ix, ty-iy)
 				} else if (Board.Tiles[tx-iy][ty-ix].Element == E_CENTIPEDE_SEGMENT) && (Board.Stats[GetStatIdAt(tx-iy, ty-ix)].Leader < 0) {
-					stat.Follower = GetStatIdAt(tx-iy, ty-ix)
+					stat2.Follower = GetStatIdAt(tx-iy, ty-ix)
 				} else if (Board.Tiles[tx+iy][ty+ix].Element == E_CENTIPEDE_SEGMENT) && (Board.Stats[GetStatIdAt(tx+iy, ty+ix)].Leader < 0) {
-					stat.Follower = GetStatIdAt(tx+iy, ty+ix)
+					stat2.Follower = GetStatIdAt(tx+iy, ty+ix)
 				}
 
 			}
-			if stat.Follower > 0 {
-				Board.Stats[stat.Follower].Leader = statId
-				Board.Stats[stat.Follower].P1 = stat.P1
-				Board.Stats[stat.Follower].P2 = stat.P2
-				Board.Stats[stat.Follower].StepX = tx - Board.Stats[stat.Follower].X
-				Board.Stats[stat.Follower].StepY = ty - Board.Stats[stat.Follower].Y
-				MoveStat(stat.Follower, tx, ty)
+			if stat2.Follower > 0 {
+				Board.Stats[stat2.Follower].Leader = statId
+				Board.Stats[stat2.Follower].P1 = stat2.P1
+				Board.Stats[stat2.Follower].P2 = stat2.P2
+				Board.Stats[stat2.Follower].StepX = tx - Board.Stats[stat2.Follower].X
+				Board.Stats[stat2.Follower].StepY = ty - Board.Stats[stat2.Follower].Y
+				MoveStat(stat2.Follower, tx, ty)
 			}
-			statId = stat.Follower
+			statId = stat2.Follower
 
 			if statId == -1 {
 				break
@@ -405,12 +405,12 @@ func ElementConveyorTick(x, y int16, direction int16) {
 	}
 	i = iMin
 	for {
-		tile := &tiles[i]
+		tile2 := &tiles[i]
 		if canMove {
-			if ElementDefs[tile.Element].Pushable {
+			if ElementDefs[tile2.Element].Pushable {
 				ix = x + DiagonalDeltaX[(i-direction+8)%8]
 				iy = y + DiagonalDeltaY[(i-direction+8)%8]
-				if ElementDefs[tile.Element].Cycle > -1 {
+				if ElementDefs[tile2.Element].Cycle > -1 {
 					tmpTile = Board.Tiles[x+DiagonalDeltaX[i]][y+DiagonalDeltaY[i]]
 					iStat = GetStatIdAt(x+DiagonalDeltaX[i], y+DiagonalDeltaY[i])
 					Board.Tiles[x+DiagonalDeltaX[i]][y+DiagonalDeltaY[i]] = tiles[i]
@@ -428,9 +428,9 @@ func ElementConveyorTick(x, y int16, direction int16) {
 			} else {
 				canMove = false
 			}
-		} else if tile.Element == E_EMPTY {
+		} else if tile2.Element == E_EMPTY {
 			canMove = true
-		} else if !ElementDefs[tile.Element].Pushable {
+		} else if !ElementDefs[tile2.Element].Pushable {
 			canMove = false
 		}
 
@@ -1034,13 +1034,13 @@ func ElementPusherTick(statId int16) {
 	}
 
 	statId = GetStatIdAt(startX, startY)
-	stat := &Board.Stats[statId]
-	if ElementDefs[Board.Tiles[stat.X+stat.StepX][stat.Y+stat.StepY].Element].Walkable {
-		MoveStat(statId, stat.X+stat.StepX, stat.Y+stat.StepY)
+	stat2 := &Board.Stats[statId]
+	if ElementDefs[Board.Tiles[stat2.X+stat2.StepX][stat2.Y+stat2.StepY].Element].Walkable {
+		MoveStat(statId, stat2.X+stat2.StepX, stat2.Y+stat2.StepY)
 		SoundQueue(2, "\x15\x01")
-		if Board.Tiles[stat.X-(stat.StepX*2)][stat.Y-(stat.StepY*2)].Element == E_PUSHER {
-			i = GetStatIdAt(stat.X-(stat.StepX*2), stat.Y-(stat.StepY*2))
-			if (Board.Stats[i].StepX == stat.StepX) && (Board.Stats[i].StepY == stat.StepY) {
+		if Board.Tiles[stat2.X-(stat2.StepX*2)][stat2.Y-(stat2.StepY*2)].Element == E_PUSHER {
+			i = GetStatIdAt(stat2.X-(stat2.StepX*2), stat2.Y-(stat2.StepY*2))
+			if (Board.Stats[i].StepX == stat2.StepX) && (Board.Stats[i].StepY == stat2.StepY) {
 				ElementDefs[E_PUSHER].TickProc(i)
 			}
 		}

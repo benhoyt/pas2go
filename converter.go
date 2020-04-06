@@ -2,7 +2,6 @@
 
 /*
 ISSUES:
-- handle two with statements with same var name in one function, eg: ELEMENTS.PAS:1138
 - proper handling of @, eg: OOP.PAS:660 - should it just be '&'?
 - can't have const array of string, eg: EDITOR.PAS:48
 - string issues: String, TString50, etc
@@ -95,6 +94,16 @@ func (c *converter) popScope() {
 func (c *converter) defineVar(name string, spec TypeSpec) {
 	scope := c.scopes[len(c.scopes)-1]
 	scope.Vars[strings.ToLower(name)] = spec
+}
+
+func (c *converter) defineWithVar(name string) {
+	for i := len(c.scopes) - 1; i >= 0; i-- {
+		scope := c.scopes[i]
+		if scope.Type != ScopeWith {
+			scope.Vars[strings.ToLower(name)] = &IdentSpec{&TypeIdent{name, ILLEGAL}}
+			return
+		}
+	}
 }
 
 func (c *converter) defineType(name string, spec TypeSpec) {
@@ -606,6 +615,7 @@ func (c *converter) stmt(stmt Stmt) {
 			c.printf("%s := &", withName)
 			c.expr(stmt.Var)
 			c.print("\n")
+			c.defineWithVar(withName)
 		}
 		c.pushScope(ScopeWith, &VarExpr{Name: withName})
 		for _, section := range record.Sections {
@@ -674,7 +684,17 @@ func (c *converter) procArg(targetIsVar bool, arg Expr) {
 func (c *converter) makeWithName(name string) string {
 	parts := splitCamel(name)
 	lastPart := parts[len(parts)-1]
-	return strings.ToLower(strings.TrimSuffix(lastPart, "s"))
+	withName := strings.ToLower(strings.TrimSuffix(lastPart, "s"))
+	if _, spec := c.lookupVarType(withName); spec == nil {
+		return withName
+	}
+	for i := 2; i < 10; i++ {
+		numName := withName + fmt.Sprint(i)
+		if _, spec := c.lookupVarType(numName); spec == nil {
+			return numName
+		}
+	}
+	panic(fmt.Sprintf("too many tries generating 'with' name: %s", withName))
 }
 
 func splitCamel(name string) []string {
@@ -805,7 +825,7 @@ func (c *converter) varExpr(expr *VarExpr, suppressStar bool) {
 			c.print(".")
 		}
 	}
-	c.printf(expr.Name)
+	c.print(expr.Name)
 	for i, suffix := range expr.Suffixes {
 		switch suffix := suffix.(type) {
 		case *IndexSuffix:
