@@ -188,7 +188,7 @@ func EditorLoop() {
 				tile.Color = cursorColor
 			}
 		} else if copiedHasStat {
-			if EditorPrepareModifyStatAtCursor {
+			if EditorPrepareModifyStatAtCursor() {
 				AddStat(x, y, copiedTile.Element, copiedTile.Color, copiedStat.Cycle, copiedStat)
 			}
 		} else {
@@ -452,17 +452,17 @@ func EditorLoop() {
 				if (InputKeyPressed != KEY_ESCAPE) && (Length(SavedBoardFileName) != 0) {
 					Assign(f, SavedBoardFileName+".BRD")
 					Reset(f, 1)
-					if DisplayIOError {
+					if DisplayIOError() {
 						goto TransferEnd
 					}
 					BoardClose()
 					FreeMem(World.BoardData[World.Info.CurrentBoard], World.BoardLen[World.Info.CurrentBoard])
 					BlockRead(f, World.BoardLen[World.Info.CurrentBoard], 2)
-					if !DisplayIOError {
+					if !DisplayIOError() {
 						GetMem(World.BoardData[World.Info.CurrentBoard], World.BoardLen[World.Info.CurrentBoard])
 						BlockRead(f, World.BoardData[World.Info.CurrentBoard], World.BoardLen[World.Info.CurrentBoard])
 					}
-					if DisplayIOError {
+					if DisplayIOError() {
 						World.BoardLen[World.Info.CurrentBoard] = 0
 						BoardCreate()
 						EditorDrawRefresh()
@@ -479,14 +479,14 @@ func EditorLoop() {
 				if (InputKeyPressed != KEY_ESCAPE) && (Length(SavedBoardFileName) != 0) {
 					Assign(f, SavedBoardFileName+".BRD")
 					Rewrite(f, 1)
-					if DisplayIOError {
+					if DisplayIOError() {
 						goto TransferEnd
 					}
 					BoardClose()
 					BlockWrite(f, World.BoardLen[World.Info.CurrentBoard], 2)
 					BlockWrite(f, World.BoardData[World.Info.CurrentBoard], World.BoardLen[World.Info.CurrentBoard])
 					BoardOpen(World.Info.CurrentBoard)
-					if DisplayIOError {
+					if DisplayIOError() {
 					} else {
 						Close(f)
 					}
@@ -775,7 +775,7 @@ func EditorLoop() {
 								EditorSetAndCopyTile(cursorX, cursorY, iElem, elemMenuColor)
 							}
 						} else {
-							if EditorPrepareModifyStatAtCursor {
+							if EditorPrepareModifyStatAtCursor() {
 								AddStat(cursorX, cursorY, iElem, elemMenuColor, ElementDefs[iElem].Cycle, StatTemplateDefault)
 								stat := &Board.Stats[Board.StatCount]
 								if Length(ElementDefs[iElem].Param1Name) != 0 {
@@ -870,7 +870,7 @@ func HighScoresSave() {
 	Rewrite(f)
 	Write(f, HighScoreList)
 	Close(f)
-	if DisplayIOError {
+	if DisplayIOError() {
 	} else {
 	}
 }

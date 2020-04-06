@@ -7,7 +7,6 @@ ISSUES:
 - handle FILE and FILE OF
 - scalar type casting issues: eg i in: EDITOR.PAS:130: VideoWriteText(61+i, 22, i, #219)
 - Str() uses fmt.Sprint() so we need to import "fmt"
-- function call with no () should turn into a Go call, eg: EDITOR.PAS:234
 - handling of New(), eg: EDITOR.PAS:270 New(state.Lines[i]) -> state.Lines[i+1] = new(TTextWindowLine)
 - handling of other builtins, like Val, Move, GetMem, etc
 - handle bitwise 'and' and 'or' as & instead of &&, eg: EDITOR.PAS:439 -- may be able to cheat by check if RHS if ConstExpr
@@ -142,14 +141,14 @@ func (c *converter) isVarParam(name string) bool {
 }
 
 func (c *converter) lookupVarExprType(varExpr *VarExpr) (TypeSpec, string) {
-	if varExpr.HasAt {
-		panic(fmt.Sprintf("unexpected HasAt in VarExpr: %q", varExpr))
-	}
 	_, spec := c.lookupVarType(varExpr.Name)
 	if spec == nil {
 		return nil, ""
 	}
 	spec = c.lookupIdentSpec(spec)
+	if spec == nil {
+		return nil, ""
+	}
 
 	fieldName := varExpr.Name
 	for _, suffix := range varExpr.Suffixes {
@@ -162,13 +161,21 @@ func (c *converter) lookupVarExprType(varExpr *VarExpr) (TypeSpec, string) {
 				panic(fmt.Sprintf("field not found: %q", suffix.Field))
 			}
 		case *IndexSuffix:
-			array := spec.(*ArraySpec)
-			spec = array.Of
+			switch specTyped := spec.(type) {
+			case *ArraySpec:
+				spec = specTyped.Of
+			case *StringSpec, *IdentSpec:
+			default:
+				panic(fmt.Sprintf("unexpected index type: %s", spec))
+			}
 		case *PointerSuffix:
 			pointer := spec.(*PointerSpec)
 			spec = &IdentSpec{pointer.Type}
 		}
 		spec = c.lookupIdentSpec(spec)
+		if spec == nil {
+			return nil, ""
+		}
 	}
 
 	return spec, fieldName
@@ -184,7 +191,7 @@ func (c *converter) lookupIdentSpec(spec TypeSpec) TypeSpec {
 	}
 	spec = c.lookupType(ident.Name)
 	if spec == nil {
-		panic(fmt.Sprintf("named type not found: %q", ident.Name))
+		return nil
 	}
 	return spec
 }
@@ -518,7 +525,7 @@ func (c *converter) stmt(stmt Stmt) {
 	switch stmt := stmt.(type) {
 	case *AssignStmt:
 		// TODO: handle TypeConv?
-		c.expr(stmt.Var)
+		c.varExpr(stmt.Var, false)
 		c.print(" = ")
 		c.expr(stmt.Value)
 	case *CaseStmt:
@@ -606,7 +613,7 @@ func (c *converter) stmt(stmt Stmt) {
 			c.procArg(false, stmt.Args[0])
 			c.print(")")
 		default:
-			c.expr(stmt.Proc)
+			c.varExpr(stmt.Proc, false)
 			spec, _ := c.lookupVarExprType(stmt.Proc)
 			var params []*ParamGroup
 			if spec != nil {
@@ -640,7 +647,7 @@ func (c *converter) stmt(stmt Stmt) {
 		} else {
 			withName = c.makeWithName(fieldName)
 			c.printf("%s := &", withName)
-			c.expr(stmt.Var)
+			c.varExpr(stmt.Var, false)
 			c.print("\n")
 			c.defineWithVar(withName)
 		}
@@ -797,7 +804,7 @@ func (c *converter) expr(expr Expr) {
 		}
 		c.print("}")
 	case *FuncExpr:
-		c.expr(expr.Func)
+		c.varExpr(expr.Func, false)
 		spec, _ := c.lookupVarExprType(expr.Func)
 		var params []*ParamGroup
 		if spec != nil {
@@ -826,6 +833,14 @@ func (c *converter) expr(expr Expr) {
 		c.expr(expr.Expr)
 	case *VarExpr:
 		c.varExpr(expr, false)
+		spec, _ := c.lookupVarExprType(expr)
+		if spec != nil {
+			_, isFunc := spec.(*FuncSpec)
+			if isFunc {
+				// Pascal allows function call without parens
+				c.print("()")
+			}
+		}
 	case *WidthExpr:
 		// Width itself is handled in ProcStmt "str" case
 		c.expr(expr.Expr)
@@ -898,6 +913,7 @@ func (c *converter) varExpr(expr *VarExpr, suppressStar bool) {
 		}
 	}
 }
+
 func (c *converter) inExpr(expr *BinaryExpr) {
 	c.print("(")
 	values := expr.Right.(*SetExpr)

@@ -585,10 +585,10 @@ func WorldLoad(filename, extension TString50, titleOnly bool) (WorldLoad bool) {
 	VideoWriteText(62, 5, 0x1F, "Loading.....")
 	Assign(f, filename+extension)
 	Reset(f, 1)
-	if !DisplayIOError {
+	if !DisplayIOError() {
 		WorldUnload()
 		BlockRead(f, IoTmpBuf, 512)
-		if !DisplayIOError {
+		if !DisplayIOError() {
 			ptr = IoTmpBuf
 			Move(ptr, World.BoardCount, SizeOf(World.BoardCount))
 			AdvancePointer(&ptr, SizeOf(World.BoardCount))
@@ -638,7 +638,7 @@ func WorldSave(filename, extension TString50) {
 	VideoWriteText(63, 5, 0x1F, "Saving...")
 	Assign(f, filename+extension)
 	Rewrite(f, 1)
-	if !DisplayIOError {
+	if !DisplayIOError() {
 		ptr = IoTmpBuf
 		FillChar(IoTmpBuf, 512, 0)
 		version = -1
@@ -649,16 +649,16 @@ func WorldSave(filename, extension TString50) {
 		Move(World.Info, ptr, SizeOf(World.Info))
 		AdvancePointer(&ptr, SizeOf(World.Info))
 		BlockWrite(f, IoTmpBuf, 512)
-		if DisplayIOError {
+		if DisplayIOError() {
 			goto OnError
 		}
 		for i = 0; i <= World.BoardCount; i++ {
 			BlockWrite(f, World.BoardLen[i], 2)
-			if DisplayIOError {
+			if DisplayIOError() {
 				goto OnError
 			}
 			BlockWrite(f, World.BoardData[i], World.BoardLen[i])
-			if DisplayIOError {
+			if DisplayIOError() {
 				goto OnError
 			}
 		}

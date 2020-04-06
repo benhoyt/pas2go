@@ -88,7 +88,7 @@ func InputCalibrateJoystickPosition(msg string, x, y *int16) (InputCalibrateJoys
 		if KeyPressed {
 			charTyped = ReadKey
 		}
-		if (charTyped == '\x1b') || (InputIsJoystickButtonPressed) {
+		if (charTyped == '\x1b') || (InputIsJoystickButtonPressed()) {
 			break
 		}
 	}
@@ -99,7 +99,7 @@ func InputCalibrateJoystickPosition(msg string, x, y *int16) (InputCalibrateJoys
 			if KeyPressed {
 				charTyped = ReadKey
 			}
-			if (!InputIsJoystickButtonPressed) || (charTyped == '\x1b') {
+			if (!InputIsJoystickButtonPressed()) || (charTyped == '\x1b') {
 				break
 			}
 		}
@@ -232,7 +232,7 @@ func InputUpdate() {
 			}
 
 		}
-		if InputIsJoystickButtonPressed {
+		if InputIsJoystickButtonPressed() {
 			if !InputShiftAccepted {
 				InputShiftPressed = true
 			}
@@ -303,8 +303,8 @@ func InputInitMouse() (InputInitMouse bool) {
 }
 
 func InputInitDevices() {
-	InputJoystickEnabled = InputInitJoystick
-	InputMouseEnabled = InputInitMouse
+	InputJoystickEnabled = InputInitJoystick()
+	InputMouseEnabled = InputInitMouse()
 }
 
 func InputConfigure() (InputConfigure bool) {

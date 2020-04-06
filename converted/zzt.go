@@ -87,7 +87,7 @@ func GameConfigure() {
 	TextBackground(Black)
 	ClrScr()
 	TextColor(Yellow)
-	if !InputConfigure {
+	if !InputConfigure() {
 		GameTitleExitRequested = true
 	} else {
 		TextColor(LightGreen)
