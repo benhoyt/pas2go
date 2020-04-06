@@ -6,7 +6,6 @@ ISSUES:
 - pointer issues
 - handle FILE and FILE OF
 - scalar type casting issues: eg i in: EDITOR.PAS:130: VideoWriteText(61+i, 22, i, #219)
-- Str() uses fmt.Sprint() so we need to import "fmt"
 - handling of New(), eg: EDITOR.PAS:270 New(state.Lines[i]) -> state.Lines[i+1] = new(TTextWindowLine)
 - handling of other builtins, like Val, Move, GetMem, etc
 - handle bitwise 'and' and 'or' as & instead of &&, eg: EDITOR.PAS:439 -- may be able to cheat by check if RHS if ConstExpr
@@ -603,14 +602,17 @@ func (c *converter) stmt(stmt Stmt) {
 		case "exit":
 			c.print("return")
 		case "str":
-			c.expr(stmt.Args[1])
 			if widthExpr, isWidth := stmt.Args[0].(*WidthExpr); isWidth {
-				c.printf(" = fmt.Sprintf(\"%%%dv\", ",
-					widthExpr.Width.(*ConstExpr).Value.(int))
+				c.print("StrWidth(")
+				c.procArg(false, stmt.Args[0])
+				c.printf(", %d", widthExpr.Width.(*ConstExpr).Value.(int))
+				c.print(", ")
 			} else {
-				c.print(" = fmt.Sprint(")
+				c.print("Str(")
+				c.procArg(false, stmt.Args[0])
+				c.print(", ")
 			}
-			c.procArg(false, stmt.Args[0])
+			c.expr(stmt.Args[1])
 			c.print(")")
 		default:
 			c.varExpr(stmt.Proc, false)

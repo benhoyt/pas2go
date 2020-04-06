@@ -34,3 +34,11 @@ func Random(end int16) int16 {
 func Sqr(n int16) int16 {
 	return n * n
 }
+
+func Str(n int16, s []byte) {
+	// TODO
+}
+
+func StrWidth(n, width int16, s []byte) {
+	// TODO
+}

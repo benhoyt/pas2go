@@ -133,7 +133,7 @@ func EditorLoop() {
 		var boardNumStr string
 		BoardDrawBorder()
 		EditorDrawSidebar()
-		boardNumStr = fmt.Sprint(World.Info.CurrentBoard)
+		Str(World.Info.CurrentBoard, boardNumStr)
 		TransitionDrawToBoard()
 		if Length(Board.Name) != 0 {
 			VideoWriteText((59-Length(Board.Name))/2, 0, 0x70, ' '+Board.Name+' ')
@@ -233,14 +233,14 @@ func EditorLoop() {
 				New(state.Lines[i+1])
 			}
 			state.Lines[2] = "         Title: " + Board.Name
-			numStr = fmt.Sprint(Board.Info.MaxShots)
+			Str(Board.Info.MaxShots, numStr)
 			state.Lines[3] = "      Can fire: " + numStr + " shots."
 			state.Lines[4] = " Board is dark: " + BoolToString(Board.Info.IsDark)
 			for i = 4; i <= 7; i++ {
 				state.Lines[i+1] = NeighborBoardStrs[i-4] + ": " + EditorGetBoardName(Board.Info.NeighborBoards[i-4], true)
 			}
 			state.Lines[9] = "Re-enter when zapped: " + BoolToString(Board.Info.ReenterWhenZapped)
-			numStr = fmt.Sprint(Board.Info.TimeLimitSec)
+			Str(Board.Info.TimeLimitSec, numStr)
 			state.Lines[10] = "  Time limit, 0=None: " + numStr + " sec."
 			state.Lines[11] = "          Quit!"
 			TextWindowSelect(&state, false, false)
@@ -254,7 +254,7 @@ func EditorLoop() {
 					exitRequested = true
 					TextWindowDrawClose(&state)
 				case 2:
-					numStr = fmt.Sprint(Board.Info.MaxShots)
+					Str(Board.Info.MaxShots, numStr)
 					SidebarPromptString("Maximum shots?", "", &numStr, PROMPT_NUMERIC)
 					if Length(numStr) != 0 {
 						Val(numStr, Board.Info.MaxShots, i)
@@ -271,7 +271,7 @@ func EditorLoop() {
 				case 8:
 					Board.Info.ReenterWhenZapped = !Board.Info.ReenterWhenZapped
 				case 9:
-					numStr = fmt.Sprint(Board.Info.TimeLimitSec)
+					Str(Board.Info.TimeLimitSec, numStr)
 					SidebarPromptString("Time limit?", " Sec", &numStr, PROMPT_NUMERIC)
 					if Length(numStr) != 0 {
 						Val(numStr, Board.Info.TimeLimitSec, i)
@@ -885,7 +885,7 @@ func HighScoresInitTextWindow(state *TTextWindowState) {
 	TextWindowAppend(state, "-----  ----------------------------------")
 	for i = 1; i <= HIGH_SCORE_COUNT; i++ {
 		if Length(HighScoreList[i+1].Name) != 0 {
-			scoreStr = fmt.Sprintf("%5v", HighScoreList[i+1].Score)
+			StrWidth(HighScoreList[i+1].Score, 5, scoreStr)
 			TextWindowAppend(state, scoreStr+"  "+HighScoreList[i+1].Name)
 		}
 	}
