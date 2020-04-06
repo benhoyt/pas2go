@@ -135,13 +135,13 @@ CalibrationStart:
 	WriteLn("  Joystick calibration:  Press ESCAPE to abort.")
 	WriteLn()
 	if !InputCalibrateJoystickPosition("  Center joystick and press button: ", &JoystickXCenter, &JoystickYCenter) {
-		exit()
+		return
 	}
 	if !InputCalibrateJoystickPosition("  Move joystick to UPPER LEFT corner and press button: ", &JoystickXMin, &JoystickYMin) {
-		exit()
+		return
 	}
 	if !InputCalibrateJoystickPosition("  Move joystick to LOWER RIGHT corner and press button: ", &JoystickXMax, &JoystickYMax) {
-		exit()
+		return
 	}
 	JoystickXMin = JoystickXMin - JoystickXCenter
 	JoystickXMax = JoystickXMax - JoystickXCenter

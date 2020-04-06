@@ -535,7 +535,7 @@ func DisplayIOError() (DisplayIOError bool) {
 	)
 	if IOResult == 0 {
 		DisplayIOError = false
-		exit()
+		return
 	}
 	DisplayIOError = true
 	textWindow.Title = fmt.Sprint(IOResult)
@@ -595,7 +595,7 @@ func WorldLoad(filename, extension TString50, titleOnly bool) (WorldLoad bool) {
 				if World.BoardCount != -1 {
 					VideoWriteText(63, 5, 0x1E, "You need a newer")
 					VideoWriteText(63, 6, 0x1E, " version of ZZT!")
-					exit()
+					return
 				} else {
 					Move(ptr, World.BoardCount, SizeOf(World.BoardCount))
 					AdvancePointer(&ptr, SizeOf(World.BoardCount))
@@ -665,7 +665,7 @@ func WorldSave(filename, extension TString50) {
 	BoardOpen(World.Info.CurrentBoard)
 	SidebarClearLine(5)
 	Close(f)
-	exit()
+	return
 OnError:
 	Close(f)
 

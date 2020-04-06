@@ -204,7 +204,7 @@ func TextWindowPrint(state *TTextWindowState) {
 		WriteLn(Lst, line)
 		if IOResult != 0 {
 			Close(Lst)
-			exit()
+			return
 		}
 	}
 	if state.LoadedFilename == "ORDER.HLP" {
@@ -242,7 +242,7 @@ func TextWindowSelect(state *TTextWindowState, hyperlinkAsSelect, viewingFile bo
 					TextWindowFree(state)
 					TextWindowOpenFile(pointerStr, state)
 					if state.LineCount == 0 {
-						exit()
+						return
 					} else {
 						viewingFile = true
 						newLinePos = state.LinePos
@@ -536,12 +536,12 @@ func TextWindowSaveFile(filename TTextWindowLine, state *TTextWindowState) {
 	Assign(f, filename)
 	Rewrite(f)
 	if IOResult != 0 {
-		exit()
+		return
 	}
 	for i = 1; i <= state.LineCount; i++ {
 		WriteLn(f, Lines[i+1])
 		if IOResult != 0 {
-			exit()
+			return
 		}
 	}
 	Close(f)

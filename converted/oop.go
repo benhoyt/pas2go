@@ -175,7 +175,7 @@ func OopFindString(statId int16, s string) (OopFindString int16) {
 		if ((OopChar >= 'A') && (OopChar <= 'Z')) || (OopChar == '_') {
 		} else {
 			OopFindString = pos
-			exit()
+			return
 		}
 	NoMatch:
 		pos = pos + 1
@@ -336,7 +336,7 @@ ColorFound:
 		if OopWord == OopStringToWord(ElementDefs[i].Name) {
 			OopParseTile = true
 			tile.Element = i
-			exit()
+			return
 		}
 	}
 
@@ -363,13 +363,13 @@ func FindTileOnBoard(x, y *int16, tile TTile) (FindTileOnBoard bool) {
 			*x = 1
 			*y = *y + 1
 			if *y > BOARD_HEIGHT {
-				exit()
+				return
 			}
 		}
 		if Board.Tiles[*x][*y].Element == tile.Element {
 			if (tile.Color == 0) || (GetColorForTileMatch(Board.Tiles[*x][*y]) == tile.Color) {
 				FindTileOnBoard = true
-				exit()
+				return
 			}
 		}
 	}

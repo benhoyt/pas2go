@@ -3,7 +3,6 @@
 /*
 ISSUES:
 - handle two with statements with same var name in one function, eg: ELEMENTS.PAS:1138
-- "exit" -> break or return (should EXIT be a keyword in lexer?)
 - proper handling of @, eg: OOP.PAS:660 - should it just be '&'?
 - can't have const array of string, eg: EDITOR.PAS:48
 - string issues: String, TString50, etc
@@ -558,6 +557,8 @@ func (c *converter) stmt(stmt Stmt) {
 		c.stmt(stmt.Stmt)
 	case *ProcStmt:
 		switch strings.ToLower(stmt.Proc.String()) {
+		case "exit":
+			c.print("return")
 		case "str":
 			c.expr(stmt.Args[1])
 			if widthExpr, isWidth := stmt.Args[0].(*WidthExpr); isWidth {

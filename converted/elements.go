@@ -265,7 +265,7 @@ TryMove:
 	iElem = Board.Tiles[ix][iy].Element
 	if ElementDefs[iElem].Walkable || (iElem == E_WATER) {
 		MoveStat(statId, ix, iy)
-		exit()
+		return
 	}
 	if (iElem == E_RICOCHET) && firstTry {
 		stat.StepX = -stat.StepX
@@ -273,7 +273,7 @@ TryMove:
 		SoundQueue(1, "\xf9\x01")
 		firstTry = false
 		goto TryMove
-		exit()
+		return
 	}
 	if (iElem == E_BREAKABLE) || (ElementDefs[iElem].Destructible && ((iElem == E_PLAYER) || (stat.P1 == 0))) {
 		if ElementDefs[iElem].ScoreValue != 0 {
@@ -281,7 +281,7 @@ TryMove:
 			GameUpdateSidebar()
 		}
 		BoardAttack(statId, ix, iy)
-		exit()
+		return
 	}
 	if (Board.Tiles[stat.X+stat.StepY][stat.Y+stat.StepX].Element == E_RICOCHET) && firstTry {
 		ix = stat.StepX
@@ -290,7 +290,7 @@ TryMove:
 		SoundQueue(1, "\xf9\x01")
 		firstTry = false
 		goto TryMove
-		exit()
+		return
 	}
 	if (Board.Tiles[stat.X-stat.StepY][stat.Y-stat.StepX].Element == E_RICOCHET) && firstTry {
 		ix = stat.StepX
@@ -299,7 +299,7 @@ TryMove:
 		SoundQueue(1, "\xf9\x01")
 		firstTry = false
 		goto TryMove
-		exit()
+		return
 	}
 	RemoveStat(statId)
 	CurrentStatTicked = CurrentStatTicked - 1
