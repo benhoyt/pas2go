@@ -2,7 +2,6 @@
 
 /*
 ISSUES:
-- can't have const array of string, eg: EDITOR.PAS:48
 - string issues: String, TString50, etc
 - pointer issues
 - handle FILE and FILE OF
@@ -312,26 +311,55 @@ func (c *converter) decls(decls []DeclPart, isMain bool) {
 func (c *converter) decl(decl DeclPart, isMain bool) {
 	switch decl := decl.(type) {
 	case *ConstDecls:
-		if len(decl.Decls) == 1 {
-			c.print("const ")
-		} else {
-			c.print("const (\n")
-		}
+		consts := []*ConstDecl{}
+		vars := []*ConstDecl{}
 		for _, d := range decl.Decls {
-			c.printf("%s", d.Name)
-			if d.Type != nil {
-				c.print(" ")
-				c.typeSpec(d.Type)
+			switch d.Value.(type) {
+			case *ConstArrayExpr, *ConstRecordExpr:
+				vars = append(vars, d)
+			default:
+				consts = append(consts, d)
 			}
-			c.print(" = ")
-			if _, isConstRecord := d.Value.(*ConstRecordExpr); isConstRecord {
-				c.typeSpec(d.Type)
-			}
-			c.expr(d.Value)
-			c.print("\n")
 		}
-		if len(decl.Decls) != 1 {
-			c.print(")\n")
+		if len(consts) > 0 {
+			if len(consts) == 1 {
+				c.print("const ")
+			} else {
+				c.print("const (\n")
+			}
+			for _, d := range consts {
+				c.printf("%s", d.Name)
+				if d.Type != nil {
+					c.print(" ")
+					c.typeSpec(d.Type)
+				}
+				c.print(" = ")
+				c.expr(d.Value)
+				c.print("\n")
+			}
+			if len(consts) != 1 {
+				c.print(")\n")
+			}
+		}
+		if len(vars) > 0 {
+			if len(vars) == 1 {
+				c.print("var ")
+			} else {
+				c.print("var (\n")
+			}
+			for _, d := range vars {
+				c.printf("%s ", d.Name)
+				c.typeSpec(d.Type)
+				c.print(" = ")
+				if _, isConstRecord := d.Value.(*ConstRecordExpr); isConstRecord {
+					c.typeSpec(d.Type)
+				}
+				c.expr(d.Value)
+				c.print("\n")
+			}
+			if len(vars) != 1 {
+				c.print(")\n")
+			}
 		}
 	case *FuncDecl:
 		if decl.Stmt == nil {
