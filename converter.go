@@ -8,8 +8,6 @@ ISSUES:
 - scalar type casting issues: eg i in: EDITOR.PAS:130: VideoWriteText(61+i, 22, i, #219)
 - handling of New(), eg: EDITOR.PAS:270 New(state.Lines[i]) -> state.Lines[i+1] = new(TTextWindowLine)
 - handling of other builtins, like Val, Move, GetMem, etc
-- handle bitwise 'and' and 'or' as & instead of &&, eg: EDITOR.PAS:439 -- may be able to cheat by check if RHS if ConstExpr
-- handle boolean 'xor' ('^' in Go), eg: GAME.PAS:1043
 - distinguishing string constants vs char, eg: pArg[1] == "/"
 
 NICE TO HAVES:
@@ -765,7 +763,19 @@ func (c *converter) expr(expr Expr) {
 			return
 		}
 		c.expr(expr.Left)
-		c.printf(" %s ", operatorStr(expr.Op))
+		var opStr string
+		if expr.Op == AND || expr.Op == OR || expr.Op == XOR {
+			// This is cheating; should really use types, but this works with most code
+			_, isConst := expr.Right.(*ConstExpr)
+			if isConst {
+				opStr = bitwiseOperatorStr(expr.Op)
+			} else {
+				opStr = operatorStr(expr.Op)
+			}
+		} else {
+			opStr = operatorStr(expr.Op)
+		}
+		c.printf(" %s ", opStr)
 		c.expr(expr.Right)
 	case *ConstExpr:
 		switch value := expr.Value.(type) {
@@ -1004,7 +1014,7 @@ func operatorStr(op Token) string {
 	case OR:
 		return "||"
 	case XOR:
-		return "^" // TODO: note, only for integers in Go
+		return "!="
 	case DIV:
 		return "/"
 	case MOD:
@@ -1020,5 +1030,18 @@ func operatorStr(op Token) string {
 	default:
 		// same as in Pascal
 		return op.String()
+	}
+}
+
+func bitwiseOperatorStr(op Token) string {
+	switch op {
+	case AND:
+		return "&"
+	case OR:
+		return "|"
+	case XOR:
+		return "^"
+	default:
+		panic(fmt.Sprintf("unexpected operator: %s", op))
 	}
 }

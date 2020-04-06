@@ -55,7 +55,7 @@ var (
 )
 
 func InputIsJoystickButtonPressed() (InputIsJoystickButtonPressed bool) {
-	InputIsJoystickButtonPressed = (Port[PORT_JOYSTICK] && 0x30) != 0x30
+	InputIsJoystickButtonPressed = (Port[PORT_JOYSTICK] & 0x30) != 0x30
 	return
 }
 
@@ -66,9 +66,9 @@ func InputJoystickGetCoords(x, y *int16) {
 	startTicks = TimerTicks
 	Port[PORT_JOYSTICK] = 0
 	for {
-		*x = *x + (Port[PORT_JOYSTICK] && 1)
-		*y = *y + (Port[PORT_JOYSTICK] && 2)
-		if ((Port[PORT_JOYSTICK] && 3) == 0) || ((TimerTicks - startTicks) > 3) {
+		*x = *x + (Port[PORT_JOYSTICK] & 1)
+		*y = *y + (Port[PORT_JOYSTICK] & 2)
+		if ((Port[PORT_JOYSTICK] & 3) == 0) || ((TimerTicks - startTicks) > 3) {
 			break
 		}
 	}
@@ -177,7 +177,7 @@ func InputUpdate() {
 	for KeyPressed {
 		InputKeyPressed = ReadKey
 		if (InputKeyPressed == '\x00') || (InputKeyPressed == '\x01') || (InputKeyPressed == '\x02') {
-			InputKeyBuffer = InputKeyBuffer + Chr(Ord(ReadKey) || 0x80)
+			InputKeyBuffer = InputKeyBuffer + Chr(Ord(ReadKey)|0x80)
 		} else {
 			InputKeyBuffer = InputKeyBuffer + InputKeyPressed
 		}
@@ -266,14 +266,14 @@ func InputUpdate() {
 
 		regs.AX = 0x03
 		Intr(0x33, regs)
-		if (regs.BX && 1) != 0 {
+		if (regs.BX & 1) != 0 {
 			if !InputShiftAccepted {
 				InputShiftPressed = true
 			}
 		} else {
 			InputShiftAccepted = false
 		}
-		if (regs.BX && 6) != 0 {
+		if (regs.BX & 6) != 0 {
 			if (InputDeltaX != 0) || (InputDeltaY != 0) {
 				InputMouseButtonX = InputDeltaX
 				InputMouseButtonY = InputDeltaY

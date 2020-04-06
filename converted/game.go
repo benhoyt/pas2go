@@ -770,7 +770,7 @@ func AddStat(tx, ty int16, element byte, color, tcycle int16, template TStat) {
 			Move(template.Data, Board.Stats[Board.StatCount].Data, template.DataLen)
 		}
 		if ElementDefs[Board.Tiles[tx][ty].Element].PlaceableOnTop {
-			Board.Tiles[tx][ty].Color = (color && 0x0F) + (Board.Tiles[tx][ty].Color && 0x70)
+			Board.Tiles[tx][ty].Color = (color & 0x0F) + (Board.Tiles[tx][ty].Color & 0x70)
 		} else {
 			Board.Tiles[tx][ty].Color = color
 		}
@@ -872,15 +872,15 @@ func MoveStat(statId int16, newX, newY int16) {
 		oldBgColor int16
 	)
 	stat := &Board.Stats[statId]
-	oldBgColor = Board.Tiles[newX][newY].Color && 0xF0
+	oldBgColor = Board.Tiles[newX][newY].Color & 0xF0
 	iUnder = Board.Stats[statId].Under
 	Board.Stats[statId].Under = Board.Tiles[newX][newY]
 	if Board.Tiles[stat.X][stat.Y].Element == E_PLAYER {
 		Board.Tiles[newX][newY].Color = Board.Tiles[stat.X][stat.Y].Color
 	} else if Board.Tiles[newX][newY].Element == E_EMPTY {
-		Board.Tiles[newX][newY].Color = Board.Tiles[stat.X][stat.Y].Color && 0x0F
+		Board.Tiles[newX][newY].Color = Board.Tiles[stat.X][stat.Y].Color & 0x0F
 	} else {
-		Board.Tiles[newX][newY].Color = (Board.Tiles[stat.X][stat.Y].Color && 0x0F) + (Board.Tiles[newX][newY].Color && 0x70)
+		Board.Tiles[newX][newY].Color = (Board.Tiles[stat.X][stat.Y].Color & 0x0F) + (Board.Tiles[newX][newY].Color & 0x70)
 	}
 
 	Board.Tiles[newX][newY].Element = Board.Tiles[stat.X][stat.Y].Element
@@ -897,7 +897,7 @@ func MoveStat(statId int16, newX, newY int16) {
 				if (ix >= 1) && (ix <= BOARD_WIDTH) {
 					for iy = (stat.Y - TORCH_DY - 3); iy <= (stat.Y + TORCH_DY + 3); iy++ {
 						if (iy >= 1) && (iy <= BOARD_HEIGHT) {
-							if (((Sqr(ix - oldX)) + (Sqr(iy-oldY) * 2)) < TORCH_DIST_SQR) ^ (((Sqr(ix - newX)) + (Sqr(iy-newY) * 2)) < TORCH_DIST_SQR) {
+							if (((Sqr(ix - oldX)) + (Sqr(iy-oldY) * 2)) < TORCH_DIST_SQR) != (((Sqr(ix - newX)) + (Sqr(iy-newY) * 2)) < TORCH_DIST_SQR) {
 								BoardDrawTile(ix, iy)
 							}
 						}

@@ -369,7 +369,7 @@ func EditorLoop() {
 				promptByte = (stat.P2 % 0x80)
 				SidebarPromptSlider(selected, 63, iy, ElementDefs[element].Param2Name, &promptByte)
 				if selected {
-					stat.P2 = (stat.P2 && 0x80) + promptByte
+					stat.P2 = (stat.P2 & 0x80) + promptByte
 					World.EditorStatSettings[element].P2 = stat.P2
 				}
 				iy = iy + 4
@@ -742,7 +742,7 @@ func EditorLoop() {
 						elemMenuColor = (cursorColor * 0x10) - 0x71
 					} else if ElementDefs[iElem].Color == COLOR_CHOICE_ON_CHOICE {
 						elemMenuColor = ((cursorColor - 8) * 0x11) + 8
-					} else if (ElementDefs[iElem].Color && 0x70) == 0x00 {
+					} else if (ElementDefs[iElem].Color & 0x70) == 0x00 {
 						elemMenuColor = (ElementDefs[iElem].Color % 0x10) + 0x10
 					} else {
 						elemMenuColor = ElementDefs[iElem].Color

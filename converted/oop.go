@@ -345,11 +345,11 @@ ColorFound:
 
 func GetColorForTileMatch(tile *TTile) (GetColorForTileMatch byte) {
 	if ElementDefs[tile.Element].Color < COLOR_SPECIAL_MIN {
-		GetColorForTileMatch = ElementDefs[tile.Element].Color && 0x07
+		GetColorForTileMatch = ElementDefs[tile.Element].Color & 0x07
 	} else if ElementDefs[tile.Element].Color == COLOR_WHITE_ON_CHOICE {
-		GetColorForTileMatch = ((tile.Color >> 4) && 0x0F) + 8
+		GetColorForTileMatch = ((tile.Color >> 4) & 0x0F) + 8
 	} else {
-		GetColorForTileMatch = (tile.Color && 0x0F)
+		GetColorForTileMatch = (tile.Color & 0x0F)
 	}
 
 	return
