@@ -9,6 +9,7 @@ ISSUES:
 - handling of New(), eg: EDITOR.PAS:270 New(state.Lines[i]) -> state.Lines[i+1] = new(TTextWindowLine)
 - handling of other builtins, like Val, Move, GetMem, etc
 - distinguishing string constants vs char, eg: pArg[1] == "/"
+- OopParseDirection and OopCheckCondition calls themselves - causes naming issue with named return value
 
 NICE TO HAVES:
 - uses operator precedence rather than ParenExpr
