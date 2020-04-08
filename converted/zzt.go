@@ -19,7 +19,7 @@ func ParseArguments() {
 			}
 		} else {
 			StartupWorldFileName = pArg
-			if (Length(StartupWorldFileName) > 4) && (StartupWorldFileName[Length(StartupWorldFileName)-3] == '.') {
+			if (Length(StartupWorldFileName) > 4) && (StartupWorldFileName[(Length(StartupWorldFileName)-3)-1] == '.') {
 				StartupWorldFileName = Copy(StartupWorldFileName, 1, Length(StartupWorldFileName)-4)
 			}
 		}
@@ -43,7 +43,7 @@ func GameConfigure() {
 		Readln(cfgFile, ConfigWorldFile)
 		Readln(cfgFile, ConfigRegistration)
 	}
-	if ConfigWorldFile[1] == '*' {
+	if ConfigWorldFile[0] == '*' {
 		EditorEnabled = false
 		ConfigWorldFile = Copy(ConfigWorldFile, 2, Length(ConfigWorldFile)-1)
 	}
@@ -100,20 +100,20 @@ func GameConfigure() {
 
 func main() {
 	WorldFileDescCount = 7
-	WorldFileDescKeys[2] = "TOWN"
-	WorldFileDescValues[2] = "TOWN       The Town of ZZT"
-	WorldFileDescKeys[3] = "DEMO"
-	WorldFileDescValues[3] = "DEMO       Demo of the ZZT World Editor"
-	WorldFileDescKeys[4] = "CAVES"
-	WorldFileDescValues[4] = "CAVES      The Caves of ZZT"
-	WorldFileDescKeys[5] = "DUNGEONS"
-	WorldFileDescValues[5] = "DUNGEONS   The Dungeons of ZZT"
-	WorldFileDescKeys[6] = "CITY"
-	WorldFileDescValues[6] = "CITY       Underground City of ZZT"
-	WorldFileDescKeys[7] = "BEST"
-	WorldFileDescValues[7] = "BEST       The Best of ZZT"
-	WorldFileDescKeys[8] = "TOUR"
-	WorldFileDescValues[8] = "TOUR       Guided Tour ZZT's Other Worlds"
+	WorldFileDescKeys[0] = "TOWN"
+	WorldFileDescValues[0] = "TOWN       The Town of ZZT"
+	WorldFileDescKeys[1] = "DEMO"
+	WorldFileDescValues[1] = "DEMO       Demo of the ZZT World Editor"
+	WorldFileDescKeys[2] = "CAVES"
+	WorldFileDescValues[2] = "CAVES      The Caves of ZZT"
+	WorldFileDescKeys[3] = "DUNGEONS"
+	WorldFileDescValues[3] = "DUNGEONS   The Dungeons of ZZT"
+	WorldFileDescKeys[4] = "CITY"
+	WorldFileDescValues[4] = "CITY       Underground City of ZZT"
+	WorldFileDescKeys[5] = "BEST"
+	WorldFileDescValues[5] = "BEST       The Best of ZZT"
+	WorldFileDescKeys[6] = "TOUR"
+	WorldFileDescValues[6] = "TOUR       Guided Tour ZZT's Other Worlds"
 	Randomize()
 	SetCBreak(false)
 	InitialTextAttr = TextAttr

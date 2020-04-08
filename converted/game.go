@@ -44,15 +44,15 @@ func GenerateTransitionTable() {
 	for iy = 1; iy <= BOARD_HEIGHT; iy++ {
 		for ix = 1; ix <= BOARD_WIDTH; ix++ {
 			TransitionTableSize = TransitionTableSize + 1
-			TransitionTable[TransitionTableSize+1].X = ix
-			TransitionTable[TransitionTableSize+1].Y = iy
+			TransitionTable[TransitionTableSize-1].X = ix
+			TransitionTable[TransitionTableSize-1].Y = iy
 		}
 	}
 	for ix = 1; ix <= TransitionTableSize; ix++ {
 		iy = Random(TransitionTableSize) + 1
-		t = TransitionTable[iy+1]
-		TransitionTable[iy+1] = TransitionTable[ix+1]
-		TransitionTable[ix+1] = t
+		t = TransitionTable[iy-1]
+		TransitionTable[iy-1] = TransitionTable[ix-1]
+		TransitionTable[ix-1] = t
 	}
 }
 
@@ -243,10 +243,10 @@ func WorldCreate() {
 	World.Info.BoardTimeSec = 0
 	World.Info.BoardTimeHsec = 0
 	for i = 1; i <= 7; i++ {
-		World.Info.Keys[i+1] = false
+		World.Info.Keys[i-1] = false
 	}
 	for i = 1; i <= 10; i++ {
-		World.Info.Flags[i+1] = ""
+		World.Info.Flags[i-1] = ""
 	}
 	BoardChange(0)
 	Board.Name = "Title screen"
@@ -257,7 +257,7 @@ func WorldCreate() {
 func TransitionDrawToFill(chr byte, color int16) {
 	var i int16
 	for i = 1; i <= TransitionTableSize; i++ {
-		VideoWriteText(TransitionTable[i+1].X-1, TransitionTable[i+1].Y-1, color, chr)
+		VideoWriteText(TransitionTable[i-1].X-1, TransitionTable[i-1].Y-1, color, chr)
 	}
 }
 
@@ -305,7 +305,7 @@ func TransitionDrawToBoard() {
 	var i int16
 	BoardDrawBorder()
 	for i = 1; i <= TransitionTableSize; i++ {
-		table := &TransitionTable[i+1]
+		table := &TransitionTable[i-1]
 		BoardDrawTile(table.X, table.Y)
 
 	}
@@ -707,8 +707,8 @@ func GameWorldLoad(extension TString50) (GameWorldLoad bool) {
 	for DosError == 0 {
 		entryName = Copy(fileSearchRec.Name, 1, Length(fileSearchRec.name)-4)
 		for i = 1; i <= WorldFileDescCount; i++ {
-			if entryName == WorldFileDescKeys[i+1] {
-				entryName = WorldFileDescValues[i+1]
+			if entryName == WorldFileDescKeys[i-1] {
+				entryName = WorldFileDescValues[i-1]
 			}
 		}
 		TextWindowAppend(&textWindow, entryName)
@@ -719,7 +719,7 @@ func GameWorldLoad(extension TString50) (GameWorldLoad bool) {
 	TextWindowSelect(&textWindow, false, false)
 	TextWindowDrawClose(&textWindow)
 	if (textWindow.LinePos < textWindow.LineCount) && !TextWindowRejected {
-		entryName = textWindow.Lines[textWindow.LinePos+1]
+		entryName = textWindow.Lines[textWindow.LinePos-1]
 		if Pos(' ', entryName) != 0 {
 			entryName = Copy(entryName, 1, Pos(' ', entryName)-1)
 		}
@@ -989,7 +989,7 @@ func GameUpdateSidebar() {
 			}
 		}
 		for i = 1; i <= 7; i++ {
-			if World.Info.Keys[i+1] {
+			if World.Info.Keys[i-1] {
 				VideoWriteText(71+i, 12, 0x18+i, ElementDefs[E_KEY].Character)
 			} else {
 				VideoWriteText(71+i, 12, 0x1F, ' ')
@@ -1193,11 +1193,11 @@ func GameDebugPrompt() {
 	SidebarClearLine(5)
 	PromptString(63, 5, 0x1E, 0x0F, 11, PROMPT_ANY, &input)
 	for i = 1; i <= Length(input); i++ {
-		input[i] = UpCase(input[i])
+		input[i-1] = UpCase(input[i-1])
 	}
 	toggle = true
-	if (input[1] == '+') || (input[1] == '-') {
-		if input[1] == '-' {
+	if (input[0] == '+') || (input[0] == '-') {
+		if input[0] == '-' {
 			toggle = false
 		}
 		input = Copy(input, 2, Length(input)-1)
@@ -1214,7 +1214,7 @@ func GameDebugPrompt() {
 		World.Info.Ammo = World.Info.Ammo + 5
 	} else if input == "KEYS" {
 		for i = 1; i <= 7; i++ {
-			World.Info.Keys[i+1] = true
+			World.Info.Keys[i-1] = true
 		}
 	} else if input == "TORCHES" {
 		World.Info.Torches = World.Info.Torches + 3
@@ -1509,10 +1509,10 @@ func GamePrintRegisterMessage() {
 	iy = 0
 	color = 0x0F
 	for i = 1; i <= ResourceDataHeader.EntryCount; i++ {
-		if ResourceDataHeader.Name[i+1] == s {
+		if ResourceDataHeader.Name[i-1] == s {
 			Assign(f, ResourceDataFileName)
 			Reset(f, 1)
-			Seek(f, ResourceDataHeader.FileOffset[i+1])
+			Seek(f, ResourceDataHeader.FileOffset[i-1])
 			isReading = true
 			for (IOResult == 0) && isReading {
 				BlockRead(f, s, 1)

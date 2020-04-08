@@ -902,7 +902,7 @@ func (c *converter) varExpr(expr *VarExpr, suppressStar bool) {
 			case *ArraySpec:
 				min = spec.Min.(*ConstExpr).Value.(int)
 			case *StringSpec:
-				min = 0
+				min = 1
 			}
 
 			c.print("[")
@@ -910,14 +910,14 @@ func (c *converter) varExpr(expr *VarExpr, suppressStar bool) {
 				switch index := suffix.Index.(type) {
 				case *ConstExpr:
 					val := index.Value.(int)
-					c.printf("%d", val+min)
+					c.printf("%d", val-min)
 				case *FuncExpr, *ParenExpr, *PointerExpr, *TypeConvExpr, *UnaryExpr, *VarExpr:
 					c.expr(suffix.Index)
-					c.printf(" + %d", min)
+					c.printf(" - %d", min)
 				default:
 					c.print("(")
 					c.expr(suffix.Index)
-					c.printf(") + %d", min)
+					c.printf(") - %d", min)
 				}
 			} else {
 				c.expr(suffix.Index)

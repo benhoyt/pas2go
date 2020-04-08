@@ -276,7 +276,7 @@ func WorldGetFlagPosition(name TString50) (WorldGetFlagPosition int16) {
 	var i int16
 	WorldGetFlagPosition = -1
 	for i = 1; i <= 10; i++ {
-		if World.Info.Flags[i+1] == name {
+		if World.Info.Flags[i-1] == name {
 			WorldGetFlagPosition = i
 		}
 	}
@@ -287,17 +287,17 @@ func WorldSetFlag(name TString50) {
 	var i int16
 	if WorldGetFlagPosition(name) < 0 {
 		i = 1
-		for (i < MAX_FLAG) && (Length(World.Info.Flags[i+1]) != 0) {
+		for (i < MAX_FLAG) && (Length(World.Info.Flags[i-1]) != 0) {
 			i = i + 1
 		}
-		World.Info.Flags[i+1] = name
+		World.Info.Flags[i-1] = name
 	}
 }
 
 func WorldClearFlag(name TString50) {
 	var i int16
 	if WorldGetFlagPosition(name) >= 0 {
-		World.Info.Flags[WorldGetFlagPosition(name)+1] = ""
+		World.Info.Flags[WorldGetFlagPosition(name)-1] = ""
 	}
 }
 
@@ -308,10 +308,10 @@ func OopStringToWord(input TString50) (OopStringToWord TString50) {
 	)
 	output = ""
 	for i = 1; i <= Length(input); i++ {
-		if ((input[i] >= 'A') && (input[i] <= 'Z')) || ((input[i] >= '0') && (input[i] <= '9')) {
-			output = output + input[i]
-		} else if (input[i] >= 'a') && (input[i] <= 'z') {
-			output = output + Chr(Ord(input[i])-0x20)
+		if ((input[i-1] >= 'A') && (input[i-1] <= 'Z')) || ((input[i-1] >= '0') && (input[i-1] <= '9')) {
+			output = output + input[i-1]
+		} else if (input[i-1] >= 'a') && (input[i-1] <= 'z') {
+			output = output + Chr(Ord(input[i-1])-0x20)
 		}
 
 	}
@@ -325,7 +325,7 @@ func OopParseTile(statId, position *int16, tile *TTile) (OopParseTile bool) {
 	tile.Color = 0
 	OopReadWord(*statId, position)
 	for i = 1; i <= 7; i++ {
-		if OopWord == OopStringToWord(ColorNames[i+1]) {
+		if OopWord == OopStringToWord(ColorNames[i-1]) {
 			tile.Color = i + 0x08
 			OopReadWord(*statId, position)
 			goto ColorFound
@@ -815,7 +815,7 @@ StartParsing:
 			}
 		}
 	} else if textWindow.LineCount == 1 {
-		DisplayMessage(200, textWindow.Lines[2])
+		DisplayMessage(200, textWindow.Lines[0])
 		TextWindowFree(&textWindow)
 	}
 
