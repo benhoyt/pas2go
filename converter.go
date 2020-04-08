@@ -597,7 +597,8 @@ func (c *converter) stmt(stmt Stmt) {
 		c.printf("%s:\n", stmt.Label)
 		c.stmt(stmt.Stmt)
 	case *ProcStmt:
-		switch strings.ToLower(stmt.Proc.String()) {
+		procStr := strings.ToLower(stmt.Proc.String())
+		switch procStr {
 		case "exit":
 			c.print("return")
 		case "str":
@@ -614,6 +615,10 @@ func (c *converter) stmt(stmt Stmt) {
 			c.expr(stmt.Args[1])
 			c.print(")")
 		default:
+			if procStr == "delete" {
+				c.varExpr(stmt.Args[0].(*VarExpr), false)
+				c.print(" = ")
+			}
 			c.varExpr(stmt.Proc, false)
 			spec, _ := c.lookupVarExprType(stmt.Proc)
 			var params []*ParamGroup

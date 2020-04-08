@@ -1,17 +1,15 @@
 package main
 
 import (
+	"encoding/binary"
 	"io"
 	"math/rand"
 	"os"
+	"strings"
 	"time"
 )
 
-type TVideoLine string
-
-func VideoWriteText(x, y, color byte, text TVideoLine) {
-	// TODO
-}
+// String functions
 
 func Ord(c byte) byte {
 	return c
@@ -21,16 +19,44 @@ func Chr(i byte) byte {
 	return i
 }
 
-func Length(b []byte) int16 {
-	return len(b)
+func Length(s string) int16 {
+	return int16(len(s))
+}
+
+func UpCase(b byte) byte {
+	if b >= 'a' && b <= 'z' {
+		return b - ('a' - 'A')
+	}
+	return b
+}
+
+func Copy(s string, index, count int16) string {
+	return s[index-1 : index-1+count]
+}
+
+func Pos(b byte, s string) int16 {
+	return int16(strings.IndexByte(s, b) + 1)
+}
+
+// NOTE: in Turbo Pascal Delete() is a procedure that modifies the string in-place
+func Delete(s string, index, count int16) string {
+	return s[:index-1] + s[index-1+count:]
+}
+
+// Misc functions
+
+type TVideoLine string
+
+func VideoWriteText(x, y, color byte, text TVideoLine) {
+	// TODO
 }
 
 func Delay(milliseconds int16) {
-	time.Sleep(milliseconds * time.Millisecond)
+	time.Sleep(time.Duration(milliseconds) * time.Millisecond)
 }
 
 func Random(end int16) int16 {
-	return int16(rand.Intn(end))
+	return int16(rand.Intn(int(end)))
 }
 
 func Sqr(n int16) int16 {
@@ -45,10 +71,10 @@ func StrWidth(n, width int16, s []byte) {
 	// TODO
 }
 
-// File routines
+// File functions
 
 type File struct {
-	name []byte
+	name string
 	file *os.File
 }
 
@@ -65,7 +91,7 @@ func setIOResult(err error) {
 	}
 }
 
-func Assign(f *File, name []byte) {
+func Assign(f *File, name string) {
 	f.name = name
 }
 
@@ -92,16 +118,16 @@ func Write(f *File, data interface{}) {
 }
 
 func Close(f *File) {
-	err := f.Close()
+	err := f.file.Close()
 	setIOResult(err)
 }
 
 func Erase(f *File) {
-	err := os.Remove()
+	err := os.Remove(f.name)
 	setIOResult(err)
 }
 
 func Seek(f *File, offset int16) {
-	_, err := f.file(int64(offset), io.SeekSet)
+	_, err := f.file.Seek(int64(offset), io.SeekStart)
 	setIOResult(err)
 }

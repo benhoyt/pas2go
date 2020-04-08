@@ -186,14 +186,14 @@ func TextWindowPrint(state *TTextWindowState) {
 		if Length(line) > 0 {
 			switch line[1] {
 			case '$':
-				Delete(line, 1, 1)
+				line = Delete(line, 1, 1)
 				for iChar = ((80 - Length(line)) / 2); iChar >= 1; iChar-- {
 					line = ' ' + line
 				}
 			case '!', ':':
 				iChar = Pos(';', line)
 				if iChar > 0 {
-					Delete(line, 1, iChar)
+					line = Delete(line, 1, iChar)
 				} else {
 					line = ""
 				}
@@ -238,7 +238,7 @@ func TextWindowSelect(state *TTextWindowState, hyperlinkAsSelect, viewingFile bo
 					pointerStr = Copy(pointerStr, 1, Pos(';', pointerStr)-1)
 				}
 				if pointerStr[1] == '-' {
-					Delete(pointerStr, 1, 1)
+					pointerStr = Delete(pointerStr, 1, 1)
 					TextWindowFree(state)
 					TextWindowOpenFile(pointerStr, state)
 					if state.LineCount == 0 {
