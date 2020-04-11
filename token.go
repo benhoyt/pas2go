@@ -41,9 +41,7 @@ const (
 	AND
 	ARRAY
 	BEGIN
-	BOOLEAN
 	CASE
-	CHAR
 	CONST
 	DIV
 	DO
@@ -59,7 +57,6 @@ const (
 	IMPLEMENTATION
 	IN
 	INLINE
-	INTEGER
 	INTERFACE
 	INTERRUPT
 	LABEL
@@ -70,12 +67,10 @@ const (
 	OR
 	PROCEDURE
 	PROGRAM
-	REAL
 	RECORD
 	REPEAT
 	SHL
 	SHR
-	STRING
 	THEN
 	TO
 	TRUE
@@ -99,9 +94,7 @@ var keywordTokens = map[string]Token{
 	"AND":            AND,
 	"ARRAY":          ARRAY,
 	"BEGIN":          BEGIN,
-	"BOOLEAN":        BOOLEAN,
 	"CASE":           CASE,
-	"CHAR":           CHAR,
 	"CONST":          CONST,
 	"DIV":            DIV,
 	"DO":             DO,
@@ -117,7 +110,6 @@ var keywordTokens = map[string]Token{
 	"IMPLEMENTATION": IMPLEMENTATION,
 	"IN":             IN,
 	"INLINE":         INLINE,
-	"INTEGER":        INTEGER,
 	"INTERFACE":      INTERFACE,
 	"INTERRUPT":      INTERRUPT,
 	"LABEL":          LABEL,
@@ -128,12 +120,10 @@ var keywordTokens = map[string]Token{
 	"OR":             OR,
 	"PROCEDURE":      PROCEDURE,
 	"PROGRAM":        PROGRAM,
-	"REAL":           REAL,
 	"RECORD":         RECORD,
 	"REPEAT":         REPEAT,
 	"SHL":            SHL,
 	"SHR":            SHR,
-	"STRING":         STRING,
 	"THEN":           THEN,
 	"TO":             TO,
 	"TRUE":           TRUE,
@@ -183,9 +173,7 @@ var tokenNames = map[Token]string{
 	AND:            "AND",
 	ARRAY:          "ARRAY",
 	BEGIN:          "BEGIN",
-	BOOLEAN:        "BOOLEAN",
 	CASE:           "CASE",
-	CHAR:           "CHAR",
 	CONST:          "CONST",
 	DIV:            "DIV",
 	DO:             "DO",
@@ -201,7 +189,6 @@ var tokenNames = map[Token]string{
 	IMPLEMENTATION: "IMPLEMENTATION",
 	IN:             "IN",
 	INLINE:         "INLINE",
-	INTEGER:        "INTEGER",
 	INTERFACE:      "INTERFACE",
 	INTERRUPT:      "INTERRUPT",
 	LABEL:          "LABEL",
@@ -212,12 +199,10 @@ var tokenNames = map[Token]string{
 	OR:             "OR",
 	PROCEDURE:      "PROCEDURE",
 	PROGRAM:        "PROGRAM",
-	REAL:           "REAL",
 	RECORD:         "RECORD",
 	REPEAT:         "REPEAT",
 	SHL:            "SHL",
 	SHR:            "SHR",
-	STRING:         "STRING",
 	THEN:           "THEN",
 	TO:             "TO",
 	TRUE:           "TRUE",

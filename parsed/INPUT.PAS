@@ -80,7 +80,7 @@ procedure InputJoystickGetCoords(var x, y: integer);
         end;
     end;
 
-function InputCalibrateJoystickPosition(msg: string; var x, y: integer): boolean;
+function InputCalibrateJoystickPosition(msg: String; var x, y: integer): boolean;
     var
         charTyped: char;
     begin

@@ -3,12 +3,12 @@ unit Keys;
 interface
     
     var
-        KeysRightShiftHeld: boolean;
-        KeysLeftShiftHeld: boolean;
-        KeysShiftHeld: boolean;
-        KeysCtrlHeld: boolean;
-        KeysAltHeld: boolean;
-        KeysNumLockHeld: boolean;
+        KeysRightShiftHeld: Boolean;
+        KeysLeftShiftHeld: Boolean;
+        KeysShiftHeld: Boolean;
+        KeysCtrlHeld: Boolean;
+        KeysAltHeld: Boolean;
+        KeysNumLockHeld: Boolean;
     procedure KeysUpdateModifiers;
 
 implementation

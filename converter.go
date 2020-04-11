@@ -36,7 +36,7 @@ func Convert(file File, units []*Unit, w io.Writer) {
 	// Port is predefined by Turbo Pascal, fake it
 	min := &ConstExpr{0, false}
 	max := &ConstExpr{1000, false}
-	c.defineVar("Port", &ArraySpec{min, max, &IdentSpec{&TypeIdent{"", INTEGER}}})
+	c.defineVar("Port", &ArraySpec{min, max, &IdentSpec{&TypeIdent{"integer"}}})
 
 	// Builtin functions
 	// TODO
@@ -97,7 +97,7 @@ func (c *converter) defineWithVar(name string) {
 	for i := len(c.scopes) - 1; i >= 0; i-- {
 		scope := c.scopes[i]
 		if scope.Type != ScopeWith {
-			scope.Vars[strings.ToLower(name)] = &IdentSpec{&TypeIdent{name, ILLEGAL}}
+			scope.Vars[strings.ToLower(name)] = &IdentSpec{&TypeIdent{name}}
 			return
 		}
 	}
@@ -189,10 +189,11 @@ func (c *converter) lookupIdentSpec(spec TypeSpec) TypeSpec {
 	if !isIdent {
 		return spec
 	}
-	if ident.Name == "" {
+	n := strings.ToLower(ident.Type.Name)
+	if n == "char" || n == "boolean" || n == "integer" || n == "real" || n == "string" {
 		return spec // builtin type
 	}
-	spec = c.lookupType(ident.Name)
+	spec = c.lookupType(ident.Type.Name)
 	if spec == nil {
 		return nil
 	}
@@ -203,7 +204,7 @@ func (c *converter) lookupNamedType(spec TypeSpec) TypeSpec {
 	if a, ok := spec.(*ArraySpec); ok {
 		spec = a.Of
 	}
-	typeName := spec.(*IdentSpec).Name
+	typeName := spec.(*IdentSpec).Type.Name
 	spec = c.lookupType(typeName)
 	if spec == nil {
 		panic(fmt.Sprintf("named type not found: %q", typeName))
@@ -483,28 +484,25 @@ func (c *converter) params(params []*ParamGroup) {
 
 func (c *converter) typeIdent(typ *TypeIdent) {
 	var s string
-	switch typ.Builtin {
-	case CHAR:
+	switch strings.ToLower(typ.Name) {
+	case "char":
 		s = "byte"
-	case BOOLEAN:
+	case "boolean":
 		s = "bool"
-	case INTEGER:
+	case "integer":
 		s = "int16"
-	case REAL:
+	case "real":
 		s = "float64"
-	case STRING:
+	case "string":
 		s = "string"
+	case "pointer":
+		s = "uintptr" // TODO: change to *byte?
+	case "word":
+		s = "uint16"
+	case "longint":
+		s = "int32"
 	default:
-		switch strings.ToLower(typ.Name) {
-		case "pointer":
-			s = "uintptr" // TODO: change to *byte?
-		case "word":
-			s = "uint16"
-		case "longint":
-			s = "int32"
-		default:
-			s = typ.Name
-		}
+		s = typ.Name
 	}
 	c.print(s)
 }
@@ -883,7 +881,7 @@ func (c *converter) expr(expr Expr) {
 	case *SetExpr:
 		panic("unexpected SetExpr: should be handled by 'in'")
 	case *TypeConvExpr:
-		c.typeIdent(&TypeIdent{"", expr.Type})
+		c.typeIdent(expr.Type)
 		c.print("(")
 		c.expr(expr.Expr)
 		c.print(")")
@@ -1027,7 +1025,7 @@ func (c *converter) typeSpec(spec TypeSpec) {
 		// spec.Names are defined by TypeDefs handling
 		c.print("uint8")
 	case *IdentSpec:
-		c.typeIdent(spec.TypeIdent)
+		c.typeIdent(spec.Type)
 	case *StringSpec:
 		// TODO: how to handle string sizes? should we use [Size]byte
 		c.print("string")

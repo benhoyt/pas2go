@@ -260,14 +260,9 @@ func (p *parser) paramGroup() *ParamGroup {
 }
 
 func (p *parser) typeIdent() *TypeIdent {
-	if p.matches(CHAR, BOOLEAN, INTEGER, REAL, STRING) {
-		tok := p.tok
-		p.next()
-		return &TypeIdent{"", tok}
-	}
 	name := p.val
 	p.expect(IDENT)
-	return &TypeIdent{name, ILLEGAL}
+	return &TypeIdent{name}
 }
 
 // typeSpec: type | functionType | procedureType
@@ -295,19 +290,6 @@ func (p *parser) typeSpec() TypeSpec {
 		names := p.identList()
 		p.expect(RPAREN)
 		return &ScalarSpec{names}
-	case STRING:
-		p.next()
-		if p.tok != LBRACKET {
-			return &IdentSpec{&TypeIdent{"", STRING}}
-		}
-		p.expect(LBRACKET)
-		size, err := strconv.Atoi(p.val)
-		if err != nil {
-			panic(p.error("expected integer"))
-		}
-		p.expect(NUM)
-		p.expect(RBRACKET)
-		return &StringSpec{size}
 	case POINTER:
 		p.next()
 		typ := p.typeIdent()
@@ -339,6 +321,20 @@ func (p *parser) typeSpec() TypeSpec {
 		}
 		return &FileSpec{ofType}
 	default:
+		if p.tok == IDENT && strings.ToLower(p.val) == "string" {
+			p.next()
+			if p.tok != LBRACKET {
+				return &IdentSpec{&TypeIdent{"string"}}
+			}
+			p.expect(LBRACKET)
+			size, err := strconv.Atoi(p.val)
+			if err != nil {
+				panic(p.error("expected integer"))
+			}
+			p.expect(NUM)
+			p.expect(RBRACKET)
+			return &StringSpec{size}
+		}
 		ident := p.typeIdent()
 		return &IdentSpec{ident}
 	}
@@ -374,15 +370,16 @@ func (p *parser) stmt() Stmt {
 
 func (p *parser) labelledStmt(allowLabel bool) Stmt {
 	switch p.tok {
-	case IDENT, AT, CHAR, BOOLEAN, INTEGER, REAL, STRING:
-		var convType Token
-		if p.matches(CHAR, BOOLEAN, INTEGER, REAL, STRING) {
-			convType = p.tok
+	case IDENT, AT:
+		var convType *TypeIdent
+		ts := strings.ToLower(p.val)
+		if p.tok == IDENT && (ts == "char" || ts == "boolean" || ts == "integer" || ts == "real" || ts == "string") {
+			convType = &TypeIdent{p.val}
 			p.next()
 			p.expect(LPAREN)
 		}
 		varExpr := p.varExpr()
-		if convType != ILLEGAL {
+		if convType != nil {
 			p.expect(RPAREN)
 		}
 		identExpr, isIdent := varExpr.(*IdentExpr)
@@ -393,7 +390,7 @@ func (p *parser) labelledStmt(allowLabel bool) Stmt {
 			value := p.expr()
 			return &AssignStmt{convType, varExpr, value}
 		case COLON:
-			if !isIdent || convType != ILLEGAL {
+			if !isIdent || convType != nil {
 				panic(p.error("label must be a simple identifier"))
 			}
 			if !allowLabel {
@@ -403,7 +400,7 @@ func (p *parser) labelledStmt(allowLabel bool) Stmt {
 			stmt := p.labelledStmt(false)
 			return &LabelledStmt{identExpr.Name, stmt}
 		case LPAREN:
-			if convType != ILLEGAL {
+			if convType != nil {
 				panic(p.error("can't have type conversion in procedure call"))
 			}
 			p.next()
@@ -684,14 +681,16 @@ func (p *parser) factor() Expr {
 	case NIL:
 		p.next()
 		return &ConstExpr{nil, false}
-	case CHAR, BOOLEAN, INTEGER, REAL, STRING:
-		typ := p.tok
-		p.next()
-		p.expect(LPAREN)
-		expr := p.expr()
-		p.expect(RPAREN)
-		return &TypeConvExpr{typ, expr}
 	case IDENT, AT:
+		ts := strings.ToLower(p.val)
+		if p.tok == IDENT && (ts == "char" || ts == "boolean" || ts == "integer" || ts == "real" || ts == "string") {
+			val := p.val
+			p.next()
+			p.expect(LPAREN)
+			expr := p.expr()
+			p.expect(RPAREN)
+			return &TypeConvExpr{&TypeIdent{val}, expr}
+		}
 		expr := p.varExpr()
 		if p.tok == LPAREN {
 			p.next()

@@ -144,14 +144,10 @@ func (d *FuncDecl) String() string {
 }
 
 type TypeIdent struct {
-	Name    string
-	Builtin Token
+	Name string
 }
 
 func (t *TypeIdent) String() string {
-	if t.Name == "" {
-		return strings.ToLower(t.Builtin.String())
-	}
 	return t.Name
 }
 
@@ -271,7 +267,11 @@ func (s *ScalarSpec) String() string {
 }
 
 type IdentSpec struct {
-	*TypeIdent
+	Type *TypeIdent
+}
+
+func (s *IdentSpec) String() string {
+	return s.Type.String()
 }
 
 type StringSpec struct {
@@ -375,13 +375,13 @@ func (s *WhileStmt) stmt()    {}
 func (s *WithStmt) stmt()     {}
 
 type AssignStmt struct {
-	TypeConv Token
+	TypeConv *TypeIdent
 	Var      Expr
 	Value    Expr
 }
 
 func (s *AssignStmt) String() string {
-	if s.TypeConv != ILLEGAL {
+	if s.TypeConv != nil {
 		typeStr := s.TypeConv.String()
 		typeStr = string(typeStr[0]) + strings.ToLower(typeStr[1:])
 		return fmt.Sprintf("%s(%s) := %s", typeStr, s.Var, s.Value)
@@ -762,7 +762,7 @@ func (e *SetExpr) String() string {
 }
 
 type TypeConvExpr struct {
-	Type Token
+	Type *TypeIdent
 	Expr Expr
 }
 
