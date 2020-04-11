@@ -1518,7 +1518,7 @@ func GamePrintRegisterMessage() {
 				BlockRead(f, s, 1)
 				strPtr = Ptr(Seg(s), Ofs(s)+1)
 				if Length(s) == 0 {
-					Dec(color)
+					color--
 				} else {
 					BlockRead(f, strPtr, Length(s))
 					if s != '@' {
@@ -1527,7 +1527,7 @@ func GamePrintRegisterMessage() {
 						isReading = false
 					}
 				}
-				Inc(iy)
+				iy++
 			}
 			Close(f)
 			VideoWriteText(28, 24, 0x1F, "Press any key to exit...")

@@ -605,8 +605,20 @@ func (c *converter) stmt(stmt Stmt) {
 	case *ProcStmt:
 		procStr := strings.ToLower(stmt.Proc.String())
 		switch procStr {
+		case "dec":
+			if len(stmt.Args) != 1 {
+				panic(fmt.Sprintf("Dec() requires 1 arg, got %d", len(stmt.Args)))
+			}
+			c.expr(stmt.Args[0])
+			c.print("--")
 		case "exit":
 			c.print("return")
+		case "inc":
+			if len(stmt.Args) != 1 {
+				panic(fmt.Sprintf("Inc() requires 1 arg, got %d", len(stmt.Args)))
+			}
+			c.expr(stmt.Args[0])
+			c.print("++")
 		case "str":
 			if widthExpr, isWidth := stmt.Args[0].(*WidthExpr); isWidth {
 				c.print("StrWidth(")

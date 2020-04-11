@@ -148,7 +148,7 @@ func SoundHasTimeElapsed(counter *int16, duration int16) (SoundHasTimeElapsed bo
 }
 
 func SoundTimerHandler() {
-	Inc(TimerTicks)
+	TimerTicks++
 	if (SoundTimeCheckCounter > 0) && ((SoundTimeCheckCounter % 2) == 0) {
 		SoundTimeCheckCounter = SoundTimeCheckCounter - 1
 	}
@@ -156,7 +156,7 @@ func SoundTimerHandler() {
 		SoundIsPlaying = false
 		NoSound()
 	} else if SoundIsPlaying {
-		Dec(SoundDurationCounter)
+		SoundDurationCounter--
 		if SoundDurationCounter <= 0 {
 			NoSound()
 			if SoundBufferPos >= Length(SoundBuffer) {
@@ -171,9 +171,9 @@ func SoundTimerHandler() {
 					SoundPlayDrum(SoundDrumTable[Ord(SoundBuffer[SoundBufferPos])-240])
 				}
 
-				Inc(SoundBufferPos)
+				SoundBufferPos++
 				SoundDurationCounter = SoundDurationMultiplier * Ord(SoundBuffer[SoundBufferPos])
-				Inc(SoundBufferPos)
+				SoundBufferPos++
 			}
 		}
 	}

@@ -495,7 +495,7 @@ func TextWindowOpenFile(filename TTextWindowLine, state *TTextWindowState) {
 		Assign(tf, filename)
 		Reset(tf)
 		for (IOResult == 0) && (!Eof(tf)) {
-			Inc(state.LineCount)
+			state.LineCount++
 			New(state.Lines[state.LineCount-1])
 			ReadLn(tf, state.Lines[state.LineCount-1])
 		}
@@ -507,7 +507,7 @@ func TextWindowOpenFile(filename TTextWindowLine, state *TTextWindowState) {
 		if IOResult == 0 {
 			retVal = true
 			for (IOResult == 0) && retVal {
-				Inc(state.LineCount)
+				state.LineCount++
 				New(state.Lines[state.LineCount-1])
 				BlockRead(f, state.Lines[state.LineCount-1], 1)
 				line = Ptr(Seg(state.Lines[state.LineCount-1]), Ofs(state.Lines[state.LineCount-1])+1)

@@ -16,7 +16,7 @@ func OopReadChar(statId int16, position *int16) {
 	stat := &Board.Stats[statId]
 	if (*position >= 0) && (*position < stat.DataLen) {
 		Move(Ptr(Seg(stat.Data), Ofs(stat.Data)+*position), OopChar, 1)
-		Inc(*position)
+		*position++
 	} else {
 		OopChar = '\x00'
 	}
@@ -40,7 +40,7 @@ func OopReadWord(statId int16, position *int16) {
 		}
 	}
 	if *position > 0 {
-		Dec(*position)
+		*position--
 	}
 }
 
@@ -549,7 +549,7 @@ StartParsing:
 				}
 				OopReadChar(statId, position)
 				if OopChar != '\r' {
-					Dec(*position)
+					*position--
 				}
 				stopRunning = true
 			} else {
@@ -565,7 +565,7 @@ StartParsing:
 			if Length(OopWord) == 0 {
 				goto ReadInstruction
 			}
-			Inc(insCount)
+			insCount++
 			if Length(OopWord) != 0 {
 				if OopWord == "GO" {
 					OopReadDirection(statId, position, &deltaX, &deltaY)
