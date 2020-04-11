@@ -762,6 +762,14 @@ func (c *converter) procArg(targetIsVar bool, arg Expr) {
 		default: // !isVar && !targetIsVar
 			c.identExpr(arg)
 		}
+	case *AtExpr, *DotExpr, *IndexExpr, *PointerExpr, *FuncExpr:
+		spec, _ := c.lookupVarExprType(arg)
+		if spec != nil {
+			if _, isPtr := spec.(*PointerSpec); isPtr {
+				c.print("*")
+			}
+		}
+		c.expr(arg)
 	default:
 		c.expr(arg)
 	}

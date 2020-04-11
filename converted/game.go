@@ -107,16 +107,16 @@ func BoardClose() {
 		Move(Board.Stats[ix], ptr, SizeOf(TStat))
 		AdvancePointer(&ptr, SizeOf(TStat))
 		if stat.DataLen > 0 {
-			Move(stat.Data, ptr, stat.DataLen)
+			Move(*stat.Data, ptr, stat.DataLen)
 			FreeMem(stat.Data, stat.DataLen)
 			AdvancePointer(&ptr, stat.DataLen)
 		}
 
 	}
 	FreeMem(World.BoardData[World.Info.CurrentBoard], World.BoardLen[World.Info.CurrentBoard])
-	World.BoardLen[World.Info.CurrentBoard] = Ofs(ptr) - Ofs(IoTmpBuf)
+	World.BoardLen[World.Info.CurrentBoard] = Ofs(ptr) - Ofs(*IoTmpBuf)
 	GetMem(World.BoardData[World.Info.CurrentBoard], World.BoardLen[World.Info.CurrentBoard])
-	Move(IoTmpBuf, World.BoardData[World.Info.CurrentBoard], World.BoardLen[World.Info.CurrentBoard])
+	Move(*IoTmpBuf, World.BoardData[World.Info.CurrentBoard], World.BoardLen[World.Info.CurrentBoard])
 }
 
 func BoardOpen(boardId int16) {
@@ -160,7 +160,7 @@ func BoardOpen(boardId int16) {
 		AdvancePointer(&ptr, SizeOf(TStat))
 		if stat.DataLen > 0 {
 			GetMem(stat.Data, stat.DataLen)
-			Move(ptr, stat.Data, stat.DataLen)
+			Move(ptr, *stat.Data, stat.DataLen)
 			AdvancePointer(&ptr, stat.DataLen)
 		} else if stat.DataLen < 0 {
 			stat.Data = Board.Stats[-stat.DataLen].Data
@@ -587,7 +587,7 @@ func WorldLoad(filename, extension string, titleOnly bool) (WorldLoad bool) {
 	Reset(f, 1)
 	if !DisplayIOError() {
 		WorldUnload()
-		BlockRead(f, IoTmpBuf, 512)
+		BlockRead(f, *IoTmpBuf, 512)
 		if !DisplayIOError() {
 			ptr = IoTmpBuf
 			Move(ptr, World.BoardCount, SizeOf(World.BoardCount))
@@ -640,7 +640,7 @@ func WorldSave(filename, extension string) {
 	Rewrite(f, 1)
 	if !DisplayIOError() {
 		ptr = IoTmpBuf
-		FillChar(IoTmpBuf, 512, 0)
+		FillChar(*IoTmpBuf, 512, 0)
 		version = -1
 		Move(version, ptr, SizeOf(version))
 		AdvancePointer(&ptr, SizeOf(version))
@@ -648,7 +648,7 @@ func WorldSave(filename, extension string) {
 		AdvancePointer(&ptr, SizeOf(World.BoardCount))
 		Move(World.Info, ptr, SizeOf(World.Info))
 		AdvancePointer(&ptr, SizeOf(World.Info))
-		BlockWrite(f, IoTmpBuf, 512)
+		BlockWrite(f, *IoTmpBuf, 512)
 		if DisplayIOError() {
 			goto OnError
 		}
@@ -766,8 +766,8 @@ func AddStat(tx, ty int16, element byte, color, tcycle int16, template TStat) {
 		stat.DataPos = 0
 
 		if template.Data != nil {
-			GetMem(Board.Stats[Board.StatCount].Data, template.DataLen)
-			Move(template.Data, Board.Stats[Board.StatCount].Data, template.DataLen)
+			GetMem(*Board.Stats[Board.StatCount].Data, template.DataLen)
+			Move(*template.Data, *Board.Stats[Board.StatCount].Data, template.DataLen)
 		}
 		if ElementDefs[Board.Tiles[tx][ty].Element].PlaceableOnTop {
 			Board.Tiles[tx][ty].Color = (color & 0x0F) + (Board.Tiles[tx][ty].Color & 0x70)

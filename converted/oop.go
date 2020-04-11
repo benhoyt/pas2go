@@ -15,7 +15,7 @@ func OopError(statId int16, message string) {
 func OopReadChar(statId int16, position *int16) {
 	stat := &Board.Stats[statId]
 	if (*position >= 0) && (*position < stat.DataLen) {
-		Move(Ptr(Seg(stat.Data), Ofs(stat.Data)+*position), OopChar, 1)
+		Move(Ptr(Seg(*stat.Data), Ofs(*stat.Data)+*position), OopChar, 1)
 		*position++
 	} else {
 		OopChar = '\x00'
@@ -815,7 +815,7 @@ StartParsing:
 			}
 		}
 	} else if textWindow.LineCount == 1 {
-		DisplayMessage(200, textWindow.Lines[0])
+		DisplayMessage(200, *textWindow.Lines[0])
 		TextWindowFree(&textWindow)
 	}
 

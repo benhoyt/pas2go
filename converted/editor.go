@@ -224,13 +224,13 @@ func EditorLoop() {
 		state.Selectable = true
 		exitRequested = false
 		for i = 1; i <= state.LineCount; i++ {
-			New(state.Lines[i-1])
+			New(*state.Lines[i-1])
 		}
 		for {
 			state.Selectable = true
 			state.LineCount = 10
 			for i = 1; i <= state.LineCount; i++ {
-				New(state.Lines[i-1])
+				New(*state.Lines[i-1])
 			}
 			state.Lines[0] = "         Title: " + Board.Name
 			Str(Board.Info.MaxShots, numStr)
@@ -311,12 +311,12 @@ func EditorLoop() {
 		}
 		EditorOpenEditTextWindow(&state)
 		for iLine = 1; iLine <= state.LineCount; iLine++ {
-			stat.DataLen += Length(state.Lines[iLine-1]) + 1
+			stat.DataLen += Length(*state.Lines[iLine-1]) + 1
 		}
 		GetMem(stat.Data, stat.DataLen)
 		dataPtr = stat.Data
 		for iLine = 1; iLine <= state.LineCount; iLine++ {
-			for iChar = 1; iChar <= Length(state.Lines[iLine-1]); iChar++ {
+			for iChar = 1; iChar <= Length(*state.Lines[iLine-1]); iChar++ {
 				dataChar = state.Lines[iLine-1][iChar-1]
 				Move(dataChar, dataPtr, 1)
 				AdvancePointer(&dataPtr, 1)

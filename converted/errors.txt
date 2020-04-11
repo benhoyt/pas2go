@@ -40,9 +40,7 @@
 ./editor.go:266:130: cannot use Board.Info.NeighborBoards[state.LinePos - 4] (type byte) as type int16 in argument to EditorSelectBoard
 ./editor.go:267:52: invalid operation: Board.Info.NeighborBoards[state.LinePos - 4] > World.BoardCount (mismatched types byte and int16)
 ./editor.go:274:20: cannot use numStr (type string) as type []byte in argument to Str
-./editor.go:314:38: cannot use state.Lines[iLine - 1] (type *string) as type string in argument to Length
 ./editor.go:317:11: cannot use stat.Data (type *string) as type uintptr in assignment
-./editor.go:319:46: cannot use state.Lines[iLine - 1] (type *string) as type string in argument to Length
 ./editor.go:320:36: invalid operation: state.Lines[iLine - 1][iChar - 1] (type *string does not support indexing)
 ./editor.go:354:24: cannot use stat.X (type byte) as type int16 in argument to BoardDrawTile
 ./editor.go:354:32: cannot use stat.Y (type byte) as type int16 in argument to BoardDrawTile
@@ -706,7 +704,7 @@
 ./lib.go:48:2: cannot use nInt (type int) as type int16 in return argument
 ./oop.go:18:8: undefined: Ptr
 ./oop.go:18:12: undefined: Seg
-./oop.go:18:28: undefined: Ofs
+./oop.go:18:29: undefined: Ofs
 ./oop.go:37:12: invalid operation: OopWord += OopChar (mismatched types string and byte)
 ./oop.go:61:5: invalid operation: s += OopChar (mismatched types string and byte)
 ./oop.go:87:5: cannot convert 'N' (type untyped number) to type string
@@ -784,7 +782,6 @@
 ./oop.go:747:25: cannot use stat.X (type byte) as type int16 in argument to BoardDrawTile
 ./oop.go:747:33: cannot use stat.Y (type byte) as type int16 in argument to BoardDrawTile
 ./oop.go:784:23: invalid operation: OopChar + OopReadLineToEnd(statId, position) (mismatched types byte and string)
-./oop.go:818:39: cannot use textWindow.Lines[0] (type *string) as type string in argument to DisplayMessage
 ./oop.go:823:6: cannot use stat.X (type byte) as type int16 in assignment
 ./oop.go:824:6: cannot use stat.Y (type byte) as type int16 in assignment
 ./sounds.go:62:24: invalid operation: octave * ln2 (mismatched types int16 and float64)
@@ -851,12 +848,7 @@
 ./txtwind.go:110:29: cannot use lineY (type int16) as type byte in argument to VideoWriteText
 ./txtwind.go:114:30: cannot use TextWindowX + 4 (type int16) as type byte in argument to VideoWriteText
 ./txtwind.go:114:30: cannot use lineY (type int16) as type byte in argument to VideoWriteText
-./txtwind.go:114:58: cannot use state.Lines[lpos - 1] (type *string) as type string in argument to VideoWriteText
-./txtwind.go:119:25: cannot use state.Lines[lpos - 1] (type *string) as type string in argument to Length
 ./txtwind.go:120:31: invalid operation: state.Lines[lpos - 1][0] (type *string does not support indexing)
-./txtwind.go:122:39: cannot use state.Lines[lpos - 1] (type *string) as type string in argument to Pos
 ./txtwind.go:123:26: cannot use textX + 2 (type int16) as type byte in argument to VideoWriteText
 ./txtwind.go:123:26: cannot use lineY (type int16) as type byte in argument to VideoWriteText
 ./txtwind.go:123:43: cannot use '\u0010' (type rune) as type string in argument to VideoWriteText
-./txtwind.go:127:39: cannot use state.Lines[lpos - 1] (type *string) as type string in argument to Pos
-./txtwind.go:132:66: cannot use state.Lines[lpos - 1] (type *string) as type string in argument to Length
