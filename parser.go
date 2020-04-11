@@ -385,6 +385,7 @@ func (p *parser) labelledStmt(allowLabel bool) Stmt {
 		if convType != ILLEGAL {
 			p.expect(RPAREN)
 		}
+		identExpr, isIdent := varExpr.(*IdentExpr)
 
 		switch p.tok {
 		case ASSIGN:
@@ -392,7 +393,7 @@ func (p *parser) labelledStmt(allowLabel bool) Stmt {
 			value := p.expr()
 			return &AssignStmt{convType, varExpr, value}
 		case COLON:
-			if !varExpr.IsNameOnly() || convType != ILLEGAL {
+			if !isIdent || convType != ILLEGAL {
 				panic(p.error("label must be a simple identifier"))
 			}
 			if !allowLabel {
@@ -400,14 +401,14 @@ func (p *parser) labelledStmt(allowLabel bool) Stmt {
 			}
 			p.next()
 			stmt := p.labelledStmt(false)
-			return &LabelledStmt{varExpr.Name, stmt}
+			return &LabelledStmt{identExpr.Name, stmt}
 		case LPAREN:
 			if convType != ILLEGAL {
 				panic(p.error("can't have type conversion in procedure call"))
 			}
 			p.next()
 			var args []Expr
-			if strings.ToLower(varExpr.Name) == "str" {
+			if isIdent && strings.ToLower(identExpr.Name) == "str" {
 				// Special case: Str(expr:width, str);
 				first := p.expr()
 				if p.tok == COLON {
@@ -533,13 +534,13 @@ func (p *parser) constDeclValue() Expr {
 		p.next()
 		first := p.constant()
 		if p.tok == COLON { // record constant
-			varExpr, ok := first.(*VarExpr)
-			if !ok || !varExpr.IsNameOnly() {
+			identExpr, isIdent := first.(*IdentExpr)
+			if !isIdent {
 				panic(p.error("expected record field: 'name: value'"))
 			}
 			p.expect(COLON)
 			value := p.expr()
-			fields := []*ConstField{&ConstField{varExpr.Name, value}}
+			fields := []*ConstField{&ConstField{identExpr.Name, value}}
 			for p.tok == SEMICOLON {
 				p.next()
 				name := p.val
@@ -574,35 +575,35 @@ func (p *parser) argList() []Expr {
 }
 
 // variable: (AT identifier | identifier) (LBRACKET expression (COMMA expression)* RBRACKET | DOT identifier | POINTER)*
-func (p *parser) varExpr() *VarExpr {
+func (p *parser) varExpr() Expr {
 	hasAt := false
 	if p.tok == AT {
 		p.next()
 		hasAt = true
 	}
-	ident := p.val
+	var expr Expr = &IdentExpr{p.val}
 	p.expect(IDENT)
-	var parts []VarSuffix
 	for p.tok == LBRACKET || p.tok == DOT || p.tok == POINTER {
-		var part VarSuffix
 		switch p.tok {
 		case LBRACKET:
 			p.next()
 			index := p.expr()
 			p.expect(RBRACKET)
-			part = &IndexSuffix{index}
+			expr = &IndexExpr{expr, index}
 		case DOT:
 			p.next()
 			field := p.val
 			p.expect(IDENT)
-			part = &DotSuffix{field}
+			expr = &DotExpr{expr, field}
 		case POINTER:
 			p.next()
-			part = &PointerSuffix{}
+			expr = &PointerExpr{expr}
 		}
-		parts = append(parts, part)
 	}
-	return &VarExpr{hasAt, ident, parts}
+	if hasAt {
+		expr = &AtExpr{expr}
+	}
+	return expr
 }
 
 // expr: simpleExpr (relationalOp expr)?
@@ -691,22 +692,19 @@ func (p *parser) factor() Expr {
 		p.expect(RPAREN)
 		return &TypeConvExpr{typ, expr}
 	case IDENT, AT:
-		varExpr := p.varExpr()
-		switch p.tok {
-		case LPAREN:
+		expr := p.varExpr()
+		if p.tok == LPAREN {
 			p.next()
 			args := p.argList()
 			p.expect(RPAREN)
-			var expr Expr = &FuncExpr{varExpr, args}
+			expr = &FuncExpr{expr, args}
 			if p.tok == POINTER {
 				p.next()
 				expr = &PointerExpr{expr}
 			}
-			return expr
-		default:
-			// TODO: should handle POINTER here as well? eg: EDITOR.PAS:278
-			return varExpr
 		}
+		// TODO: should handle POINTER here as well? eg: EDITOR.PAS:278
+		return expr
 	default:
 		panic(p.error("expected factor"))
 	}

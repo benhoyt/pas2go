@@ -57,7 +57,7 @@ func GenerateTransitionTable() {
 }
 
 func AdvancePointer(address *uintptr, count int16) {
-	*address = Ptr(Seg(address), Ofs(address)+count)
+	*address = Ptr(Seg(*address), Ofs(*address)+count)
 }
 
 func BoardClose() {
@@ -107,7 +107,7 @@ func BoardClose() {
 		Move(Board.Stats[ix], ptr, SizeOf(TStat))
 		AdvancePointer(&ptr, SizeOf(TStat))
 		if stat.DataLen > 0 {
-			Move(Data, ptr, stat.DataLen)
+			Move(stat.Data, ptr, stat.DataLen)
 			FreeMem(stat.Data, stat.DataLen)
 			AdvancePointer(&ptr, stat.DataLen)
 		}
@@ -160,7 +160,7 @@ func BoardOpen(boardId int16) {
 		AdvancePointer(&ptr, SizeOf(TStat))
 		if stat.DataLen > 0 {
 			GetMem(stat.Data, stat.DataLen)
-			Move(ptr, Data, stat.DataLen)
+			Move(ptr, stat.Data, stat.DataLen)
 			AdvancePointer(&ptr, stat.DataLen)
 		} else if stat.DataLen < 0 {
 			stat.Data = Board.Stats[-stat.DataLen].Data

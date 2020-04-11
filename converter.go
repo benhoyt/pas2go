@@ -2,6 +2,8 @@
 
 /*
 ISSUES:
+- extra * when addressing a var record type, eg: oop.go *tile.Color = 0
+
 - string issues: String, TString50, etc
 - pointer issues
 - handle FILE and FILE OF
@@ -32,7 +34,7 @@ func Convert(file File, units []*Unit, w io.Writer) {
 		c.units[strings.ToLower(unit.Name)] = unit
 	}
 	c.types = make(map[string]TypeSpec)
-	c.pushScope(ScopeGlobal, nil)
+	c.pushScope(ScopeGlobal, "")
 
 	// Port is predefined by Turbo Pascal, fake it
 	min := &ConstExpr{0, false}
@@ -63,7 +65,7 @@ type converter struct {
 
 type Scope struct {
 	Type      ScopeType
-	WithExpr  *VarExpr
+	WithName  string
 	Vars      map[string]TypeSpec
 	VarParams map[string]struct{}
 }
@@ -77,8 +79,8 @@ const (
 	ScopeWith
 )
 
-func (c *converter) pushScope(typ ScopeType, withExpr *VarExpr) {
-	scope := Scope{typ, withExpr, make(map[string]TypeSpec), make(map[string]struct{})}
+func (c *converter) pushScope(typ ScopeType, withName string) {
+	scope := Scope{typ, withName, make(map[string]TypeSpec), make(map[string]struct{})}
 	c.scopes = append(c.scopes, scope)
 }
 
@@ -138,44 +140,47 @@ func (c *converter) isVarParam(name string) bool {
 	return false
 }
 
-func (c *converter) lookupVarExprType(varExpr *VarExpr) (TypeSpec, string) {
-	_, spec := c.lookupVarType(varExpr.Name)
-	if spec == nil {
-		return nil, ""
-	}
-	spec = c.lookupIdentSpec(spec)
-	if spec == nil {
-		return nil, ""
-	}
+func (c *converter) lookupVarExprType(expr Expr) (TypeSpec, string) {
+	var spec TypeSpec
+	fieldName := ""
 
-	fieldName := varExpr.Name
-	for _, suffix := range varExpr.Suffixes {
-		switch suffix := suffix.(type) {
-		case *DotSuffix:
-			fieldName = suffix.Field
-			record := spec.(*RecordSpec)
-			spec = findField(record, suffix.Field)
-			if spec == nil {
-				panic(fmt.Sprintf("field not found: %q", suffix.Field))
-			}
-		case *IndexSuffix:
-			switch specTyped := spec.(type) {
-			case *ArraySpec:
-				spec = specTyped.Of
-			case *StringSpec, *IdentSpec:
-			default:
-				panic(fmt.Sprintf("unexpected index type: %s", spec))
-			}
-		case *PointerSuffix:
-			pointer := spec.(*PointerSpec)
-			spec = &IdentSpec{pointer.Type}
-		}
-		spec = c.lookupIdentSpec(spec)
+	switch expr := expr.(type) {
+	case *AtExpr:
+		spec, fieldName = c.lookupVarExprType(expr.Expr)
+	case *DotExpr:
+		fieldName = expr.Field
+		spec, _ = c.lookupVarExprType(expr.Record)
 		if spec == nil {
 			return nil, ""
 		}
+		spec = findField(spec.(*RecordSpec), expr.Field)
+		if spec == nil {
+			panic(fmt.Sprintf("field not found: %q", expr.Field))
+		}
+	case *IdentExpr:
+		fieldName = expr.Name
+		_, spec = c.lookupVarType(expr.Name)
+	case *IndexExpr:
+		spec, fieldName = c.lookupVarExprType(expr.Array)
+		switch specTyped := spec.(type) {
+		case *ArraySpec:
+			spec = specTyped.Of
+		case *StringSpec, *IdentSpec:
+		case *PointerSpec:
+			spec = &IdentSpec{specTyped.Type}
+		default:
+			panic(fmt.Sprintf("unexpected index type: %s", spec))
+		}
+	case *PointerExpr:
+		spec, fieldName = c.lookupVarExprType(expr.Expr)
+	case *FuncExpr:
+	default:
+		panic(fmt.Sprintf("unexpected varExpr type: %T", expr))
 	}
 
+	if spec != nil {
+		spec = c.lookupIdentSpec(spec)
+	}
 	return spec, fieldName
 }
 
@@ -380,7 +385,7 @@ func (c *converter) decl(decl DeclPart, isMain bool) {
 		c.typeIdent(decl.Result)
 		c.print(") {\n")
 
-		c.pushScope(ScopeLocal, nil)
+		c.pushScope(ScopeLocal, "")
 		c.defineParams(decl.Params)
 		c.defineDecls(decl.Decls)
 		c.decls(decl.Decls, false)
@@ -402,7 +407,7 @@ func (c *converter) decl(decl DeclPart, isMain bool) {
 		c.params(decl.Params)
 		c.print(") {\n")
 
-		c.pushScope(ScopeLocal, nil)
+		c.pushScope(ScopeLocal, "")
 		c.defineParams(decl.Params)
 		c.defineDecls(decl.Decls)
 		c.decls(decl.Decls, false)
@@ -616,7 +621,7 @@ func (c *converter) stmt(stmt Stmt) {
 			c.print(")")
 		default:
 			if procStr == "delete" {
-				c.varExpr(stmt.Args[0].(*VarExpr), false)
+				c.varExpr(stmt.Args[0], false)
 				c.print(" = ")
 			}
 			c.varExpr(stmt.Proc, false)
@@ -646,10 +651,12 @@ func (c *converter) stmt(stmt Stmt) {
 		if spec == nil {
 			panic(fmt.Sprintf("'with' statement var not found: %s", stmt.Var))
 		}
+		spec = c.lookupIdentSpec(spec)
 		record := spec.(*RecordSpec)
 		var withName string
-		if len(stmt.Var.Suffixes) == 0 && strings.ToLower(fieldName) == strings.ToLower(stmt.Var.Name) {
-			withName = stmt.Var.Name
+		if identExpr, isIdent := stmt.Var.(*IdentExpr); isIdent &&
+			strings.ToLower(fieldName) == strings.ToLower(identExpr.Name) {
+			withName = identExpr.Name
 		} else {
 			withName = c.makeWithName(fieldName)
 			c.printf("%s := &", withName)
@@ -657,7 +664,7 @@ func (c *converter) stmt(stmt Stmt) {
 			c.print("\n")
 			c.defineWithVar(withName)
 		}
-		c.pushScope(ScopeWith, &VarExpr{Name: withName})
+		c.pushScope(ScopeWith, withName)
 		for _, section := range record.Sections {
 			for _, name := range section.Names {
 				c.defineVar(name, section.Type)
@@ -694,27 +701,19 @@ func (c *converter) procArgs(params []*ParamGroup, args []Expr) {
 
 func (c *converter) procArg(targetIsVar bool, arg Expr) {
 	switch arg := arg.(type) {
-	case *VarExpr:
-		if len(arg.Suffixes) == 0 {
-			if arg.HasAt {
-				panic(fmt.Sprintf("unexpected HasAt: %q", arg.Name))
-			}
-			isVar := c.isVarParam(arg.Name)
-			switch {
-			case isVar && targetIsVar:
-				c.varExpr(arg, true) // pass pointer straight through
-			case isVar && !targetIsVar:
-				c.print("*")
-				c.varExpr(arg, true)
-			case !isVar && targetIsVar:
-				c.print("&")
-				c.varExpr(arg, true)
-			default: // !isVar && !targetIsVar
-				c.varExpr(arg, true)
-			}
-		} else {
-			// TODO: do we ever need * or & in these cases?
-			c.expr(arg)
+	case *IdentExpr:
+		isVar := c.isVarParam(arg.Name)
+		switch {
+		case isVar && targetIsVar:
+			c.identExpr(arg) // pass pointer straight through
+		case isVar && !targetIsVar:
+			c.print("*")
+			c.identExpr(arg)
+		case !isVar && targetIsVar:
+			c.print("&")
+			c.identExpr(arg)
+		default: // !isVar && !targetIsVar
+			c.identExpr(arg)
 		}
 	default:
 		c.expr(arg)
@@ -835,8 +834,6 @@ func (c *converter) expr(expr Expr) {
 		c.print("(")
 		c.expr(expr.Expr)
 		c.print(")")
-	case *PointerExpr:
-		c.expr(expr.Expr)
 	case *RangeExpr:
 		panic("unexpected RangeExpr: should be handled by 'case' and 'in'")
 	case *SetExpr:
@@ -849,8 +846,9 @@ func (c *converter) expr(expr Expr) {
 	case *UnaryExpr:
 		c.print(operatorStr(expr.Op))
 		c.expr(expr.Expr)
-	case *VarExpr:
+	case *AtExpr, *DotExpr, *IdentExpr, *IndexExpr, *PointerExpr:
 		c.varExpr(expr, false)
+		// Add parens if it's actually a function call
 		spec, _ := c.lookupVarExprType(expr)
 		if spec != nil {
 			_, isFunc := spec.(*FuncSpec)
@@ -863,72 +861,86 @@ func (c *converter) expr(expr Expr) {
 		// Width itself is handled in ProcStmt "str" case
 		c.expr(expr.Expr)
 	default:
-		c.printf("%s", expr)
+		panic(fmt.Sprintf("unexpected Expr type %T", expr))
 	}
 }
 
-func (c *converter) varExpr(expr *VarExpr, suppressStar bool) {
-	isVar := len(expr.Suffixes) == 0 && c.isVarParam(expr.Name)
-	if expr.HasAt && isVar {
-		panic(fmt.Sprintf("unexpected @ with var param: %s", expr))
-	}
-	if isVar && !suppressStar {
-		c.printf("*")
-	} else if expr.HasAt {
-		c.printf("&")
-	}
-	if len(expr.Suffixes) == 0 {
-		// If record field name is being used inside "with"
-		// statement, prefix it with the with expression and ".".
-		scope, spec := c.lookupVarType(expr.Name)
-		if spec != nil && scope.Type == ScopeWith {
-			c.varExpr(scope.WithExpr, true)
-			c.print(".")
-		}
+func (c *converter) identExpr(expr *IdentExpr) {
+	// If record field name is being used inside "with"
+	// statement, prefix it with the with expression and ".".
+	scope, spec := c.lookupVarType(expr.Name)
+	if spec != nil && scope.Type == ScopeWith {
+		c.print(scope.WithName)
+		c.print(".")
 	}
 	c.print(expr.Name)
-	for i, suffix := range expr.Suffixes {
-		switch suffix := suffix.(type) {
-		case *IndexSuffix:
-			// Look up var + suffixes so far and add Min array index if not 0
-			varExprSoFar := &VarExpr{false, expr.Name, expr.Suffixes[:i]}
-			spec, _ := c.lookupVarExprType(varExprSoFar)
-			if spec == nil {
-				panic(fmt.Sprintf("array not found: %s", varExprSoFar))
-			}
+}
 
-			var min int
-			switch spec := spec.(type) {
-			case *ArraySpec:
-				min = spec.Min.(*ConstExpr).Value.(int)
-			case *StringSpec:
-				min = 1
-			}
+func (c *converter) varExpr(expr Expr, suppressStar bool) {
+	identExpr, isIdent := expr.(*IdentExpr)
+	isVar := isIdent && c.isVarParam(identExpr.Name)
+	if isVar && !suppressStar {
+		c.printf("*")
+	} else if atExpr, isAt := expr.(*AtExpr); isAt {
+		c.printf("&")
+		expr = atExpr.Expr
+	}
+	switch expr := expr.(type) {
+	case *AtExpr:
+		c.print("&")
+		c.varExpr(expr.Expr, suppressStar)
+	case *DotExpr:
+		c.varExpr(expr.Record, suppressStar)
+		c.printf(".%s", expr.Field)
+	case *IdentExpr:
+		c.identExpr(expr)
+	case *IndexExpr:
+		c.varExpr(expr.Array, suppressStar)
 
-			c.print("[")
-			if min != 0 {
-				switch index := suffix.Index.(type) {
-				case *ConstExpr:
-					val := index.Value.(int)
-					c.printf("%d", val-min)
-				case *FuncExpr, *ParenExpr, *PointerExpr, *TypeConvExpr, *UnaryExpr, *VarExpr:
-					c.expr(suffix.Index)
-					c.printf(" - %d", min)
-				default:
-					c.print("(")
-					c.expr(suffix.Index)
-					c.printf(") - %d", min)
-				}
-			} else {
-				c.expr(suffix.Index)
-			}
-			c.print("]")
-		case *DotSuffix:
-			c.print(".", suffix.Field)
-		case *PointerSuffix:
-		default:
-			panic(fmt.Sprintf("unhandled VarSuffix: %T", suffix))
+		spec, _ := c.lookupVarExprType(expr.Array)
+		if spec == nil {
+			panic(fmt.Sprintf("array not found: %s", expr.Array))
 		}
+
+		min := 0
+		if ptrSpec, isPtr := spec.(*PointerSpec); isPtr {
+			spec = c.lookupNamedType(&IdentSpec{ptrSpec.Type})
+		}
+		switch spec := spec.(type) {
+		case *ArraySpec:
+			min = spec.Min.(*ConstExpr).Value.(int)
+		case *StringSpec:
+			min = 1
+		}
+
+		c.print("[")
+		if min != 0 {
+			switch index := expr.Index.(type) {
+			case *ConstExpr:
+				val := index.Value.(int)
+				c.printf("%d", val-min)
+			case *AtExpr, *DotExpr, *FuncExpr, *IdentExpr, *IndexExpr,
+				*ParenExpr, *PointerExpr, *TypeConvExpr, *UnaryExpr:
+				c.expr(expr.Index)
+				c.printf(" - %d", min)
+			default:
+				c.print("(")
+				c.expr(expr.Index)
+				c.printf(") - %d", min)
+			}
+		} else {
+			c.expr(expr.Index)
+		}
+		c.print("]")
+	case *PointerExpr:
+		if isVar && !suppressStar {
+			c.print("*")
+		}
+		c.varExpr(expr.Expr, suppressStar)
+	case *FuncExpr:
+		c.expr(expr)
+	default:
+		panic(fmt.Sprintf("unexpected varExpr type: %T", expr))
 	}
 }
 

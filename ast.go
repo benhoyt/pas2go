@@ -376,7 +376,7 @@ func (s *WithStmt) stmt()     {}
 
 type AssignStmt struct {
 	TypeConv Token
-	Var      *VarExpr
+	Var      Expr
 	Value    Expr
 }
 
@@ -516,7 +516,7 @@ func (s *LabelledStmt) String() string {
 }
 
 type ProcStmt struct {
-	Proc *VarExpr
+	Proc Expr
 	Args []Expr
 }
 
@@ -555,7 +555,7 @@ func (s *WhileStmt) String() string {
 }
 
 type WithStmt struct {
-	Var  *VarExpr
+	Var  Expr
 	Stmt Stmt
 }
 
@@ -570,19 +570,30 @@ type Expr interface {
 	String() string
 }
 
+func (e *AtExpr) expr()          {}
 func (e *BinaryExpr) expr()      {}
 func (e *ConstExpr) expr()       {}
 func (e *ConstArrayExpr) expr()  {}
 func (e *ConstRecordExpr) expr() {}
+func (e *DotExpr) expr()         {}
 func (e *FuncExpr) expr()        {}
+func (e *IdentExpr) expr()       {}
+func (e *IndexExpr) expr()       {}
 func (e *ParenExpr) expr()       {}
 func (e *PointerExpr) expr()     {}
 func (e *RangeExpr) expr()       {}
 func (e *SetExpr) expr()         {}
 func (e *TypeConvExpr) expr()    {}
 func (e *UnaryExpr) expr()       {}
-func (e *VarExpr) expr()         {}
 func (e *WidthExpr) expr()       {}
+
+type AtExpr struct {
+	Expr Expr
+}
+
+func (e *AtExpr) String() string {
+	return "@" + e.Expr.String()
+}
 
 type BinaryExpr struct {
 	Left  Expr
@@ -678,13 +689,39 @@ func (f *ConstField) String() string {
 	return fmt.Sprintf("%s: %s", f.Name, f.Value)
 }
 
+type DotExpr struct {
+	Record Expr
+	Field  string
+}
+
+func (e *DotExpr) String() string {
+	return fmt.Sprintf("%s.%s", e.Record, e.Field)
+}
+
 type FuncExpr struct {
-	Func *VarExpr
+	Func Expr
 	Args []Expr
 }
 
 func (e *FuncExpr) String() string {
 	return e.Func.String() + formatArgList(e.Args)
+}
+
+type IdentExpr struct {
+	Name string
+}
+
+func (e *IdentExpr) String() string {
+	return e.Name
+}
+
+type IndexExpr struct {
+	Array Expr
+	Index Expr
+}
+
+func (e *IndexExpr) String() string {
+	return fmt.Sprintf("%s[%s]", e.Array, e.Index)
 }
 
 type ParenExpr struct {
@@ -748,28 +785,6 @@ func (e *UnaryExpr) String() string {
 	return fmt.Sprintf("%s%s", e.Op, e.Expr)
 }
 
-type VarExpr struct {
-	HasAt    bool
-	Name     string
-	Suffixes []VarSuffix
-}
-
-func (e *VarExpr) IsNameOnly() bool {
-	return !e.HasAt && e.Suffixes == nil
-}
-
-func (e *VarExpr) String() string {
-	parts := []string{}
-	if e.HasAt {
-		parts = append(parts, "@")
-	}
-	parts = append(parts, e.Name)
-	for _, part := range e.Suffixes {
-		parts = append(parts, part.String())
-	}
-	return strings.Join(parts, "")
-}
-
 type WidthExpr struct {
 	Expr  Expr
 	Width Expr
@@ -777,35 +792,4 @@ type WidthExpr struct {
 
 func (e *WidthExpr) String() string {
 	return fmt.Sprintf("%s:%s", e.Expr, e.Width)
-}
-
-type VarSuffix interface {
-	varSuffix()
-	String() string
-}
-
-func (s *IndexSuffix) varSuffix()   {}
-func (s *DotSuffix) varSuffix()     {}
-func (s *PointerSuffix) varSuffix() {}
-
-type IndexSuffix struct {
-	Index Expr
-}
-
-func (s *IndexSuffix) String() string {
-	return "[" + s.Index.String() + "]"
-}
-
-type DotSuffix struct {
-	Field string
-}
-
-func (s *DotSuffix) String() string {
-	return "." + s.Field
-}
-
-type PointerSuffix struct{}
-
-func (s *PointerSuffix) String() string {
-	return "^"
 }

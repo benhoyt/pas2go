@@ -103,8 +103,8 @@ func SoundInitDrumTable() {
 
 func SoundPlayDrum(drum *TDrumData) {
 	var i int16
-	for i = 1; i <= drum.Len; i++ {
-		Sound(drum.Data[i-1])
+	for i = 1; i <= *drum.Len; i++ {
+		Sound(*drum.Data[i-1])
 		Delay(1)
 	}
 	NoSound()
