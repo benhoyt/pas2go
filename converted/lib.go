@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/binary"
 	"io"
+	"math"
 	"math/rand"
 	"os"
 	"strconv"
@@ -40,11 +41,11 @@ func Pos(b byte, s string) int16 {
 }
 
 func Val(s string) (n int16, code int16) {
-	n, err := strconv.Atoi(s)
+	nInt, err := strconv.Atoi(s)
 	if err != nil {
-		return n, 1 // TODO: code should be 1-based position of first non-number char
+		return int16(nInt), 1 // TODO: code should be 1-based position of first non-number char
 	}
-	return n, 0
+	return nInt, 0
 }
 
 func Str(n int16, s []byte) {
@@ -61,6 +62,8 @@ func Delete(s string, index, count int16) string {
 }
 
 // Misc functions
+
+var Time int16 // TODO
 
 type TVideoLine string
 
@@ -88,6 +91,25 @@ func Sound(x int16) {
 
 func NoSound() {
 	// TODO
+}
+
+func Abs(n int16) int16 {
+	if n < 0 {
+		return -n
+	}
+	return n
+}
+
+func Ln(x float64) float64 {
+	return math.Log(x)
+}
+
+func Exp(x float64) float64 {
+	return math.Exp(x)
+}
+
+func Trunc(x float64) int16 {
+	return int16(x)
 }
 
 // File functions
@@ -161,6 +183,8 @@ func Seek(f *File, offset int16) {
 
 // Memory functions
 
+var MemAvail = 32767
+
 func New(p interface{}) {
 	// TODO
 }
@@ -179,6 +203,7 @@ func Move(src, dest interface{}, size int16) {
 
 func SizeOf(val interface{}) int16 {
 	// TODO
+	return 0
 }
 
 func FillChar(dest interface{}, count int16, c byte) {
