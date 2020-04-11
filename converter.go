@@ -13,7 +13,6 @@ ISSUES:
 
 NICE TO HAVES:
 - uses operator precedence rather than ParenExpr
-- output Go x+=y for Pascal x=x+y?
 */
 
 package main
@@ -530,6 +529,28 @@ func (c *converter) stmt(stmt Stmt) {
 	case *AssignStmt:
 		// TODO: handle TypeConv?
 		c.varExpr(stmt.Var, false)
+
+		// Simplify expressions like "x := x + n"
+		binary, isBinary := stmt.Value.(*BinaryExpr)
+		if isBinary && (binary.Op == PLUS || binary.Op == MINUS) {
+			if stmt.Var.String() == binary.Left.String() {
+				cnst, isConst := binary.Right.(*ConstExpr)
+				if isConst {
+					intVal, isInt := cnst.Value.(int)
+					if isInt && intVal == 1 {
+						if binary.Op == PLUS {
+							c.print("++")
+						} else {
+							c.print("--")
+						}
+						break
+					}
+				}
+				c.printf(" %s= ", operatorStr(binary.Op))
+				c.expr(binary.Right)
+				break
+			}
+		}
 		c.print(" = ")
 		c.expr(stmt.Value)
 	case *CaseStmt:

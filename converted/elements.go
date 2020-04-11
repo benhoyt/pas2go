@@ -25,10 +25,10 @@ func ElementMessageTimerTick(statId int16) {
 	switch stat.X {
 	case 0:
 		VideoWriteText((60-Length(Board.Info.Message))/2, 24, 9+(stat.P2%7), ' '+Board.Info.Message+' ')
-		stat.P2 = stat.P2 - 1
+		stat.P2--
 		if stat.P2 <= 0 {
 			RemoveStat(statId)
-			CurrentStatTicked = CurrentStatTicked - 1
+			CurrentStatTicked--
 			BoardDrawBorder()
 			Board.Info.Message = ""
 		}
@@ -243,7 +243,7 @@ func ElementCentipedeSegmentTick(statId int16) {
 		if stat.Leader < -1 {
 			Board.Tiles[stat.X][stat.Y].Element = E_CENTIPEDE_HEAD
 		} else {
-			stat.Leader = stat.Leader - 1
+			stat.Leader--
 		}
 	}
 
@@ -277,7 +277,7 @@ TryMove:
 	}
 	if (iElem == E_BREAKABLE) || (ElementDefs[iElem].Destructible && ((iElem == E_PLAYER) || (stat.P1 == 0))) {
 		if ElementDefs[iElem].ScoreValue != 0 {
-			World.Info.Score = World.Info.Score + ElementDefs[iElem].ScoreValue
+			World.Info.Score += ElementDefs[iElem].ScoreValue
 			GameUpdateSidebar()
 		}
 		BoardAttack(statId, ix, iy)
@@ -302,7 +302,7 @@ TryMove:
 		return
 	}
 	RemoveStat(statId)
-	CurrentStatTicked = CurrentStatTicked - 1
+	CurrentStatTicked--
 	if (iElem == E_OBJECT) || (iElem == E_SCROLL) {
 		iStat = GetStatIdAt(ix, iy)
 		if OopSend(-iStat, "SHOT", false) {
@@ -331,7 +331,7 @@ func ElementLineDraw(x, y int16, ch *byte) {
 	for i = 0; i <= 3; i++ {
 		switch Board.Tiles[x+NeighborDeltaX[i]][y+NeighborDeltaY[i]].Element {
 		case E_LINE, E_BOARD_EDGE:
-			v = v + shift
+			v += shift
 		}
 		shift = shift << 1
 	}
@@ -398,7 +398,7 @@ func ElementConveyorTick(x, y int16, direction int16) {
 			canMove = false
 		}
 
-		i = i + direction
+		i += direction
 		if i == iMax {
 			break
 		}
@@ -434,7 +434,7 @@ func ElementConveyorTick(x, y int16, direction int16) {
 			canMove = false
 		}
 
-		i = i + direction
+		i += direction
 		if i == iMax {
 			break
 		}
@@ -495,7 +495,7 @@ func ElementBombTick(statId int16) {
 	var oldX, oldY int16
 	stat := &Board.Stats[statId]
 	if stat.P1 > 0 {
-		stat.P1 = stat.P1 - 1
+		stat.P1--
 		BoardDrawTile(stat.X, stat.Y)
 		if stat.P1 == 1 {
 			SoundQueue(1, "`\x01P\x01@\x010\x01 \x01\x10\x01")
@@ -546,8 +546,8 @@ func ElementTransporterMove(x, y, deltaX, deltaY int16) {
 		finishSearch = false
 		isValidDest = true
 		for {
-			ix = ix + deltaX
-			iy = iy + deltaY
+			ix += deltaX
+			iy += deltaY
 			tile := &Board.Tiles[ix][iy]
 			if tile.Element == E_BOARD_EDGE {
 				finishSearch = true
@@ -608,7 +608,7 @@ func ElementTransporterDraw(x, y int16, ch *byte) {
 
 func ElementStarDraw(x, y int16, ch *byte) {
 	*ch = Ord(StarAnimChars[(CurrentTick%4)+1])
-	Board.Tiles[x][y].Color = Board.Tiles[x][y].Color + 1
+	Board.Tiles[x][y].Color++
 	if Board.Tiles[x][y].Color > 15 {
 		Board.Tiles[x][y].Color = 9
 	}
@@ -616,7 +616,7 @@ func ElementStarDraw(x, y int16, ch *byte) {
 
 func ElementStarTick(statId int16) {
 	stat := &Board.Stats[statId]
-	stat.P2 = stat.P2 - 1
+	stat.P2--
 	if stat.P2 <= 0 {
 		RemoveStat(statId)
 	} else if (stat.P2 % 2) == 0 {
@@ -660,7 +660,7 @@ func ElementSlimeTick(statId int16) {
 	)
 	stat := &Board.Stats[statId]
 	if stat.P1 < stat.P2 {
-		stat.P1 = stat.P1 + 1
+		stat.P1++
 	} else {
 		color = Board.Tiles[stat.X][stat.Y].Color
 		stat.P1 = 0
@@ -678,7 +678,7 @@ func ElementSlimeTick(statId int16) {
 					AddStat(startX+NeighborDeltaX[dir], startY+NeighborDeltaY[dir], E_SLIME, color, ElementDefs[E_SLIME].Cycle, StatTemplateDefault)
 					Board.Stats[Board.StatCount].P2 = stat.P2
 				}
-				changedTiles = changedTiles + 1
+				changedTiles++
 			}
 		}
 		if changedTiles == 0 {
@@ -743,8 +743,8 @@ func ElementBlinkWallTick(statId int16) {
 		for (Board.Tiles[ix][iy].Element == el) && (Board.Tiles[ix][iy].Color == Board.Tiles[stat.X][stat.Y].Color) {
 			Board.Tiles[ix][iy].Element = E_EMPTY
 			BoardDrawTile(ix, iy)
-			ix = ix + stat.StepX
-			iy = iy + stat.StepY
+			ix += stat.StepX
+			iy += stat.StepY
 			stat.P3 = (stat.P2)*2 + 1
 		}
 		if ((stat.X + stat.StepX) == ix) && ((stat.Y + stat.StepY) == iy) {
@@ -784,8 +784,8 @@ func ElementBlinkWallTick(statId int16) {
 				} else {
 					hitBoundary = true
 				}
-				ix = ix + stat.StepX
-				iy = iy + stat.StepY
+				ix += stat.StepX
+				iy += stat.StepY
 				if hitBoundary {
 					break
 				}
@@ -793,7 +793,7 @@ func ElementBlinkWallTick(statId int16) {
 			stat.P3 = (stat.P2 * 2) + 1
 		}
 	} else {
-		stat.P3 = stat.P3 - 1
+		stat.P3--
 	}
 
 }
@@ -883,7 +883,7 @@ func ElementDuplicatorTick(statId int16) {
 	var sourceStatId int16
 	stat := &Board.Stats[statId]
 	if stat.P1 <= 4 {
-		stat.P1 = stat.P1 + 1
+		stat.P1++
 		BoardDrawTile(stat.X, stat.Y)
 	} else {
 		stat.P1 = 0
@@ -919,7 +919,7 @@ func ElementDuplicatorTick(statId int16) {
 
 func ElementScrollTick(statId int16) {
 	stat := &Board.Stats[statId]
-	Board.Tiles[stat.X][stat.Y].Color = Board.Tiles[stat.X][stat.Y].Color + 1
+	Board.Tiles[stat.X][stat.Y].Color++
 	if Board.Tiles[stat.X][stat.Y].Color > 0x0F {
 		Board.Tiles[stat.X][stat.Y].Color = 0x09
 	}
@@ -960,7 +960,7 @@ func ElementKeyTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16) {
 }
 
 func ElementAmmoTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16) {
-	World.Info.Ammo = World.Info.Ammo + 5
+	World.Info.Ammo += 5
 	Board.Tiles[x][y].Element = E_EMPTY
 	GameUpdateSidebar()
 	SoundQueue(2, "0\x011\x012\x01")
@@ -971,9 +971,9 @@ func ElementAmmoTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16) {
 }
 
 func ElementGemTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16) {
-	World.Info.Gems = World.Info.Gems + 1
-	World.Info.Health = World.Info.Health + 1
-	World.Info.Score = World.Info.Score + 10
+	World.Info.Gems++
+	World.Info.Health++
+	World.Info.Score += 10
 	Board.Tiles[x][y].Element = E_EMPTY
 	GameUpdateSidebar()
 	SoundQueue(2, "@\x017\x014\x010\x01")
@@ -1049,7 +1049,7 @@ func ElementPusherTick(statId int16) {
 }
 
 func ElementTorchTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16) {
-	World.Info.Torches = World.Info.Torches + 1
+	World.Info.Torches++
 	Board.Tiles[x][y].Element = E_EMPTY
 	BoardDrawTile(x, y)
 	GameUpdateSidebar()
@@ -1242,12 +1242,12 @@ func ElementPlayerTick(statId int16) {
 				bulletCount = 0
 				for i = 0; i <= Board.StatCount; i++ {
 					if (Board.Tiles[Board.Stats[i].X][Board.Stats[i].Y].Element == E_BULLET) && (Board.Stats[i].P1 == 0) {
-						bulletCount = bulletCount + 1
+						bulletCount++
 					}
 				}
 				if bulletCount < Board.Info.MaxShots {
 					if BoardShoot(E_BULLET, stat.X, stat.Y, PlayerDirX, PlayerDirY, SHOT_SOURCE_PLAYER) {
-						World.Info.Ammo = World.Info.Ammo - 1
+						World.Info.Ammo--
 						GameUpdateSidebar()
 						SoundQueue(2, "@\x010\x01 \x01")
 						InputDeltaX = 0
@@ -1282,7 +1282,7 @@ func ElementPlayerTick(statId int16) {
 		if World.Info.TorchTicks <= 0 {
 			if World.Info.Torches > 0 {
 				if Board.Info.IsDark {
-					World.Info.Torches = World.Info.Torches - 1
+					World.Info.Torches--
 					World.Info.TorchTicks = TORCH_DURATION
 					DrawPlayerSurroundings(stat.X, stat.Y, 0)
 					GameUpdateSidebar()
@@ -1321,7 +1321,7 @@ func ElementPlayerTick(statId int16) {
 		InputKeyPressed = '\x00'
 	}
 	if World.Info.TorchTicks > 0 {
-		World.Info.TorchTicks = World.Info.TorchTicks - 1
+		World.Info.TorchTicks--
 		if World.Info.TorchTicks <= 0 {
 			DrawPlayerSurroundings(stat.X, stat.Y, 0)
 			SoundQueue(3, "0\x01 \x01\x10\x01")
@@ -1331,7 +1331,7 @@ func ElementPlayerTick(statId int16) {
 		}
 	}
 	if World.Info.EnergizerTicks > 0 {
-		World.Info.EnergizerTicks = World.Info.EnergizerTicks - 1
+		World.Info.EnergizerTicks--
 		if World.Info.EnergizerTicks == 10 {
 			SoundQueue(9, " \x03\x1a\x03\x17\x03\x16\x03\x15\x03\x13\x03\x10\x03")
 		} else if World.Info.EnergizerTicks <= 0 {
@@ -1342,7 +1342,7 @@ func ElementPlayerTick(statId int16) {
 	}
 	if (Board.Info.TimeLimitSec > 0) && (World.Info.Health > 0) {
 		if SoundHasTimeElapsed(World.Info.BoardTimeHsec, 100) {
-			World.Info.BoardTimeSec = World.Info.BoardTimeSec + 1
+			World.Info.BoardTimeSec++
 			if (Board.Info.TimeLimitSec - 10) == World.Info.BoardTimeSec {
 				DisplayMessage(200, "Running out of time!")
 				SoundQueue(3, "@\x06E\x06@\x065\x06@\x06E\x06@\n")

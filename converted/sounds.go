@@ -37,7 +37,7 @@ func SoundQueue(priority int16, pattern string) {
 			SoundBuffer = Copy(SoundBuffer, SoundBufferPos, Length(SoundBuffer)-SoundBufferPos+1)
 			SoundBufferPos = 1
 			if (Length(SoundBuffer) + Length(pattern)) < 255 {
-				SoundBuffer = SoundBuffer + pattern
+				SoundBuffer += pattern
 			}
 		}
 		SoundIsPlaying = true
@@ -127,7 +127,7 @@ func SoundHasTimeElapsed(counter *int16, duration int16) (SoundHasTimeElapsed bo
 		hSecsTotal              int16
 	)
 	if (SoundTimeCheckCounter > 0) && ((SoundTimeCheckCounter % 2) == 1) {
-		SoundTimeCheckCounter = SoundTimeCheckCounter - 1
+		SoundTimeCheckCounter--
 		SoundCheckTimeIntr()
 	}
 	if UseSystemTimeForElapsed {
@@ -150,7 +150,7 @@ func SoundHasTimeElapsed(counter *int16, duration int16) (SoundHasTimeElapsed bo
 func SoundTimerHandler() {
 	TimerTicks++
 	if (SoundTimeCheckCounter > 0) && ((SoundTimeCheckCounter % 2) == 0) {
-		SoundTimeCheckCounter = SoundTimeCheckCounter - 1
+		SoundTimeCheckCounter--
 	}
 	if !SoundEnabled {
 		SoundIsPlaying = false
@@ -227,12 +227,12 @@ func SoundParse(input string) (SoundParse string) {
 			AdvanceInput()
 		case '+':
 			if noteOctave < 6 {
-				noteOctave = noteOctave + 1
+				noteOctave++
 			}
 			AdvanceInput()
 		case '-':
 			if noteOctave > 1 {
-				noteOctave = noteOctave - 1
+				noteOctave--
 			}
 			AdvanceInput()
 		case 'A', 'B', 'C', 'D', 'E', 'F', 'G':
@@ -261,18 +261,18 @@ func SoundParse(input string) (SoundParse string) {
 			}
 			switch UpCase(input[1]) {
 			case '!':
-				noteTone = noteTone - 1
+				noteTone--
 				AdvanceInput()
 			case '#':
-				noteTone = noteTone + 1
+				noteTone++
 				AdvanceInput()
 			}
-			output = output + Chr(noteOctave*0x10+noteTone) + Chr(noteDuration)
+			output += Chr(noteOctave*0x10+noteTone) + Chr(noteDuration)
 		case 'X':
-			output = output + '\x00' + Chr(noteDuration)
+			output += '\x00' + Chr(noteDuration)
 			AdvanceInput()
 		case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
-			output = output + Chr(Ord(input[1])+0xF0-Ord('0')) + Chr(noteDuration)
+			output += Chr(Ord(input[1])+0xF0-Ord('0')) + Chr(noteDuration)
 			AdvanceInput()
 		default:
 			AdvanceInput()

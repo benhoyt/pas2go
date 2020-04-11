@@ -121,7 +121,7 @@ func TextWindowDrawLine(state *TTextWindowState, lpos int16, withoutFormatting, 
 				case '!':
 					textOffset = Pos(';', state.Lines[lpos-1]) + 1
 					VideoWriteText(textX+2, lineY, 0x1D, '\x10')
-					textX = textX + 5
+					textX += 5
 					textColor = 0x1F
 				case ':':
 					textOffset = Pos(';', state.Lines[lpos-1]) + 1
@@ -160,7 +160,7 @@ func TextWindowDraw(state *TTextWindowState, withoutFormatting, viewingFile bool
 }
 
 func TextWindowAppend(state *TTextWindowState, line TTextWindowLine) {
-	state.LineCount = state.LineCount + 1
+	state.LineCount++
 	New(state.Lines[state.LineCount-1])
 	state.Lines[state.LineCount-1] = line
 
@@ -169,7 +169,7 @@ func TextWindowAppend(state *TTextWindowState, line TTextWindowLine) {
 func TextWindowFree(state *TTextWindowState) {
 	for state.LineCount > 0 {
 		Dispose(state.Lines[state.LineCount-1])
-		state.LineCount = state.LineCount - 1
+		state.LineCount--
 	}
 	state.LoadedFilename = ""
 
@@ -229,7 +229,7 @@ func TextWindowSelect(state *TTextWindowState, hyperlinkAsSelect, viewingFile bo
 		InputUpdate()
 		newLinePos = state.LinePos
 		if InputDeltaY != 0 {
-			newLinePos = newLinePos + InputDeltaY
+			newLinePos += InputDeltaY
 		} else if InputShiftPressed || (InputKeyPressed == KEY_ENTER) {
 			InputShiftAccepted = true
 			if (state.Lines[state.LinePos-1][0]) == '!' {
@@ -330,7 +330,7 @@ func TextWindowEdit(state *TTextWindowState) {
 			for i = (state.LinePos + 1); i <= state.LineCount; i++ {
 				state.Lines[(i-1)-1] = state.Lines[i-1]
 			}
-			state.LineCount = state.LineCount - 1
+			state.LineCount--
 			if state.LinePos > state.LineCount {
 				newLinePos = state.LineCount
 			} else {
@@ -373,13 +373,13 @@ func TextWindowEdit(state *TTextWindowState) {
 		case KEY_PAGE_DOWN:
 			newLinePos = state.LinePos + TextWindowHeight - 4
 		case KEY_RIGHT:
-			charPos = charPos + 1
+			charPos++
 			if charPos > (Length(state.Lines[state.LinePos-1]) + 1) {
 				charPos = 1
 				newLinePos = state.LinePos + 1
 			}
 		case KEY_LEFT:
-			charPos = charPos - 1
+			charPos--
 			if charPos < 1 {
 				charPos = TextWindowWidth
 				newLinePos = state.LinePos - 1
@@ -394,12 +394,12 @@ func TextWindowEdit(state *TTextWindowState) {
 				state.Lines[state.LinePos-1] = Copy(state.Lines[state.LinePos-1], 1, charPos-1)
 				newLinePos = state.LinePos + 1
 				charPos = 1
-				state.LineCount = state.LineCount + 1
+				state.LineCount++
 			}
 		case KEY_BACKSPACE:
 			if charPos > 1 {
 				state.Lines[state.LinePos-1] = Copy(state.Lines[state.LinePos-1], 1, charPos-2) + Copy(state.Lines[state.LinePos-1], charPos, Length(state.Lines[state.LinePos-1])-charPos+1)
-				charPos = charPos - 1
+				charPos--
 			} else if Length(state.Lines[state.LinePos-1]) == 0 {
 				DeleteCurrLine()
 				newLinePos = state.LinePos - 1
@@ -416,11 +416,11 @@ func TextWindowEdit(state *TTextWindowState) {
 			if (InputKeyPressed >= ' ') && (charPos < (TextWindowWidth - 7)) {
 				if !insertMode {
 					state.Lines[state.LinePos-1] = Copy(state.Lines[state.LinePos-1], 1, charPos-1) + InputKeyPressed + Copy(state.Lines[state.LinePos-1], charPos+1, Length(state.Lines[state.LinePos-1])-charPos)
-					charPos = charPos + 1
+					charPos++
 				} else {
 					if Length(state.Lines[state.LinePos-1]) < (TextWindowWidth - 8) {
 						state.Lines[state.LinePos-1] = Copy(state.Lines[state.LinePos-1], 1, charPos-1) + InputKeyPressed + Copy(state.Lines[state.LinePos-1], charPos, Length(state.Lines[state.LinePos-1])-charPos+1)
-						charPos = charPos + 1
+						charPos++
 					}
 				}
 			}
@@ -443,7 +443,7 @@ func TextWindowEdit(state *TTextWindowState) {
 	}
 	if Length(state.Lines[state.LineCount-1]) == 0 {
 		Dispose(state.Lines[state.LineCount-1])
-		state.LineCount = state.LineCount - 1
+		state.LineCount--
 	}
 
 }
@@ -463,7 +463,7 @@ func TextWindowOpenFile(filename TTextWindowLine, state *TTextWindowState) {
 		retVal = retVal && (filename[i-1] != '.')
 	}
 	if retVal {
-		filename = filename + ".HLP"
+		filename += ".HLP"
 	}
 	if filename[0] == '*' {
 		filename = Copy(filename, 2, Length(filename)-1)
@@ -570,8 +570,8 @@ func TextWindowInit(x, y, width, height int16) {
 	TextWindowStrInnerEmpty = ""
 	TextWindowStrInnerLine = ""
 	for i = 1; i <= (TextWindowWidth - 5); i++ {
-		TextWindowStrInnerEmpty = TextWindowStrInnerEmpty + ' '
-		TextWindowStrInnerLine = TextWindowStrInnerLine + 'Í'
+		TextWindowStrInnerEmpty += ' '
+		TextWindowStrInnerLine += 'Í'
 	}
 	TextWindowStrTop = "\xc6\xd1" + TextWindowStrInnerLine + 'Ñ' + 'µ'
 	TextWindowStrBottom = "\xc6\xcf" + TextWindowStrInnerLine + 'Ï' + 'µ'

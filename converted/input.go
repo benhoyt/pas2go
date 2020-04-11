@@ -66,8 +66,8 @@ func InputJoystickGetCoords(x, y *int16) {
 	startTicks = TimerTicks
 	Port[PORT_JOYSTICK] = 0
 	for {
-		*x = *x + (Port[PORT_JOYSTICK] & 1)
-		*y = *y + (Port[PORT_JOYSTICK] & 2)
+		*x += (Port[PORT_JOYSTICK] & 1)
+		*y += (Port[PORT_JOYSTICK] & 2)
 		if ((Port[PORT_JOYSTICK] & 3) == 0) || ((TimerTicks - startTicks) > 3) {
 			break
 		}
@@ -143,10 +143,10 @@ CalibrationStart:
 	if !InputCalibrateJoystickPosition("  Move joystick to LOWER RIGHT corner and press button: ", &JoystickXMax, &JoystickYMax) {
 		return
 	}
-	JoystickXMin = JoystickXMin - JoystickXCenter
-	JoystickXMax = JoystickXMax - JoystickXCenter
-	JoystickYMin = JoystickYMin - JoystickYCenter
-	JoystickYMax = JoystickYMax - JoystickYCenter
+	JoystickXMin -= JoystickXCenter
+	JoystickXMax -= JoystickXCenter
+	JoystickYMin -= JoystickYCenter
+	JoystickYMax -= JoystickYCenter
 	if (JoystickXMin < 1) && (JoystickXMax > 1) && (JoystickYMin < 1) && (JoystickYMax > 1) {
 		InputJoystickEnabled = true
 	} else {
@@ -177,9 +177,9 @@ func InputUpdate() {
 	for KeyPressed {
 		InputKeyPressed = ReadKey
 		if (InputKeyPressed == '\x00') || (InputKeyPressed == '\x01') || (InputKeyPressed == '\x02') {
-			InputKeyBuffer = InputKeyBuffer + Chr(Ord(ReadKey)|0x80)
+			InputKeyBuffer += Chr(Ord(ReadKey) | 0x80)
 		} else {
-			InputKeyBuffer = InputKeyBuffer + InputKeyPressed
+			InputKeyBuffer += InputKeyPressed
 		}
 	}
 	if Length(InputKeyBuffer) != 0 {
@@ -242,8 +242,8 @@ func InputUpdate() {
 	} else if InputMouseEnabled {
 		regs.AX = 0x0B
 		Intr(0x33, regs)
-		InputMouseX = InputMouseX + int16(regs.CX)
-		InputMouseY = InputMouseY + int16(regs.DX)
+		InputMouseX += int16(regs.CX)
+		InputMouseY += int16(regs.DX)
 		if Abs(InputMouseX) > Abs(InputMouseY) {
 			if Abs(InputMouseX) > InputMouseActivationX {
 				if InputMouseX > 0 {

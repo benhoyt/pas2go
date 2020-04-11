@@ -17,7 +17,7 @@ var NeighborBoardStrs [4]string = [...]string{"       Board \x18", "       Board
 func EditorAppendBoard() {
 	if World.BoardCount < MAX_BOARD {
 		BoardClose()
-		World.BoardCount = World.BoardCount + 1
+		World.BoardCount++
 		World.Info.CurrentBoard = World.BoardCount
 		World.BoardLen[World.BoardCount] = 0
 		BoardCreate()
@@ -311,7 +311,7 @@ func EditorLoop() {
 		}
 		EditorOpenEditTextWindow(&state)
 		for iLine = 1; iLine <= state.LineCount; iLine++ {
-			stat.DataLen = stat.DataLen + Length(state.Lines[iLine-1]) + 1
+			stat.DataLen += Length(state.Lines[iLine-1]) + 1
 		}
 		GetMem(stat.Data, stat.DataLen)
 		dataPtr = stat.Data
@@ -358,7 +358,7 @@ func EditorLoop() {
 				if selected {
 					World.EditorStatSettings[element].P1 = stat.P1
 				}
-				iy = iy + 4
+				iy += 4
 			}
 			if (InputKeyPressed != KEY_ESCAPE) && (Length(ElementDefs[element].ParamTextName) != 0) {
 				if selected {
@@ -372,7 +372,7 @@ func EditorLoop() {
 					stat.P2 = (stat.P2 & 0x80) + promptByte
 					World.EditorStatSettings[element].P2 = stat.P2
 				}
-				iy = iy + 4
+				iy += 4
 			}
 			if (InputKeyPressed != KEY_ESCAPE) && (Length(ElementDefs[element].ParamBulletTypeName) != 0) {
 				promptByte = (stat.P2) / 0x80
@@ -381,7 +381,7 @@ func EditorLoop() {
 					stat.P2 = (stat.P2 % 0x80) + (promptByte * 0x80)
 					World.EditorStatSettings[element].P2 = stat.P2
 				}
-				iy = iy + 4
+				iy += 4
 			}
 			if (InputKeyPressed != KEY_ESCAPE) && (Length(ElementDefs[element].ParamDirName) != 0) {
 				SidebarPromptDirection(selected, iy, ElementDefs[element].ParamDirName, &stat.StepX, &stat.StepY)
@@ -389,7 +389,7 @@ func EditorLoop() {
 					World.EditorStatSettings[element].StepX = stat.StepX
 					World.EditorStatSettings[element].StepY = stat.StepY
 				}
-				iy = iy + 4
+				iy += 4
 			}
 			if (InputKeyPressed != KEY_ESCAPE) && (Length(ElementDefs[element].ParamBoardName) != 0) {
 				if selected {
@@ -407,7 +407,7 @@ func EditorLoop() {
 					} else {
 						InputKeyPressed = KEY_ESCAPE
 					}
-					iy = iy + 4
+					iy += 4
 				} else {
 					VideoWriteText(63, iy, 0x1F, "Room: "+Copy(EditorGetBoardName(stat.P3, true), 1, 10))
 				}
@@ -518,12 +518,12 @@ func EditorLoop() {
 					if (tile.Element == from.Element) && ((from.Element == 0) || (tile.Color == from.Color)) {
 						xPosition[toFill] = x + NeighborDeltaX[i]
 						yPosition[toFill] = y + NeighborDeltaY[i]
-						toFill = toFill + 1
+						toFill++
 					}
 
 				}
 			}
-			filled = filled + 1
+			filled++
 			x = xPosition[filled]
 			y = yPosition[filled]
 		}
@@ -582,7 +582,7 @@ func EditorLoop() {
 				}
 				InputKeyPressed = '\x00'
 			} else if (InputKeyPressed == KEY_BACKSPACE) && (cursorX > 1) && EditorPrepareModifyTile(cursorX-1, cursorY) {
-				cursorX = cursorX - 1
+				cursorX--
 			} else if (InputKeyPressed == KEY_ENTER) || (InputKeyPressed == KEY_ESCAPE) {
 				drawMode = DrawingOff
 				InputKeyPressed = '\x00'
@@ -602,14 +602,14 @@ func EditorLoop() {
 			}
 		}
 		if (InputDeltaX != 0) || (InputDeltaY != 0) {
-			cursorX = cursorX + InputDeltaX
+			cursorX += InputDeltaX
 			if cursorX < 1 {
 				cursorX = 1
 			}
 			if cursorX > BOARD_WIDTH {
 				cursorX = BOARD_WIDTH
 			}
-			cursorY = cursorY + InputDeltaY
+			cursorY += InputDeltaY
 			if cursorY < 1 {
 				cursorY = 1
 			}
@@ -628,7 +628,7 @@ func EditorLoop() {
 		case 'P':
 			VideoWriteText(62, 21, 0x1F, "       ")
 			if cursorPattern <= EditorPatternCount {
-				cursorPattern = cursorPattern + 1
+				cursorPattern++
 			} else {
 				cursorPattern = 1
 			}
@@ -636,7 +636,7 @@ func EditorLoop() {
 			VideoWriteText(72, 19, 0x1E, "       ")
 			VideoWriteText(69, 21, 0x1F, "        ")
 			if (cursorColor % 0x10) != 0x0F {
-				cursorColor = cursorColor + 1
+				cursorColor++
 			} else {
 				cursorColor = ((cursorColor / 0x10) * 0x10) + 9
 			}
@@ -730,9 +730,9 @@ func EditorLoop() {
 			for iElem = 0; iElem <= MAX_ELEMENT; iElem++ {
 				if ElementDefs[iElem].EditorCategory == selectedCategory {
 					if Length(ElementDefs[iElem].CategoryName) != 0 {
-						i = i + 1
+						i++
 						VideoWriteText(65, i, 0x1E, ElementDefs[iElem].CategoryName)
-						i = i + 1
+						i++
 					}
 					VideoWriteText(61, i, ((i%2)<<6)+0x30, ' '+ElementDefs[iElem].EditorShortcut+' ')
 					VideoWriteText(65, i, 0x1F, ElementDefs[iElem].Name)
@@ -749,7 +749,7 @@ func EditorLoop() {
 					}
 
 					VideoWriteText(78, i, elemMenuColor, ElementDefs[iElem].Character)
-					i = i + 1
+					i++
 				}
 			}
 			InputReadWaitKey()
@@ -947,7 +947,7 @@ func HighScoresAdd(score int16) {
 	)
 	listPos = 1
 	for (listPos <= 30) && (score < HighScoreList[listPos-1].Score) {
-		listPos = listPos + 1
+		listPos++
 	}
 	if (listPos <= 30) && (score > 0) {
 		for i = 29; i >= listPos; i-- {

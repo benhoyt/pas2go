@@ -43,7 +43,7 @@ func GenerateTransitionTable() {
 	TransitionTableSize = 0
 	for iy = 1; iy <= BOARD_HEIGHT; iy++ {
 		for ix = 1; ix <= BOARD_WIDTH; ix++ {
-			TransitionTableSize = TransitionTableSize + 1
+			TransitionTableSize++
 			TransitionTable[TransitionTableSize-1].X = ix
 			TransitionTable[TransitionTableSize-1].Y = iy
 		}
@@ -74,13 +74,13 @@ func BoardClose() {
 	rle.Count = 1
 	rle.Tile = Board.Tiles[ix][iy]
 	for {
-		ix = ix + 1
+		ix++
 		if ix > BOARD_WIDTH {
 			ix = 1
-			iy = iy + 1
+			iy++
 		}
 		if (Board.Tiles[ix][iy].Color == rle.Tile.Color) && (Board.Tiles[ix][iy].Element == rle.Tile.Element) && (rle.Count < 255) && (iy <= BOARD_HEIGHT) {
-			rle.Count = rle.Count + 1
+			rle.Count++
 		} else {
 			Move(rle, ptr, SizeOf(rle))
 			AdvancePointer(&ptr, SizeOf(rle))
@@ -140,12 +140,12 @@ func BoardOpen(boardId int16) {
 			AdvancePointer(&ptr, SizeOf(rle))
 		}
 		Board.Tiles[ix][iy] = rle.Tile
-		ix = ix + 1
+		ix++
 		if ix > BOARD_WIDTH {
 			ix = 1
-			iy = iy + 1
+			iy++
 		}
-		rle.Count = rle.Count - 1
+		rle.Count--
 		if iy > BOARD_HEIGHT {
 			break
 		}
@@ -397,7 +397,7 @@ func SidebarPromptChoice(editable bool, y int16, prompt, choiceStr string, resul
 	choiceCount = 1
 	for i = 1; i <= Length(choiceStr); i++ {
 		if choiceStr[i] == ' ' {
-			choiceCount = choiceCount + 1
+			choiceCount++
 		}
 	}
 	for {
@@ -405,9 +405,9 @@ func SidebarPromptChoice(editable bool, y int16, prompt, choiceStr string, resul
 		i = 1
 		for (j < *result) && (i < Length(choiceStr)) {
 			if choiceStr[i] == ' ' {
-				j = j + 1
+				j++
 			}
-			i = i + 1
+			i++
 		}
 		if editable {
 			VideoWriteText(62+i, y+1, 0x9F, '\x1f')
@@ -467,13 +467,13 @@ func PromptString(x, y, arrowColor, color, width int16, mode byte, buffer *TStri
 			switch mode {
 			case PROMPT_NUMERIC:
 				if InputKeyPressed >= '0' && InputKeyPressed <= '9' {
-					*buffer = *buffer + InputKeyPressed
+					*buffer += InputKeyPressed
 				}
 			case PROMPT_ANY:
-				*buffer = *buffer + InputKeyPressed
+				*buffer += InputKeyPressed
 			case PROMPT_ALPHANUM:
 				if (UpCase(InputKeyPressed) >= 'A' && UpCase(InputKeyPressed) <= 'Z') || (InputKeyPressed >= '0' && InputKeyPressed <= '9') || (InputKeyPressed == '-') {
-					*buffer = *buffer + UpCase(InputKeyPressed)
+					*buffer += UpCase(InputKeyPressed)
 				}
 			}
 		} else if (InputKeyPressed == KEY_LEFT) || (InputKeyPressed == KEY_BACKSPACE) {
@@ -747,7 +747,7 @@ func CopyStatDataToTextWindow(statId int16, state *TTextWindowState) {
 			TextWindowAppend(state, dataStr)
 			dataStr = ""
 		} else {
-			dataStr = dataStr + dataChr
+			dataStr += dataChr
 		}
 		AdvancePointer(&dataPtr, 1)
 	}
@@ -756,7 +756,7 @@ func CopyStatDataToTextWindow(statId int16, state *TTextWindowState) {
 
 func AddStat(tx, ty int16, element byte, color, tcycle int16, template TStat) {
 	if Board.StatCount < MAX_STAT {
-		Board.StatCount = Board.StatCount + 1
+		Board.StatCount++
 		Board.Stats[Board.StatCount] = template
 		stat := &Board.Stats[Board.StatCount]
 		stat.X = tx
@@ -794,7 +794,7 @@ func RemoveStat(statId int16) {
 	}
 StatDataInUse:
 	if statId < CurrentStatTicked {
-		CurrentStatTicked = CurrentStatTicked - 1
+		CurrentStatTicked--
 	}
 
 	Board.Tiles[stat.X][stat.Y] = stat.Under
@@ -806,21 +806,21 @@ StatDataInUse:
 			if Board.Stats[i].Follower == statId {
 				Board.Stats[i].Follower = -1
 			} else {
-				Board.Stats[i].Follower = Board.Stats[i].Follower - 1
+				Board.Stats[i].Follower--
 			}
 		}
 		if Board.Stats[i].Leader >= statId {
 			if Board.Stats[i].Leader == statId {
 				Board.Stats[i].Leader = -1
 			} else {
-				Board.Stats[i].Leader = Board.Stats[i].Leader - 1
+				Board.Stats[i].Leader--
 			}
 		}
 	}
 	for i = (statId + 1); i <= Board.StatCount; i++ {
 		Board.Stats[i-1] = Board.Stats[i]
 	}
-	Board.StatCount = Board.StatCount - 1
+	Board.StatCount--
 
 }
 
@@ -828,7 +828,7 @@ func GetStatIdAt(x, y int16) (GetStatIdAt int16) {
 	var i int16
 	i = -1
 	for {
-		i = i + 1
+		i++
 		if ((Board.Stats[i].X == x) && (Board.Stats[i].Y == y)) || (i > Board.StatCount) {
 			break
 		}
@@ -1024,7 +1024,7 @@ func DamageStat(attackerStatId int16) {
 	stat := &Board.Stats[attackerStatId]
 	if attackerStatId == 0 {
 		if World.Info.Health > 0 {
-			World.Info.Health = World.Info.Health - 10
+			World.Info.Health -= 10
 			GameUpdateSidebar()
 			DisplayMessage(100, "Ouch!")
 			Board.Tiles[stat.X][stat.Y].Color = 0x70 + (ElementDefs[E_PLAYER].Color % 0x10)
@@ -1079,7 +1079,7 @@ func BoardAttack(attackerStatId int16, x, y int16) {
 		DamageStat(attackerStatId)
 	}
 	if (attackerStatId > 0) && (attackerStatId <= CurrentStatTicked) {
-		CurrentStatTicked = CurrentStatTicked - 1
+		CurrentStatTicked--
 	}
 	if (Board.Tiles[x][y].Element == E_PLAYER) && (World.Info.EnergizerTicks > 0) {
 		World.Info.Score = ElementDefs[Board.Tiles[Board.Stats[attackerStatId].X][Board.Stats[attackerStatId].Y].Element].ScoreValue + World.Info.Score
@@ -1209,19 +1209,19 @@ func GameDebugPrompt() {
 	}
 	DebugEnabled = WorldGetFlagPosition("DEBUG") >= 0
 	if input == "HEALTH" {
-		World.Info.Health = World.Info.Health + 50
+		World.Info.Health += 50
 	} else if input == "AMMO" {
-		World.Info.Ammo = World.Info.Ammo + 5
+		World.Info.Ammo += 5
 	} else if input == "KEYS" {
 		for i = 1; i <= 7; i++ {
 			World.Info.Keys[i-1] = true
 		}
 	} else if input == "TORCHES" {
-		World.Info.Torches = World.Info.Torches + 3
+		World.Info.Torches += 3
 	} else if input == "TIME" {
-		World.Info.BoardTimeSec = World.Info.BoardTimeSec - 30
+		World.Info.BoardTimeSec -= 30
 	} else if input == "GEMS" {
-		World.Info.Gems = World.Info.Gems + 5
+		World.Info.Gems += 5
 	} else if input == "DARK" {
 		Board.Info.IsDark = toggle
 		TransitionDrawToBoard()
@@ -1367,8 +1367,8 @@ func GamePlayLoop(boardChanged bool) {
 					MoveStat(0, Board.Stats[0].X+InputDeltaX, Board.Stats[0].Y+InputDeltaY)
 				} else {
 					BoardDrawTile(Board.Stats[0].X, Board.Stats[0].Y)
-					Board.Stats[0].X = Board.Stats[0].X + InputDeltaX
-					Board.Stats[0].Y = Board.Stats[0].Y + InputDeltaY
+					Board.Stats[0].X += InputDeltaX
+					Board.Stats[0].Y += InputDeltaY
 					Board.Tiles[Board.Stats[0].X][Board.Stats[0].Y].Element = E_PLAYER
 					Board.Tiles[Board.Stats[0].X][Board.Stats[0].Y].Color = ElementDefs[E_PLAYER].Color
 					BoardDrawTile(Board.Stats[0].X, Board.Stats[0].Y)
@@ -1387,13 +1387,13 @@ func GamePlayLoop(boardChanged bool) {
 				if (stat.Cycle != 0) && ((CurrentTick % stat.Cycle) == (CurrentStatTicked % stat.Cycle)) {
 					ElementDefs[Board.Tiles[stat.X][stat.Y].Element].TickProc(CurrentStatTicked)
 				}
-				CurrentStatTicked = CurrentStatTicked + 1
+				CurrentStatTicked++
 
 			}
 		}
 		if (CurrentStatTicked > Board.StatCount) && !GamePlayExitRequested {
 			if SoundHasTimeElapsed(&TickTimeCounter, TickTimeDuration) {
-				CurrentTick = CurrentTick + 1
+				CurrentTick++
 				if CurrentTick > 420 {
 					CurrentTick = 1
 				}

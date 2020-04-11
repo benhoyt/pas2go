@@ -34,7 +34,7 @@ func OopReadWord(statId int16, position *int16) {
 	OopChar = UpCase(OopChar)
 	if (OopChar < '0') || (OopChar > '9') {
 		for ((OopChar >= 'A') && (OopChar <= 'Z')) || (OopChar == ':') || ((OopChar >= '0') && (OopChar <= '9')) || (OopChar == '_') {
-			OopWord = OopWord + OopChar
+			OopWord += OopChar
 			OopReadChar(statId, position)
 			OopChar = UpCase(OopChar)
 		}
@@ -58,12 +58,12 @@ func OopReadValue(statId int16, position *int16) {
 	}
 	OopChar = UpCase(OopChar)
 	for (OopChar >= '0') && (OopChar <= '9') {
-		s = s + OopChar
+		s += OopChar
 		OopReadChar(statId, position)
 		OopChar = UpCase(OopChar)
 	}
 	if *position > 0 {
-		*position = *position - 1
+		*position--
 	}
 	if Length(s) != 0 {
 		OopValue, code = Val(s)
@@ -165,7 +165,7 @@ func OopFindString(statId int16, s string) (OopFindString int16) {
 			if UpCase(s[wordPos]) != UpCase(OopChar) {
 				goto NoMatch
 			}
-			wordPos = wordPos + 1
+			wordPos++
 			if wordPos > Length(s) {
 				break
 			}
@@ -178,7 +178,7 @@ func OopFindString(statId int16, s string) (OopFindString int16) {
 			return
 		}
 	NoMatch:
-		pos = pos + 1
+		pos++
 
 	}
 	OopFindString = -1
@@ -191,7 +191,7 @@ func OopIterateStat(statId int16, iStat *int16, lookup string) (OopIterateStat b
 		pos   int16
 		found bool
 	)
-	*iStat = *iStat + 1
+	*iStat++
 	found = false
 	if lookup == "ALL" {
 		if *iStat <= Board.StatCount {
@@ -202,7 +202,7 @@ func OopIterateStat(statId int16, iStat *int16, lookup string) (OopIterateStat b
 			if *iStat != statId {
 				found = true
 			} else {
-				*iStat = *iStat + 1
+				*iStat++
 				found = (*iStat <= Board.StatCount)
 			}
 		}
@@ -224,7 +224,7 @@ func OopIterateStat(statId int16, iStat *int16, lookup string) (OopIterateStat b
 				}
 			}
 			if !found {
-				*iStat = *iStat + 1
+				*iStat++
 			}
 		}
 	}
@@ -288,7 +288,7 @@ func WorldSetFlag(name TString50) {
 	if WorldGetFlagPosition(name) < 0 {
 		i = 1
 		for (i < MAX_FLAG) && (Length(World.Info.Flags[i-1]) != 0) {
-			i = i + 1
+			i++
 		}
 		World.Info.Flags[i-1] = name
 	}
@@ -309,9 +309,9 @@ func OopStringToWord(input TString50) (OopStringToWord TString50) {
 	output = ""
 	for i = 1; i <= Length(input); i++ {
 		if ((input[i-1] >= 'A') && (input[i-1] <= 'Z')) || ((input[i-1] >= '0') && (input[i-1] <= '9')) {
-			output = output + input[i-1]
+			output += input[i-1]
 		} else if (input[i-1] >= 'a') && (input[i-1] <= 'z') {
-			output = output + Chr(Ord(input[i-1])-0x20)
+			output += Chr(Ord(input[i-1]) - 0x20)
 		}
 
 	}
@@ -358,10 +358,10 @@ func GetColorForTileMatch(tile *TTile) (GetColorForTileMatch byte) {
 func FindTileOnBoard(x, y *int16, tile TTile) (FindTileOnBoard bool) {
 	FindTileOnBoard = false
 	for true {
-		*x = *x + 1
+		*x++
 		if *x > BOARD_WIDTH {
 			*x = 1
-			*y = *y + 1
+			*y++
 			if *y > BOARD_HEIGHT {
 				return
 			}
@@ -446,7 +446,7 @@ func OopReadLineToEnd(statId int16, position *int16) (OopReadLineToEnd string) {
 	s = ""
 	OopReadChar(statId, position)
 	for (OopChar != '\x00') && (OopChar != '\r') {
-		s = s + OopChar
+		s += OopChar
 		OopReadChar(statId, position)
 	}
 	OopReadLineToEnd = s
@@ -645,7 +645,7 @@ StartParsing:
 								OopValue = -OopValue
 							}
 							if (counterPtr + OopValue) >= 0 {
-								counterPtr = counterPtr + OopValue
+								counterPtr += OopValue
 							} else {
 								goto ReadCommand
 							}
