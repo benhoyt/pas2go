@@ -2,8 +2,6 @@
 
 /*
 ISSUES:
-- extra * when addressing a var record type, eg: oop.go *tile.Color = 0
-
 - string issues: String, TString50, etc
 - pointer issues
 - handle FILE and FILE OF
@@ -890,7 +888,7 @@ func (c *converter) varExpr(expr Expr, suppressStar bool) {
 		c.print("&")
 		c.varExpr(expr.Expr, suppressStar)
 	case *DotExpr:
-		c.varExpr(expr.Record, suppressStar)
+		c.varExpr(expr.Record, true)
 		c.printf(".%s", expr.Field)
 	case *IdentExpr:
 		c.identExpr(expr)

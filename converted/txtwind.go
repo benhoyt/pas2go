@@ -116,8 +116,8 @@ func TextWindowDrawLine(state *TTextWindowState, lpos int16, withoutFormatting, 
 			textOffset = 1
 			textColor = 0x1E
 			textX = TextWindowX + 4
-			if Length(*state.Lines[lpos-1]) > 0 {
-				switch *state.Lines[lpos-1][0] {
+			if Length(state.Lines[lpos-1]) > 0 {
+				switch state.Lines[lpos-1][0] {
 				case '!':
 					textOffset = Pos(';', state.Lines[lpos-1]) + 1
 					VideoWriteText(textX+2, lineY, 0x1D, '\x10')
@@ -136,7 +136,7 @@ func TextWindowDrawLine(state *TTextWindowState, lpos int16, withoutFormatting, 
 				VideoWriteText(textX, lineY, textColor, Copy(state.Lines[lpos-1], textOffset, Length(state.Lines[lpos-1])-textOffset+1))
 			}
 		}
-	} else if (lpos == 0) || (lpos == (*state.LineCount + 1)) {
+	} else if (lpos == 0) || (lpos == (state.LineCount + 1)) {
 		VideoWriteText(TextWindowX+2, lineY, 0x1E, TextWindowStrInnerSep)
 	} else if (lpos == -4) && viewingFile {
 		VideoWriteText(TextWindowX+2, lineY, 0x1A, "   Use            to view text,")
@@ -154,9 +154,9 @@ func TextWindowDraw(state *TTextWindowState, withoutFormatting, viewingFile bool
 		unk1 int16
 	)
 	for i = 0; i <= (TextWindowHeight - 4); i++ {
-		TextWindowDrawLine(state, *state.LinePos-(TextWindowHeight/2)+i+2, withoutFormatting, viewingFile)
+		TextWindowDrawLine(state, state.LinePos-(TextWindowHeight/2)+i+2, withoutFormatting, viewingFile)
 	}
-	TextWindowDrawTitle(0x1E, *state.Title)
+	TextWindowDrawTitle(0x1E, state.Title)
 }
 
 func TextWindowAppend(state *TTextWindowState, line TTextWindowLine) {
@@ -241,7 +241,7 @@ func TextWindowSelect(state *TTextWindowState, hyperlinkAsSelect, viewingFile bo
 					pointerStr = Delete(pointerStr, 1, 1)
 					TextWindowFree(state)
 					TextWindowOpenFile(pointerStr, state)
-					if *state.LineCount == 0 {
+					if state.LineCount == 0 {
 						return
 					} else {
 						viewingFile = true
@@ -287,7 +287,7 @@ func TextWindowSelect(state *TTextWindowState, hyperlinkAsSelect, viewingFile bo
 	LabelMatched:
 		if newLinePos < 1 {
 			newLinePos = 1
-		} else if newLinePos > *state.LineCount {
+		} else if newLinePos > state.LineCount {
 			newLinePos = state.LineCount
 		}
 

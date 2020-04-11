@@ -322,11 +322,11 @@ func OopStringToWord(input TString50) (OopStringToWord TString50) {
 func OopParseTile(statId, position *int16, tile *TTile) (OopParseTile bool) {
 	var i int16
 	OopParseTile = false
-	*tile.Color = 0
+	tile.Color = 0
 	OopReadWord(*statId, position)
 	for i = 1; i <= 7; i++ {
 		if OopWord == OopStringToWord(ColorNames[i-1]) {
-			*tile.Color = i + 0x08
+			tile.Color = i + 0x08
 			OopReadWord(*statId, position)
 			goto ColorFound
 		}
@@ -335,7 +335,7 @@ ColorFound:
 	for i = 0; i <= MAX_ELEMENT; i++ {
 		if OopWord == OopStringToWord(ElementDefs[i].Name) {
 			OopParseTile = true
-			*tile.Element = i
+			tile.Element = i
 			return
 		}
 	}
@@ -344,12 +344,12 @@ ColorFound:
 }
 
 func GetColorForTileMatch(tile *TTile) (GetColorForTileMatch byte) {
-	if ElementDefs[*tile.Element].Color < COLOR_SPECIAL_MIN {
-		GetColorForTileMatch = ElementDefs[*tile.Element].Color & 0x07
-	} else if ElementDefs[*tile.Element].Color == COLOR_WHITE_ON_CHOICE {
-		GetColorForTileMatch = ((*tile.Color >> 4) & 0x0F) + 8
+	if ElementDefs[tile.Element].Color < COLOR_SPECIAL_MIN {
+		GetColorForTileMatch = ElementDefs[tile.Element].Color & 0x07
+	} else if ElementDefs[tile.Element].Color == COLOR_WHITE_ON_CHOICE {
+		GetColorForTileMatch = ((tile.Color >> 4) & 0x0F) + 8
 	} else {
-		GetColorForTileMatch = (*tile.Color & 0x0F)
+		GetColorForTileMatch = (tile.Color & 0x0F)
 	}
 
 	return
@@ -379,9 +379,9 @@ func FindTileOnBoard(x, y *int16, tile TTile) (FindTileOnBoard bool) {
 func OopPlaceTile(x, y int16, tile *TTile) {
 	var color byte
 	if Board.Tiles[x][y].Element != 4 {
-		color = *tile.Color
-		if ElementDefs[*tile.Element].Color < COLOR_SPECIAL_MIN {
-			color = ElementDefs[*tile.Element].Color
+		color = tile.Color
+		if ElementDefs[tile.Element].Color < COLOR_SPECIAL_MIN {
+			color = ElementDefs[tile.Element].Color
 		} else {
 			if color == 0 {
 				color = Board.Tiles[x][y].Color
@@ -389,18 +389,18 @@ func OopPlaceTile(x, y int16, tile *TTile) {
 			if color == 0 {
 				color = 0x0F
 			}
-			if ElementDefs[*tile.Element].Color == COLOR_WHITE_ON_CHOICE {
+			if ElementDefs[tile.Element].Color == COLOR_WHITE_ON_CHOICE {
 				color = ((color - 8) * 0x10) + 0x0F
 			}
 		}
-		if Board.Tiles[x][y].Element == *tile.Element {
+		if Board.Tiles[x][y].Element == tile.Element {
 			Board.Tiles[x][y].Color = color
 		} else {
 			BoardDamageTile(x, y)
-			if ElementDefs[*tile.Element].Cycle >= 0 {
-				AddStat(x, y, *tile.Element, color, ElementDefs[*tile.Element].Cycle, StatTemplateDefault)
+			if ElementDefs[tile.Element].Cycle >= 0 {
+				AddStat(x, y, tile.Element, color, ElementDefs[tile.Element].Cycle, StatTemplateDefault)
 			} else {
-				Board.Tiles[x][y].Element = *tile.Element
+				Board.Tiles[x][y].Element = tile.Element
 				Board.Tiles[x][y].Color = color
 			}
 		}
