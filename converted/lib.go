@@ -5,6 +5,7 @@ import (
 	"io"
 	"math/rand"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -38,6 +39,22 @@ func Pos(b byte, s string) int16 {
 	return int16(strings.IndexByte(s, b) + 1)
 }
 
+func Val(s string) (n int16, code int16) {
+	n, err := strconv.Atoi(s)
+	if err != nil {
+		return n, 1 // TODO: code should be 1-based position of first non-number char
+	}
+	return n, 0
+}
+
+func Str(n int16, s []byte) {
+	// TODO
+}
+
+func StrWidth(n, width int16, s []byte) {
+	// TODO
+}
+
 // NOTE: in Turbo Pascal Delete() is a procedure that modifies the string in-place
 func Delete(s string, index, count int16) string {
 	return s[:index-1] + s[index-1+count:]
@@ -51,6 +68,8 @@ func VideoWriteText(x, y, color byte, text TVideoLine) {
 	// TODO
 }
 
+var VideoMonochrome bool
+
 func Delay(milliseconds int16) {
 	time.Sleep(time.Duration(milliseconds) * time.Millisecond)
 }
@@ -63,11 +82,11 @@ func Sqr(n int16) int16 {
 	return n * n
 }
 
-func Str(n int16, s []byte) {
+func Sound(x int16) {
 	// TODO
 }
 
-func StrWidth(n, width int16, s []byte) {
+func NoSound() {
 	// TODO
 }
 
@@ -95,13 +114,13 @@ func Assign(f *File, name string) {
 	f.name = name
 }
 
-func Reset(f *File) {
+func Reset(f *File, _ ...interface{}) {
 	file, err := os.Open(f.name)
 	f.file = file
 	setIOResult(err)
 }
 
-func Rewrite(f *File) {
+func Rewrite(f *File, _ ...interface{}) {
 	file, err := os.Create(f.name)
 	f.file = file
 	setIOResult(err)
@@ -110,6 +129,14 @@ func Rewrite(f *File) {
 func Read(f *File, data interface{}) {
 	err := binary.Read(f.file, binary.LittleEndian, data)
 	setIOResult(err)
+}
+
+func BlockRead(f *File, buf interface{}, count int16) {
+	// TODO
+}
+
+func BlockWrite(f *File, buf interface{}, count int16) {
+	// TODO
 }
 
 func Write(f *File, data interface{}) {
@@ -130,4 +157,30 @@ func Erase(f *File) {
 func Seek(f *File, offset int16) {
 	_, err := f.file.Seek(int64(offset), io.SeekStart)
 	setIOResult(err)
+}
+
+// Memory functions
+
+func New(p interface{}) {
+	// TODO
+}
+
+func FreeMem(p interface{}, size int16) {
+	// TODO
+}
+
+func GetMem(p interface{}, size int16) {
+	// TODO
+}
+
+func Move(src, dest interface{}, size int16) {
+	// TODO
+}
+
+func SizeOf(val interface{}) int16 {
+	// TODO
+}
+
+func FillChar(dest interface{}, count int16, c byte) {
+	// TODO
 }

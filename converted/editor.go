@@ -257,7 +257,7 @@ func EditorLoop() {
 					Str(Board.Info.MaxShots, numStr)
 					SidebarPromptString("Maximum shots?", "", &numStr, PROMPT_NUMERIC)
 					if Length(numStr) != 0 {
-						Val(numStr, Board.Info.MaxShots, i)
+						Board.Info.MaxShots, i = Val(numStr)
 					}
 					EditorDrawSidebar()
 				case 3:
@@ -274,7 +274,7 @@ func EditorLoop() {
 					Str(Board.Info.TimeLimitSec, numStr)
 					SidebarPromptString("Time limit?", " Sec", &numStr, PROMPT_NUMERIC)
 					if Length(numStr) != 0 {
-						Val(numStr, Board.Info.TimeLimitSec, i)
+						Board.Info.TimeLimitSec, i = Val(numStr)
 					}
 					EditorDrawSidebar()
 				case 10:
@@ -442,7 +442,7 @@ func EditorLoop() {
 	EditorTransferBoard := func() {
 		var (
 			i byte
-			f FILE
+			f File
 		)
 		i = 1
 		SidebarPromptChoice(true, 3, "Transfer board:", "Import Export", &i)
@@ -847,7 +847,7 @@ func EditorLoop() {
 
 func HighScoresLoad() {
 	var (
-		f FILE
+		f File
 		i int16
 	)
 	Assign(f, World.Info.Name+".HI")
@@ -865,7 +865,7 @@ func HighScoresLoad() {
 }
 
 func HighScoresSave() {
-	var f FILE
+	var f File
 	Assign(f, World.Info.Name+".HI")
 	Rewrite(f)
 	Write(f, HighScoreList)

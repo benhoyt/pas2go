@@ -39,6 +39,9 @@ func Convert(file File, units []*Unit, w io.Writer) {
 	max := &ConstExpr{1000, false}
 	c.defineVar("Port", &ArraySpec{min, max, &IdentSpec{&TypeIdent{"", INTEGER}}})
 
+	// Builtin functions
+	// TODO
+
 	// TODO: hack - TVideoLine is defined in VIDEO.PAS - do this in separate file
 	c.defineType("TVideoLine", &StringSpec{80})
 
@@ -617,6 +620,16 @@ func (c *converter) stmt(stmt Stmt) {
 			}
 			c.expr(stmt.Args[1])
 			c.print(")")
+		case "val":
+			if len(stmt.Args) != 3 {
+				panic(fmt.Sprintf("Val() requires 3 args, got %d", len(stmt.Args)))
+			}
+			c.expr(stmt.Args[1])
+			c.print(", ")
+			c.expr(stmt.Args[2])
+			c.print(" = Val(")
+			c.expr(stmt.Args[0])
+			c.print(")")
 		default:
 			if procStr == "delete" {
 				c.varExpr(stmt.Args[0], false)
@@ -1011,8 +1024,8 @@ func (c *converter) typeSpec(spec TypeSpec) {
 		}
 		c.print("}")
 	case *FileSpec:
-		// TODO: handle Of, how to handle FILE?
-		c.print("FILE")
+		// TODO: handle spec.Of
+		c.print("File")
 	case *PointerSpec:
 		c.print("*")
 		c.typeIdent(spec.Type)
