@@ -298,8 +298,8 @@ func (c *converter) unit(unit *Unit) {
 			c.addUnitDecls(unitName)
 		}
 	}
-	c.decls(unit.Interface, true)
 	c.defineDecls(unit.Interface)
+	c.decls(unit.Interface, true)
 	if unit.ImplementationUses != nil {
 		c.printf("\n// implementation uses: %s\n\n", strings.Join(unit.ImplementationUses, ", "))
 		for _, unitName := range unit.ImplementationUses {
@@ -483,6 +483,11 @@ func (c *converter) params(params []*ParamGroup) {
 }
 
 func (c *converter) typeIdent(typ *TypeIdent) {
+	refSpec := c.lookupType(typ.Name)
+	if _, isStr := refSpec.(*StringSpec); isStr {
+		c.print("string")
+		return
+	}
 	var s string
 	switch strings.ToLower(typ.Name) {
 	case "char":
@@ -1027,7 +1032,6 @@ func (c *converter) typeSpec(spec TypeSpec) {
 	case *IdentSpec:
 		c.typeIdent(spec.Type)
 	case *StringSpec:
-		// TODO: how to handle string sizes? should we use [Size]byte
 		c.print("string")
 	case *ArraySpec:
 		min := spec.Min.(*ConstExpr).Value.(int)

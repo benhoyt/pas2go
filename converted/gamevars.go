@@ -103,7 +103,7 @@ type (
 		StepX, StepY int16
 	}
 	TBoard struct {
-		Name      TString50
+		Name      string
 		Tiles     [BOARD_WIDTH + 1 + 1][BOARD_HEIGHT + 1 + 1]TTile
 		StatCount int16
 		Stats     [MAX_STAT + 1 + 1]TStat
@@ -130,10 +130,10 @@ var (
 	unkVar_0476                 int16
 	unkVar_0478                 int16
 	TransitionTable             [80 * 25]TCoord
-	LoadedGameFileName          TString50
-	SavedGameFileName           TString50
-	SavedBoardFileName          TString50
-	StartupWorldFileName        TString50
+	LoadedGameFileName          string
+	SavedGameFileName           string
+	SavedBoardFileName          string
+	StartupWorldFileName        string
 	Board                       TBoard
 	World                       TWorld
 	MessageAmmoNotShown         bool
@@ -171,15 +171,15 @@ var (
 	DebugEnabled                bool
 	HighScoreList               THighScoreList
 	ConfigRegistration          string
-	ConfigWorldFile             TString50
+	ConfigWorldFile             string
 	EditorEnabled               bool
-	GameVersion                 TString50
+	GameVersion                 string
 	ParsingConfigFile           bool
 	ResetConfig                 bool
 	JustStarted                 bool
 	WorldFileDescCount          int16
-	WorldFileDescKeys           [10]TString50
-	WorldFileDescValues         [10]TString50
+	WorldFileDescKeys           [10]string
+	WorldFileDescValues         [10]string
 )
 
 const (

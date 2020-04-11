@@ -970,7 +970,7 @@ func HighScoresAdd(score int16) {
 	}
 }
 
-func EditorGetBoardName(boardId int16, titleScreenIsNone bool) (EditorGetBoardName TString50) {
+func EditorGetBoardName(boardId int16, titleScreenIsNone bool) (EditorGetBoardName string) {
 	var (
 		boardData  uintptr
 		copiedName string

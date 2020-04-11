@@ -65,9 +65,7 @@ func Delete(s string, index, count int16) string {
 
 var Time int16 // TODO
 
-type TVideoLine string
-
-func VideoWriteText(x, y, color byte, text TVideoLine) {
+func VideoWriteText(x, y, color byte, text string) {
 	// TODO
 }
 

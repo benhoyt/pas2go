@@ -272,7 +272,7 @@ func OopFindLabel(statId int16, sendLabel string, iStat, iDataPos *int16, labelP
 	return
 }
 
-func WorldGetFlagPosition(name TString50) (WorldGetFlagPosition int16) {
+func WorldGetFlagPosition(name string) (WorldGetFlagPosition int16) {
 	var i int16
 	WorldGetFlagPosition = -1
 	for i = 1; i <= 10; i++ {
@@ -283,7 +283,7 @@ func WorldGetFlagPosition(name TString50) (WorldGetFlagPosition int16) {
 	return
 }
 
-func WorldSetFlag(name TString50) {
+func WorldSetFlag(name string) {
 	var i int16
 	if WorldGetFlagPosition(name) < 0 {
 		i = 1
@@ -294,14 +294,14 @@ func WorldSetFlag(name TString50) {
 	}
 }
 
-func WorldClearFlag(name TString50) {
+func WorldClearFlag(name string) {
 	var i int16
 	if WorldGetFlagPosition(name) >= 0 {
 		World.Info.Flags[WorldGetFlagPosition(name)-1] = ""
 	}
 }
 
-func OopStringToWord(input TString50) (OopStringToWord TString50) {
+func OopStringToWord(input string) (OopStringToWord string) {
 	var (
 		output string
 		i      int16
@@ -477,7 +477,7 @@ func OopSend(statId int16, sendLabel string, ignoreLock bool) (OopSend bool) {
 	return
 }
 
-func OopExecute(statId int16, position *int16, name TString50) {
+func OopExecute(statId int16, position *int16, name string) {
 	var (
 		textWindow        TTextWindowState
 		textLine          string

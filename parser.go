@@ -702,7 +702,6 @@ func (p *parser) factor() Expr {
 				expr = &PointerExpr{expr}
 			}
 		}
-		// TODO: should handle POINTER here as well? eg: EDITOR.PAS:278
 		return expr
 	default:
 		panic(p.error("expected factor"))

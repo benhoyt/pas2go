@@ -13,9 +13,9 @@ type (
 		Selectable     bool
 		LineCount      int16
 		LinePos        int16
-		Lines          [MAX_TEXT_WINDOW_LINES]*TTextWindowLine
+		Lines          [MAX_TEXT_WINDOW_LINES]*string
 		Hyperlink      string
-		Title          TTextWindowLine
+		Title          string
 		LoadedFilename string
 		ScreenCopy     [25]string
 	}
@@ -29,14 +29,14 @@ type (
 var (
 	TextWindowX, TextWindowY          int16
 	TextWindowWidth, TextWindowHeight int16
-	TextWindowStrInnerEmpty           TVideoLine
-	TextWindowStrText                 TVideoLine
-	TextWindowStrInnerLine            TVideoLine
-	TextWindowStrTop                  TVideoLine
-	TextWindowStrBottom               TVideoLine
-	TextWindowStrSep                  TVideoLine
-	TextWindowStrInnerSep             TVideoLine
-	TextWindowStrInnerArrows          TVideoLine
+	TextWindowStrInnerEmpty           string
+	TextWindowStrText                 string
+	TextWindowStrInnerLine            string
+	TextWindowStrTop                  string
+	TextWindowStrBottom               string
+	TextWindowStrSep                  string
+	TextWindowStrInnerSep             string
+	TextWindowStrInnerArrows          string
 	TextWindowRejected                bool
 	ResourceDataFileName              string
 	ResourceDataHeader                TResourceDataHeader
@@ -61,7 +61,7 @@ func TextWindowInitState(state *TTextWindowState) {
 
 }
 
-func TextWindowDrawTitle(color int16, title TTextWindowLine) {
+func TextWindowDrawTitle(color int16, title string) {
 	VideoWriteText(TextWindowX+2, TextWindowY+1, color, TextWindowStrInnerEmpty)
 	VideoWriteText(TextWindowX+((TextWindowWidth-Length(title))/2), TextWindowY+1, color, title)
 }
@@ -159,7 +159,7 @@ func TextWindowDraw(state *TTextWindowState, withoutFormatting, viewingFile bool
 	TextWindowDrawTitle(0x1E, state.Title)
 }
 
-func TextWindowAppend(state *TTextWindowState, line TTextWindowLine) {
+func TextWindowAppend(state *TTextWindowState, line string) {
 	state.LineCount++
 	New(state.Lines[state.LineCount-1])
 	state.Lines[state.LineCount-1] = line
@@ -448,7 +448,7 @@ func TextWindowEdit(state *TTextWindowState) {
 
 }
 
-func TextWindowOpenFile(filename TTextWindowLine, state *TTextWindowState) {
+func TextWindowOpenFile(filename string, state *TTextWindowState) {
 	var (
 		f        File
 		tf       text
@@ -528,7 +528,7 @@ func TextWindowOpenFile(filename TTextWindowLine, state *TTextWindowState) {
 
 }
 
-func TextWindowSaveFile(filename TTextWindowLine, state *TTextWindowState) {
+func TextWindowSaveFile(filename string, state *TTextWindowState) {
 	var (
 		f text
 		i int16

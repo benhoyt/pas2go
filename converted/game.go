@@ -311,7 +311,7 @@ func TransitionDrawToBoard() {
 	}
 }
 
-func SidebarPromptCharacter(editable bool, x, y int16, prompt TString50, value *byte) {
+func SidebarPromptCharacter(editable bool, x, y int16, prompt string, value *byte) {
 	var i, newValue int16
 	SidebarClearLine(y)
 	VideoWriteText(x, y, int16(editable)+0x1E, prompt)
@@ -443,7 +443,7 @@ func SidebarPromptDirection(editable bool, y int16, prompt string, deltaX, delta
 	*deltaY = NeighborDeltaY[choice]
 }
 
-func PromptString(x, y, arrowColor, color, width int16, mode byte, buffer *TString50) {
+func PromptString(x, y, arrowColor, color, width int16, mode byte, buffer *string) {
 	var (
 		i             int16
 		oldBuffer     string
@@ -512,7 +512,7 @@ func SidebarPromptYesNo(message string, defaultReturn bool) (SidebarPromptYesNo 
 	return
 }
 
-func SidebarPromptString(prompt string, extension TString50, filename *string, promptMode byte) {
+func SidebarPromptString(prompt string, extension string, filename *string, promptMode byte) {
 	SidebarClearLine(3)
 	SidebarClearLine(4)
 	SidebarClearLine(5)
@@ -565,7 +565,7 @@ func WorldUnload() {
 	}
 }
 
-func WorldLoad(filename, extension TString50, titleOnly bool) (WorldLoad bool) {
+func WorldLoad(filename, extension string, titleOnly bool) (WorldLoad bool) {
 	var (
 		f            File
 		ptr          uintptr
@@ -626,7 +626,7 @@ func WorldLoad(filename, extension TString50, titleOnly bool) (WorldLoad bool) {
 	return
 }
 
-func WorldSave(filename, extension TString50) {
+func WorldSave(filename, extension string) {
 	var (
 		f       File
 		i       int16
@@ -675,8 +675,8 @@ OnError:
 	SidebarClearLine(5)
 }
 
-func GameWorldSave(prompt TString50, filename *TString50, extension TString50) {
-	var newFilename TString50
+func GameWorldSave(prompt string, filename *string, extension string) {
+	var newFilename string
 	newFilename = *filename
 	SidebarPromptString(prompt, extension, &newFilename, PROMPT_ALPHANUM)
 	if (InputKeyPressed != KEY_ESCAPE) && (Length(newFilename) != 0) {
@@ -688,7 +688,7 @@ func GameWorldSave(prompt TString50, filename *TString50, extension TString50) {
 	}
 }
 
-func GameWorldLoad(extension TString50) (GameWorldLoad bool) {
+func GameWorldLoad(extension string) (GameWorldLoad bool) {
 	var (
 		textWindow    TTextWindowState
 		fileSearchRec SearchRec
@@ -912,7 +912,7 @@ func MoveStat(statId int16, newX, newY int16) {
 
 }
 
-func PopupPromptString(question string, buffer *TString50) {
+func PopupPromptString(question string, buffer *string) {
 	var x, y int16
 	VideoWriteText(3, 18, 0x4F, TextWindowStrTop)
 	VideoWriteText(3, 19, 0x4F, TextWindowStrText)
@@ -1184,7 +1184,7 @@ func BoardPassageTeleport(x, y int16) {
 
 func GameDebugPrompt() {
 	var (
-		input  TString50
+		input  string
 		i      int16
 		toggle bool
 	)
