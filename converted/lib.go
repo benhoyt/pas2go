@@ -48,11 +48,11 @@ func Val(s string) (n int16, code int16) {
 	return nInt, 0
 }
 
-func Str(n int16, s []byte) {
+func Str(n int16, s string) {
 	// TODO
 }
 
-func StrWidth(n, width int16, s []byte) {
+func StrWidth(n, width int16, s string) {
 	// TODO
 }
 
