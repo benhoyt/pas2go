@@ -168,7 +168,7 @@ func SoundTimerHandler() {
 				} else if SoundBuffer[SoundBufferPos] < 'ð' {
 					Sound(SoundFreqTable[Ord(SoundBuffer[SoundBufferPos])-1])
 				} else {
-					SoundPlayDrum(SoundDrumTable[Ord(SoundBuffer[SoundBufferPos])-240])
+					SoundPlayDrum(&SoundDrumTable[Ord(SoundBuffer[SoundBufferPos])-240])
 				}
 
 				SoundBufferPos++

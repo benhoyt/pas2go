@@ -1341,7 +1341,7 @@ func ElementPlayerTick(statId int16) {
 
 	}
 	if (Board.Info.TimeLimitSec > 0) && (World.Info.Health > 0) {
-		if SoundHasTimeElapsed(World.Info.BoardTimeHsec, 100) {
+		if SoundHasTimeElapsed(&World.Info.BoardTimeHsec, 100) {
 			World.Info.BoardTimeSec++
 			if (Board.Info.TimeLimitSec - 10) == World.Info.BoardTimeSec {
 				DisplayMessage(200, "Running out of time!")

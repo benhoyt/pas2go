@@ -23,7 +23,7 @@ func EditorAppendBoard() {
 		BoardCreate()
 		TransitionDrawToBoard()
 		for {
-			PopupPromptString("Room's Title:", Board.Name)
+			PopupPromptString("Room's Title:", &Board.Name)
 			if Length(Board.Name) != 0 {
 				break
 			}
@@ -250,7 +250,7 @@ func EditorLoop() {
 			if InputKeyPressed == KEY_ENTER {
 				switch state.LinePos {
 				case 1:
-					PopupPromptString("New title for board:", Board.Name)
+					PopupPromptString("New title for board:", &Board.Name)
 					exitRequested = true
 					TextWindowDrawClose(&state)
 				case 2:

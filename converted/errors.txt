@@ -1,5 +1,4 @@
 # _/Users/ben.hoyt/Home/zzt/pas2go/converted
-./editor.go:26:44: cannot use Board.Name (type string) as type *string in argument to PopupPromptString
 ./editor.go:92:21: cannot use 61 + i (type int16) as type byte in argument to VideoWriteText
 ./editor.go:92:25: cannot use i (type int16) as type byte in argument to VideoWriteText
 ./editor.go:92:32: cannot use '\u00db' (type rune) as type string in argument to VideoWriteText
@@ -32,7 +31,6 @@
 ./editor.go:243:18: cannot use numStr (type string) as type []byte in argument to Str
 ./editor.go:244:19: cannot use "  Time limit, 0=None: " + numStr + " sec." (type string) as type *string in assignment
 ./editor.go:245:21: cannot use "          Quit!" (type string) as type *string in assignment
-./editor.go:253:53: cannot use Board.Name (type string) as type *string in argument to PopupPromptString
 ./editor.go:257:20: cannot use Board.Info.MaxShots (type byte) as type int16 in argument to Str
 ./editor.go:257:20: cannot use numStr (type string) as type []byte in argument to Str
 ./editor.go:260:30: cannot assign int16 to Board.Info.MaxShots (type byte) in multiple assignment
@@ -356,7 +354,6 @@
 ./elements.go:1326:39: cannot use stat.Y (type byte) as type int16 in argument to DrawPlayerSurroundings
 ./elements.go:1339:22: cannot use stat.X (type byte) as type int16 in argument to BoardDrawTile
 ./elements.go:1339:30: cannot use stat.Y (type byte) as type int16 in argument to BoardDrawTile
-./elements.go:1344:36: cannot use World.Info.BoardTimeHsec (type int16) as type *int16 in argument to SoundHasTimeElapsed
 ./game.go:13:2: cannot use [8]string literal (type [8]string) as type [8]byte in assignment
 ./game.go:13:46: cannot use 20 (type int) as type string in array or slice literal
 ./game.go:13:52: cannot use 28 (type int) as type string in array or slice literal
@@ -728,7 +725,6 @@
 ./oop.go:314:11: invalid operation: output += Chr(Ord(input[i - 1]) - 32) (mismatched types string and byte)
 ./oop.go:329:15: cannot use i + 8 (type int16) as type byte in assignment
 ./oop.go:338:17: cannot use i (type int16) as type byte in assignment
-./oop.go:370:65: cannot use Board.Tiles[*x][*y] (type TTile) as type *TTile in argument to GetColorForTileMatch
 ./oop.go:401:23: cannot use color (type byte) as type int16 in argument to AddStat
 ./oop.go:420:41: cannot call non-function OopCheckCondition (type bool)
 ./oop.go:424:34: cannot use stat.X - Board.Stats[0].X (type byte) as type int16 in argument to Sqr
@@ -803,7 +799,6 @@
 ./sounds.go:139:13: cannot use hSecsTotal - *counter (type int16) as type uint16 in assignment
 ./sounds.go:141:15: invalid operation: hSecsDiff >= duration (mismatched types uint16 and int16)
 ./sounds.go:169:26: cannot use SoundFreqTable[Ord(SoundBuffer[SoundBufferPos]) - 1] (type uint16) as type int16 in argument to Sound
-./sounds.go:171:34: cannot use SoundDrumTable[Ord(SoundBuffer[SoundBufferPos]) - 240] (type TDrumData) as type *TDrumData in argument to SoundPlayDrum
 ./sounds.go:184:2: undefined: SetIntVec
 ./sounds.go:270:11: invalid operation: output += Chr(noteOctave * 16 + noteTone) + Chr(noteDuration) (mismatched types string and byte)
 ./sounds.go:270:33: cannot use noteOctave * 16 + noteTone (type int16) as type byte in argument to Chr

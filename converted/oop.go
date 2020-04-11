@@ -367,7 +367,7 @@ func FindTileOnBoard(x, y *int16, tile TTile) (FindTileOnBoard bool) {
 			}
 		}
 		if Board.Tiles[*x][*y].Element == tile.Element {
-			if (tile.Color == 0) || (GetColorForTileMatch(Board.Tiles[*x][*y]) == tile.Color) {
+			if (tile.Color == 0) || (GetColorForTileMatch(&Board.Tiles[*x][*y]) == tile.Color) {
 				FindTileOnBoard = true
 				return
 			}
