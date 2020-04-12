@@ -136,7 +136,7 @@ func EditorLoop() {
 		Str(World.Info.CurrentBoard, boardNumStr)
 		TransitionDrawToBoard()
 		if Length(Board.Name) != 0 {
-			VideoWriteText((59-Length(Board.Name))/2, 0, 0x70, ' '+Board.Name+' ')
+			VideoWriteText(byte((59-Length(Board.Name))/2), 0, 0x70, ' '+Board.Name+' ')
 		} else {
 			VideoWriteText(26, 0, 0x70, " Untitled ")
 		}

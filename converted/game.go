@@ -495,7 +495,7 @@ func SidebarPromptYesNo(message string, defaultReturn bool) (SidebarPromptYesNo 
 	SidebarClearLine(4)
 	SidebarClearLine(5)
 	VideoWriteText(63, 5, 0x1F, message)
-	VideoWriteText(63+Length(message), 5, 0x9E, "_")
+	VideoWriteText(byte(63+Length(message)), 5, 0x9E, "_")
 	for {
 		InputReadWaitKey()
 		if UpCase(InputKeyPressed) == KEY_ESCAPE || UpCase(InputKeyPressed) == 'N' || UpCase(InputKeyPressed) == 'Y' {
@@ -516,7 +516,7 @@ func SidebarPromptString(prompt string, extension string, filename *string, prom
 	SidebarClearLine(3)
 	SidebarClearLine(4)
 	SidebarClearLine(5)
-	VideoWriteText(75-Length(prompt), 3, 0x1F, prompt)
+	VideoWriteText(byte(75-Length(prompt)), 3, 0x1F, prompt)
 	VideoWriteText(63, 5, 0x0F, "        "+extension)
 	PromptString(63, 5, 0x1E, 0x0F, 8, promptMode, filename)
 	SidebarClearLine(3)

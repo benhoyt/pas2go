@@ -45,6 +45,10 @@ func Convert(file File, units []*Unit, w io.Writer) {
 		[]*ParamGroup{{false, []string{"x"}, &TypeIdent{"byte"}}},
 		&TypeIdent{"char"},
 	})
+	c.defineVar("Length", &FuncSpec{
+		[]*ParamGroup{{false, []string{"s"}, &TypeIdent{"string"}}},
+		&TypeIdent{"integer"},
+	})
 	c.defineVar("VideoWriteText", &ProcSpec{[]*ParamGroup{
 		{false, []string{"x", "y", "color"}, &TypeIdent{"byte"}},
 		{false, []string{"text"}, &TypeIdent{"string"}},

@@ -24,7 +24,7 @@ func ElementMessageTimerTick(statId int16) {
 	stat := &Board.Stats[statId]
 	switch stat.X {
 	case 0:
-		VideoWriteText((60-Length(Board.Info.Message))/2, 24, 9+(stat.P2%7), ' '+Board.Info.Message+' ')
+		VideoWriteText(byte((60-Length(Board.Info.Message))/2), 24, 9+(stat.P2%7), ' '+Board.Info.Message+' ')
 		stat.P2--
 		if stat.P2 <= 0 {
 			RemoveStat(statId)
