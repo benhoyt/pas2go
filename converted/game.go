@@ -269,16 +269,16 @@ func BoardDrawTile(x, y int16) {
 			VideoWriteText(byte(x-1), byte(y-1), 0x0F, " ")
 		} else if ElementDefs[tile.Element].HasDrawProc {
 			ElementDefs[tile.Element].DrawProc(x, y, &ch)
-			VideoWriteText(byte(x-1), byte(y-1), tile.Color, Chr(ch))
+			VideoWriteText(byte(x-1), byte(y-1), tile.Color, string(Chr(ch)))
 		} else if tile.Element < E_TEXT_MIN {
 			VideoWriteText(byte(x-1), byte(y-1), tile.Color, string(ElementDefs[tile.Element].Character))
 		} else {
 			if tile.Element == E_TEXT_WHITE {
-				VideoWriteText(byte(x-1), byte(y-1), 0x0F, Chr(Board.Tiles[x][y].Color))
+				VideoWriteText(byte(x-1), byte(y-1), 0x0F, string(Chr(Board.Tiles[x][y].Color)))
 			} else if VideoMonochrome {
-				VideoWriteText(byte(x-1), byte(y-1), ((tile.Element-E_TEXT_MIN)+1)*16, Chr(Board.Tiles[x][y].Color))
+				VideoWriteText(byte(x-1), byte(y-1), ((tile.Element-E_TEXT_MIN)+1)*16, string(Chr(Board.Tiles[x][y].Color)))
 			} else {
-				VideoWriteText(byte(x-1), byte(y-1), (((tile.Element-E_TEXT_MIN)+1)*16)+0x0F, Chr(Board.Tiles[x][y].Color))
+				VideoWriteText(byte(x-1), byte(y-1), (((tile.Element-E_TEXT_MIN)+1)*16)+0x0F, string(Chr(Board.Tiles[x][y].Color)))
 			}
 
 		}
@@ -320,7 +320,7 @@ func SidebarPromptCharacter(editable bool, x, y int16, prompt string, value *byt
 	SidebarClearLine(y + 2)
 	for {
 		for i = (*value - 4); i <= (*value + 4); i++ {
-			VideoWriteText(byte(((x+i)-*value)+5), byte(y+2), 0x1E, Chr((i+0x100)%0x100))
+			VideoWriteText(byte(((x+i)-*value)+5), byte(y+2), 0x1E, string(Chr(byte((i+0x100)%0x100))))
 		}
 		if editable {
 			Delay(25)

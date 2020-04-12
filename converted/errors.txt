@@ -1,5 +1,4 @@
 # _/Users/ben.hoyt/Home/zzt/pas2go/converted
-./editor.go:102:72: cannot use Chr(copiedChr) (type byte) as type string in argument to VideoWriteText
 ./editor.go:139:42: cannot use (59 - Length(Board.Name)) / 2 (type int16) as type byte in argument to VideoWriteText
 ./editor.go:139:58: cannot convert ' ' (type untyped number) to type string
 ./editor.go:139:58: invalid operation: ' ' + Board.Name (mismatched types rune and string)
@@ -258,16 +257,10 @@
 ./game.go:117:44: undefined: Ofs
 ./game.go:267:139: invalid operation: Board.Stats[0].X - x (mismatched types byte and int16)
 ./game.go:267:165: invalid operation: Board.Stats[0].Y - y (mismatched types byte and int16)
-./game.go:272:56: cannot use Chr(ch) (type byte) as type string in argument to VideoWriteText
-./game.go:277:51: cannot use Chr(Board.Tiles[x][y].Color) (type byte) as type string in argument to VideoWriteText
-./game.go:279:79: cannot use Chr(Board.Tiles[x][y].Color) (type byte) as type string in argument to VideoWriteText
-./game.go:281:86: cannot use Chr(Board.Tiles[x][y].Color) (type byte) as type string in argument to VideoWriteText
 ./game.go:317:45: cannot convert editable (type bool) to type int16
 ./game.go:322:9: cannot use *value - 4 (type byte) as type int16 in assignment
 ./game.go:322:27: invalid operation: i <= *value + 4 (mismatched types int16 and byte)
 ./game.go:323:24: invalid operation: x + i - *value (mismatched types int16 and byte)
-./game.go:323:63: cannot use Chr((i + 256) % 256) (type byte) as type string in argument to VideoWriteText
-./game.go:323:73: cannot use (i + 256) % 256 (type int16) as type byte in argument to Chr
 ./game.go:331:22: invalid operation: *value + InputDeltaX (mismatched types byte and int16)
 ./game.go:332:14: invalid operation: *value != newValue (mismatched types byte and int16)
 ./game.go:333:12: cannot use (newValue + 256) % 256 (type int16) as type byte in assignment
@@ -545,15 +538,11 @@
 ./sounds.go:141:15: invalid operation: hSecsDiff >= duration (mismatched types uint16 and int16)
 ./sounds.go:169:26: cannot use SoundFreqTable[Ord(SoundBuffer[SoundBufferPos]) - 1] (type uint16) as type int16 in argument to Sound
 ./sounds.go:184:2: undefined: SetIntVec
-./sounds.go:270:11: invalid operation: output += Chr(noteOctave * 16 + noteTone) + Chr(noteDuration) (mismatched types string and byte)
-./sounds.go:270:33: cannot use noteOctave * 16 + noteTone (type int16) as type byte in argument to Chr
-./sounds.go:270:49: cannot use noteDuration (type int16) as type byte in argument to Chr
-./sounds.go:272:11: invalid operation: output += '\u0000' + Chr(noteDuration) (mismatched types string and byte)
-./sounds.go:272:26: cannot use noteDuration (type int16) as type byte in argument to Chr
+./sounds.go:270:11: invalid operation: output += Chr(byte(noteOctave * 16 + noteTone)) + Chr(byte(noteDuration)) (mismatched types string and byte)
+./sounds.go:272:11: invalid operation: output += '\u0000' + Chr(byte(noteDuration)) (mismatched types string and byte)
 ./sounds.go:274:3: duplicate case '3' (value 51) in switch
 	previous case at ./sounds.go:225:8
-./sounds.go:275:11: invalid operation: output += Chr(Ord(input[1]) + 240 - Ord('0')) + Chr(noteDuration) (mismatched types string and byte)
-./sounds.go:275:52: cannot use noteDuration (type int16) as type byte in argument to Chr
+./sounds.go:275:11: invalid operation: output += Chr(Ord(input[1]) + 240 - Ord('0')) + Chr(byte(noteDuration)) (mismatched types string and byte)
 ./sounds.go:298:17: cannot use &SoundTimerHandler (type *func()) as type uintptr in assignment
 ./sounds.go:298:19: cannot take the address of SoundTimerHandler
 ./sounds.go:299:2: undefined: GetIntVec

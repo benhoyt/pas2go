@@ -12,6 +12,7 @@ ISSUES:
 - OopParseDirection and OopCheckCondition calls themselves - causes naming issue with named return value
 
 NICE TO HAVES:
+- can we eliminate Chr() and Ord() seeing they're just identity functions?
 - consider changing VideoWriteText x,y params to int16 instead of byte -- fewer type conversions
 - uses operator precedence rather than ParenExpr
 */
@@ -39,8 +40,11 @@ func Convert(file File, units []*Unit, w io.Writer) {
 	max := &ConstExpr{1000, false}
 	c.defineVar("Port", &ArraySpec{min, max, &IdentSpec{&TypeIdent{"integer"}}})
 
-	// Builtin functions
-	// TODO
+	// Builtin functions (or those in VIDEO.PAS)
+	c.defineVar("Chr", &FuncSpec{
+		[]*ParamGroup{{false, []string{"x"}, &TypeIdent{"byte"}}},
+		&TypeIdent{"char"},
+	})
 	c.defineVar("VideoWriteText", &ProcSpec{[]*ParamGroup{
 		{false, []string{"x", "y", "color"}, &TypeIdent{"byte"}},
 		{false, []string{"text"}, &TypeIdent{"string"}},
@@ -1234,9 +1238,7 @@ func (c *converter) exprKind(expr Expr) Kind {
 		if spec == nil {
 			return KindUnknown
 		}
-		resultTypeName := spec.(*FuncSpec).Result.Name
-		spec = c.lookupType(resultTypeName)
-		return c.specToKind(spec) // TODO: could do some of the above in specToKind?
+		return c.typeNameToKind(spec.(*FuncSpec).Result.Name)
 	case *ParenExpr:
 		return c.exprKind(expr.Expr)
 	case *RangeExpr:
@@ -1295,21 +1297,7 @@ func (c *converter) specToKind(spec TypeSpec) Kind {
 	case *ScalarSpec:
 		return KindByte
 	case *IdentSpec:
-		switch strings.ToLower(spec.Type.Name) {
-		case "byte", "char":
-			return KindByte
-		case "boolean":
-			return KindBoolean
-		case "integer":
-			return KindInteger
-		case "real":
-			return KindReal
-		case "string":
-			return KindString
-		default:
-			targetSpec := c.lookupType(spec.Type.Name)
-			return c.specToKind(targetSpec)
-		}
+		return c.typeNameToKind(spec.Type.Name)
 	case *StringSpec:
 		return KindString
 	case *ArraySpec:
@@ -1322,5 +1310,23 @@ func (c *converter) specToKind(spec TypeSpec) Kind {
 		return c.specToKind(&IdentSpec{&TypeIdent{spec.Type.Name}}) // TODO: hmm
 	default:
 		return KindUnknown
+	}
+}
+
+func (c *converter) typeNameToKind(name string) Kind {
+	switch strings.ToLower(name) {
+	case "byte", "char":
+		return KindByte
+	case "boolean":
+		return KindBoolean
+	case "integer":
+		return KindInteger
+	case "real":
+		return KindReal
+	case "string":
+		return KindString
+	default:
+		spec := c.lookupType(name)
+		return c.specToKind(spec)
 	}
 }

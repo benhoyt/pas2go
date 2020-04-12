@@ -13,12 +13,12 @@ import (
 
 // String functions
 
-func Ord(c byte) byte {
-	return c
+func Ord(x byte) byte {
+	return x
 }
 
-func Chr(i byte) byte {
-	return i
+func Chr(x byte) byte {
+	return x
 }
 
 func Length(s string) int16 {
