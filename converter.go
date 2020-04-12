@@ -49,6 +49,10 @@ func Convert(file File, units []*Unit, w io.Writer) {
 		[]*ParamGroup{{false, []string{"s"}, &TypeIdent{"string"}}},
 		&TypeIdent{"integer"},
 	})
+	c.defineVar("UpCase", &FuncSpec{
+		[]*ParamGroup{{false, []string{"ch"}, &TypeIdent{"char"}}},
+		&TypeIdent{"char"},
+	})
 	c.defineVar("VideoWriteText", &ProcSpec{[]*ParamGroup{
 		{false, []string{"x", "y", "color"}, &TypeIdent{"byte"}},
 		{false, []string{"text"}, &TypeIdent{"string"}},
@@ -1276,6 +1280,11 @@ func (c *converter) exprKind(expr Expr) Kind {
 		case *StringSpec:
 			return KindByte
 		case *IdentSpec:
+			if strings.ToLower(specTyped.Type.Name) == "string" {
+				return KindByte
+			} else {
+				panic(fmt.Sprintf("unexpected array IdentSpec %T", specTyped))
+			}
 		case *PointerSpec:
 			spec = &IdentSpec{specTyped.Type}
 		default:

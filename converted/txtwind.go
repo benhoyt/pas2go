@@ -259,7 +259,7 @@ func TextWindowSelect(state *TTextWindowState, hyperlinkAsSelect, viewingFile bo
 							if Length(pointerStr) > Length(*state.Lines[iLine-1]) {
 							} else {
 								for iChar = 1; iChar <= Length(pointerStr); iChar++ {
-									if UpCase(pointerStr[iChar-1]) != UpCase(state.Lines[iLine-1][iChar-1]) {
+									if UpCase(pointerStr[iChar-1]) != UpCase(byte(state.Lines[iLine-1][iChar-1])) {
 										goto LabelNotMatched
 									}
 								}
