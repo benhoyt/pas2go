@@ -1,8 +1,5 @@
 # _/Users/ben.hoyt/Home/zzt/pas2go/converted
-./editor.go:92:44: cannot use '\u00db' (type rune) as type string in argument to VideoWriteText
 ./editor.go:102:72: cannot use Chr(copiedChr) (type byte) as type string in argument to VideoWriteText
-./editor.go:128:52: cannot use '\u001f' (type rune) as type string in argument to VideoWriteText
-./editor.go:129:50: cannot use '\u001f' (type rune) as type string in argument to VideoWriteText
 ./editor.go:139:42: cannot use (59 - Length(Board.Name)) / 2 (type int16) as type byte in argument to VideoWriteText
 ./editor.go:139:58: cannot convert ' ' (type untyped number) to type string
 ./editor.go:139:58: invalid operation: ' ' + Board.Name (mismatched types rune and string)
@@ -38,12 +35,9 @@
 ./editor.go:486:16: cannot use f (type File) as type *File in argument to BlockWrite
 ./editor.go:487:16: cannot use f (type File) as type *File in argument to BlockWrite
 ./editor.go:491:12: cannot use f (type File) as type *File in argument to Close
-./editor.go:568:60: cannot use '\u00c5' (type rune) as type string in argument to VideoWriteText
 ./editor.go:577:44: cannot use cursorColor - 9 + E_TEXT_MIN (type int16) as type byte in assignment
-./editor.go:619:59: cannot use '\u00c5' (type rune) as type string in argument to VideoWriteText
 ./editor.go:655:56: cannot convert '!' (type untyped number) to type string
 ./editor.go:655:56: invalid operation: ("  " + World.Info.Name) + '!' (mismatched types string and rune)
-./editor.go:717:59: cannot use '\u00c5' (type rune) as type string in argument to VideoWriteText
 ./editor.go:737:94: cannot use ' ' + ElementDefs[iElem].EditorShortcut + ' ' (type byte) as type string in argument to VideoWriteText
 ./editor.go:746:21: cannot use ElementDefs[iElem].Color % 16 + 16 (type byte) as type int16 in assignment
 ./editor.go:748:21: cannot use ElementDefs[iElem].Color (type byte) as type int16 in assignment
@@ -264,14 +258,11 @@
 ./game.go:117:44: undefined: Ofs
 ./game.go:267:139: invalid operation: Board.Stats[0].X - x (mismatched types byte and int16)
 ./game.go:267:165: invalid operation: Board.Stats[0].Y - y (mismatched types byte and int16)
-./game.go:269:47: cannot use ' ' (type rune) as type string in argument to VideoWriteText
 ./game.go:272:56: cannot use Chr(ch) (type byte) as type string in argument to VideoWriteText
 ./game.go:277:51: cannot use Chr(Board.Tiles[x][y].Color) (type byte) as type string in argument to VideoWriteText
 ./game.go:279:79: cannot use Chr(Board.Tiles[x][y].Color) (type byte) as type string in argument to VideoWriteText
 ./game.go:281:86: cannot use Chr(Board.Tiles[x][y].Color) (type byte) as type string in argument to VideoWriteText
-./game.go:287:46: cannot use '\u00b0' (type rune) as type string in argument to VideoWriteText
 ./game.go:317:45: cannot convert editable (type bool) to type int16
-./game.go:319:45: cannot use '\u001f' (type rune) as type string in argument to VideoWriteText
 ./game.go:322:9: cannot use *value - 4 (type byte) as type int16 in assignment
 ./game.go:322:27: invalid operation: i <= *value + 4 (mismatched types int16 and byte)
 ./game.go:323:24: invalid operation: x + i - *value (mismatched types int16 and byte)
@@ -280,33 +271,23 @@
 ./game.go:331:22: invalid operation: *value + InputDeltaX (mismatched types byte and int16)
 ./game.go:332:14: invalid operation: *value != newValue (mismatched types byte and int16)
 ./game.go:333:12: cannot use (newValue + 256) % 256 (type int16) as type byte in assignment
-./game.go:341:45: cannot use '\u001f' (type rune) as type string in argument to VideoWriteText
 ./game.go:358:45: cannot convert editable (type bool) to type int16
 ./game.go:361:52: cannot convert "....:...." (type untyped string) to type byte
 ./game.go:361:52: invalid operation: startChar + "....:...." (mismatched types byte and string)
 ./game.go:367:25: invalid operation: x + *value (mismatched types int16 and byte)
-./game.go:367:54: cannot use '\u001f' (type rune) as type string in argument to VideoWriteText
 ./game.go:373:23: invalid operation: *value + InputDeltaX (mismatched types byte and int16)
 ./game.go:374:8: invalid operation: *value != newValue (mismatched types byte and int16)
 ./game.go:375:13: cannot use newValue (type int16) as type byte in assignment
 ./game.go:384:23: invalid operation: x + *value (mismatched types int16 and byte)
-./game.go:384:52: cannot use '\u001f' (type rune) as type string in argument to VideoWriteText
 ./game.go:395:40: cannot convert editable (type bool) to type int16
 ./game.go:406:7: invalid operation: j < *result (mismatched types int16 and byte)
-./game.go:413:48: cannot use '\u001f' (type rune) as type string in argument to VideoWriteText
 ./game.go:416:24: invalid operation: *result + InputDeltaX (mismatched types byte and int16)
 ./game.go:417:7: invalid operation: *result != newResult (mismatched types byte and int16)
 ./game.go:418:13: cannot use newResult (type int16) as type byte in assignment
-./game.go:426:46: cannot use '\u001f' (type rune) as type string in argument to VideoWriteText
-./game.go:456:52: cannot use ' ' (type rune) as type string in argument to VideoWriteText
-./game.go:457:59: cannot use ' ' (type rune) as type string in argument to VideoWriteText
-./game.go:459:62: cannot use ' ' (type rune) as type string in argument to VideoWriteText
-./game.go:460:87: cannot use '\u001f' (type rune) as type string in argument to VideoWriteText
 ./game.go:470:14: invalid operation: *buffer += InputKeyPressed (mismatched types string and byte)
 ./game.go:473:13: invalid operation: *buffer += InputKeyPressed (mismatched types string and byte)
 ./game.go:476:14: invalid operation: *buffer += UpCase(InputKeyPressed) (mismatched types string and byte)
 ./game.go:498:19: cannot use 63 + Length(message) (type int16) as type byte in argument to VideoWriteText
-./game.go:498:46: cannot use '_' (type rune) as type string in argument to VideoWriteText
 ./game.go:519:19: cannot use 75 - Length(prompt) (type int16) as type byte in argument to VideoWriteText
 ./game.go:537:14: invalid operation: IOResult == 0 (mismatched types func() int16 and int)
 ./game.go:542:5: cannot use IOResult (type func() int16) as type int16 in argument to Str
@@ -363,9 +344,6 @@
 ./game.go:977:38: invalid operation: numStr + ' ' (mismatched types string and rune)
 ./game.go:979:38: cannot convert ' ' (type untyped number) to type string
 ./game.go:979:38: invalid operation: numStr + ' ' (mismatched types string and rune)
-./game.go:985:42: cannot use '\u00b1' (type rune) as type string in argument to VideoWriteText
-./game.go:987:42: cannot use '\u00b0' (type rune) as type string in argument to VideoWriteText
-./game.go:995:42: cannot use ' ' (type rune) as type string in argument to VideoWriteText
 ./game.go:1004:7: cannot use MemAvail (type int) as type int16 in argument to Str
 ./game.go:1005:35: cannot convert 'm' (type untyped number) to type string
 ./game.go:1005:35: invalid operation: 'm' + numStr (mismatched types rune and string)
@@ -388,7 +366,6 @@
 ./game.go:1232:70: invalid operation: Board.Stats[0].Y + NeighborDeltaY[i] (mismatched types byte and int16)
 ./game.go:1329:58: cannot use GameStateElement (type int16) as type byte in assignment
 ./game.go:1338:19: cannot use TickSpeed * 2 (type byte) as type int16 in assignment
-./game.go:1352:67: cannot use ' ' (type rune) as type string in argument to VideoWriteText
 ./game.go:1363:45: invalid operation: Board.Stats[0].X + InputDeltaX (mismatched types byte and int16)
 ./game.go:1363:75: invalid operation: Board.Stats[0].Y + InputDeltaY (mismatched types byte and int16)
 ./game.go:1363:124: invalid operation: Board.Stats[0].X + InputDeltaX (mismatched types byte and int16)
@@ -586,4 +563,3 @@
 ./txtwind.go:95:3: undefined: VideoMove
 ./txtwind.go:96:3: undefined: VideoMove
 ./txtwind.go:120:31: invalid operation: state.Lines[lpos - 1][0] (type *string does not support indexing)
-./txtwind.go:123:55: cannot use '\u0010' (type rune) as type string in argument to VideoWriteText

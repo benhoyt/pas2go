@@ -120,7 +120,7 @@ func TextWindowDrawLine(state *TTextWindowState, lpos int16, withoutFormatting, 
 				switch state.Lines[lpos-1][0] {
 				case '!':
 					textOffset = Pos(';', *state.Lines[lpos-1]) + 1
-					VideoWriteText(byte(textX+2), byte(lineY), 0x1D, '\x10')
+					VideoWriteText(byte(textX+2), byte(lineY), 0x1D, "\x10")
 					textX += 5
 					textColor = 0x1F
 				case ':':
@@ -357,7 +357,7 @@ func TextWindowEdit(state *TTextWindowState) {
 		}
 		if charPos >= (Length(*state.Lines[state.LinePos-1]) + 1) {
 			charPos = Length(*state.Lines[state.LinePos-1]) + 1
-			VideoWriteText(byte(charPos+TextWindowX+3), byte(TextWindowY+(TextWindowHeight/2)+1), 0x70, ' ')
+			VideoWriteText(byte(charPos+TextWindowX+3), byte(TextWindowY+(TextWindowHeight/2)+1), 0x70, " ")
 		} else {
 			VideoWriteText(byte(charPos+TextWindowX+3), byte(TextWindowY+(TextWindowHeight/2)+1), 0x70, state.Lines[state.LinePos-1][charPos-1])
 		}

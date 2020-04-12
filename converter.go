@@ -793,6 +793,13 @@ func (c *converter) procArg(targetIsVar bool, targetKind Kind, arg Expr) {
 			}
 		}
 		c.expr(arg)
+	case *ConstExpr:
+		str, isStr := arg.Value.(string)
+		if isStr && targetKind == KindString {
+			c.printf("%q", str)
+			break
+		}
+		c.expr(arg)
 	default:
 		c.expr(arg)
 	}
@@ -867,7 +874,7 @@ func (c *converter) expr(expr Expr) {
 		switch value := expr.Value.(type) {
 		case string:
 			if len(value) == 1 {
-				c.printf("%q", value[0])
+				c.printf("%q", value[0]) // TODO: should be manually escaped to avoid 'Å'
 			} else {
 				c.printf("%q", value)
 			}

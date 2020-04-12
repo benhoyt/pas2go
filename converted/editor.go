@@ -89,7 +89,7 @@ func EditorLoop() {
 		VideoWriteText(61, 19, 0x30, " C ")
 		VideoWriteText(64, 19, 0x1F, " Color:")
 		for i = 9; i <= 15; i++ {
-			VideoWriteText(byte(61+i), 22, byte(i), 'Û')
+			VideoWriteText(byte(61+i), 22, byte(i), "\xdb")
 		}
 		for i = 1; i <= EditorPatternCount; i++ {
 			VideoWriteText(byte(61+i), 22, 0x0F, string(ElementDefs[EditorPatterns[i-1]].Character))
@@ -125,8 +125,8 @@ func EditorLoop() {
 		}
 
 		VideoWriteText(72, 19, 0x1E, ColorNames[(cursorColor-8)-1])
-		VideoWriteText(byte(61+cursorPattern), 21, 0x1F, '\x1f')
-		VideoWriteText(byte(61+cursorColor), 21, 0x1F, '\x1f')
+		VideoWriteText(byte(61+cursorPattern), 21, 0x1F, "\x1f")
+		VideoWriteText(byte(61+cursorColor), 21, 0x1F, "\x1f")
 	}
 
 	EditorDrawRefresh := func() {
@@ -565,7 +565,7 @@ func EditorLoop() {
 			if cursorBlinker == 0 {
 				BoardDrawTile(cursorX, cursorY)
 			} else {
-				VideoWriteText(byte(cursorX-1), byte(cursorY-1), 0x0F, 'Å')
+				VideoWriteText(byte(cursorX-1), byte(cursorY-1), 0x0F, "\xc5")
 			}
 			EditorUpdateSidebar()
 		} else {
@@ -616,7 +616,7 @@ func EditorLoop() {
 			if cursorY > BOARD_HEIGHT {
 				cursorY = BOARD_HEIGHT
 			}
-			VideoWriteText(byte(cursorX-1), byte(cursorY-1), 0x0F, 'Å')
+			VideoWriteText(byte(cursorX-1), byte(cursorY-1), 0x0F, "\xc5")
 			if (InputKeyPressed == '\x00') && InputJoystickEnabled {
 				Delay(70)
 			}
@@ -714,7 +714,7 @@ func EditorLoop() {
 				drawMode = DrawingOff
 			}
 		case KEY_F1, KEY_F2, KEY_F3:
-			VideoWriteText(byte(cursorX-1), byte(cursorY-1), 0x0F, 'Å')
+			VideoWriteText(byte(cursorX-1), byte(cursorY-1), 0x0F, "\xc5")
 			for i = 3; i <= 20; i++ {
 				SidebarClearLine(i)
 			}

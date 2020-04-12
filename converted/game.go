@@ -266,7 +266,7 @@ func BoardDrawTile(x, y int16) {
 	tile := &Board.Tiles[x][y]
 	if !Board.Info.IsDark || (ElementDefs[Board.Tiles[x][y].Element].VisibleInDark) || ((World.Info.TorchTicks > 0) && ((Sqr(Board.Stats[0].X-x) + Sqr(Board.Stats[0].Y-y)*2) < TORCH_DIST_SQR)) || ForceDarknessOff {
 		if tile.Element == E_EMPTY {
-			VideoWriteText(byte(x-1), byte(y-1), 0x0F, ' ')
+			VideoWriteText(byte(x-1), byte(y-1), 0x0F, " ")
 		} else if ElementDefs[tile.Element].HasDrawProc {
 			ElementDefs[tile.Element].DrawProc(x, y, &ch)
 			VideoWriteText(byte(x-1), byte(y-1), tile.Color, Chr(ch))
@@ -284,7 +284,7 @@ func BoardDrawTile(x, y int16) {
 		}
 
 	} else {
-		VideoWriteText(byte(x-1), byte(y-1), 0x07, '°')
+		VideoWriteText(byte(x-1), byte(y-1), 0x07, "\xb0")
 	}
 
 }
@@ -316,7 +316,7 @@ func SidebarPromptCharacter(editable bool, x, y int16, prompt string, value *byt
 	SidebarClearLine(y)
 	VideoWriteText(byte(x), byte(y), byte(int16(editable)+0x1E), prompt)
 	SidebarClearLine(y + 1)
-	VideoWriteText(byte(x+5), byte(y+1), 0x9F, '\x1f')
+	VideoWriteText(byte(x+5), byte(y+1), 0x9F, "\x1f")
 	SidebarClearLine(y + 2)
 	for {
 		for i = (*value - 4); i <= (*value + 4); i++ {
@@ -338,7 +338,7 @@ func SidebarPromptCharacter(editable bool, x, y int16, prompt string, value *byt
 			break
 		}
 	}
-	VideoWriteText(byte(x+5), byte(y+1), 0x1F, '\x1f')
+	VideoWriteText(byte(x+5), byte(y+1), 0x1F, "\x1f")
 }
 
 func SidebarPromptSlider(editable bool, x, y int16, prompt string, value *byte) {
@@ -364,7 +364,7 @@ func SidebarPromptSlider(editable bool, x, y int16, prompt string, value *byte) 
 			if InputJoystickMoved {
 				Delay(45)
 			}
-			VideoWriteText(byte(x+*value+1), byte(y+1), 0x9F, '\x1f')
+			VideoWriteText(byte(x+*value+1), byte(y+1), 0x9F, "\x1f")
 			InputUpdate()
 			if (InputKeyPressed >= '1') && (InputKeyPressed <= '9') {
 				*value = Ord(InputKeyPressed) - 49
@@ -381,7 +381,7 @@ func SidebarPromptSlider(editable bool, x, y int16, prompt string, value *byte) 
 			break
 		}
 	}
-	VideoWriteText(byte(x+*value+1), byte(y+1), 0x1F, '\x1f')
+	VideoWriteText(byte(x+*value+1), byte(y+1), 0x1F, "\x1f")
 }
 
 func SidebarPromptChoice(editable bool, y int16, prompt, choiceStr string, result *byte) {
@@ -410,7 +410,7 @@ func SidebarPromptChoice(editable bool, y int16, prompt, choiceStr string, resul
 			i++
 		}
 		if editable {
-			VideoWriteText(byte(62+i), byte(y+1), 0x9F, '\x1f')
+			VideoWriteText(byte(62+i), byte(y+1), 0x9F, "\x1f")
 			Delay(35)
 			InputUpdate()
 			newResult = *result + InputDeltaX
@@ -423,7 +423,7 @@ func SidebarPromptChoice(editable bool, y int16, prompt, choiceStr string, resul
 			break
 		}
 	}
-	VideoWriteText(byte(62+i), byte(y+1), 0x1F, '\x1f')
+	VideoWriteText(byte(62+i), byte(y+1), 0x1F, "\x1f")
 }
 
 func SidebarPromptDirection(editable bool, y int16, prompt string, deltaX, deltaY *int16) {
@@ -453,11 +453,11 @@ func PromptString(x, y, arrowColor, color, width int16, mode byte, buffer *strin
 	firstKeyPress = true
 	for {
 		for i = 0; i <= (width - 1); i++ {
-			VideoWriteText(byte(x+i), byte(y), byte(color), ' ')
-			VideoWriteText(byte(x+i), byte(y-1), byte(arrowColor), ' ')
+			VideoWriteText(byte(x+i), byte(y), byte(color), " ")
+			VideoWriteText(byte(x+i), byte(y-1), byte(arrowColor), " ")
 		}
-		VideoWriteText(byte(x+width), byte(y-1), byte(arrowColor), ' ')
-		VideoWriteText(byte(x+Length(*buffer)), byte(y-1), byte((arrowColor/0x10)*16+0x0F), '\x1f')
+		VideoWriteText(byte(x+width), byte(y-1), byte(arrowColor), " ")
+		VideoWriteText(byte(x+Length(*buffer)), byte(y-1), byte((arrowColor/0x10)*16+0x0F), "\x1f")
 		VideoWriteText(byte(x), byte(y), byte(color), *buffer)
 		InputReadWaitKey()
 		if (Length(*buffer) < width) && (InputKeyPressed >= ' ') && (InputKeyPressed < '\u0080') {
@@ -495,7 +495,7 @@ func SidebarPromptYesNo(message string, defaultReturn bool) (SidebarPromptYesNo 
 	SidebarClearLine(4)
 	SidebarClearLine(5)
 	VideoWriteText(63, 5, 0x1F, message)
-	VideoWriteText(63+Length(message), 5, 0x9E, '_')
+	VideoWriteText(63+Length(message), 5, 0x9E, "_")
 	for {
 		InputReadWaitKey()
 		if UpCase(InputKeyPressed) == KEY_ESCAPE || UpCase(InputKeyPressed) == 'N' || UpCase(InputKeyPressed) == 'Y' {
@@ -982,9 +982,9 @@ func GameUpdateSidebar() {
 		} else {
 			for i = 2; i <= 5; i++ {
 				if i <= ((World.Info.TorchTicks * 5) / TORCH_DURATION) {
-					VideoWriteText(byte(73+i), 9, 0x16, '±')
+					VideoWriteText(byte(73+i), 9, 0x16, "\xb1")
 				} else {
-					VideoWriteText(byte(73+i), 9, 0x16, '°')
+					VideoWriteText(byte(73+i), 9, 0x16, "\xb0")
 				}
 			}
 		}
@@ -992,7 +992,7 @@ func GameUpdateSidebar() {
 			if World.Info.Keys[i-1] {
 				VideoWriteText(byte(71+i), 12, byte(0x18+i), string(ElementDefs[E_KEY].Character))
 			} else {
-				VideoWriteText(byte(71+i), 12, 0x1F, ' ')
+				VideoWriteText(byte(71+i), 12, 0x1F, " ")
 			}
 		}
 		if SoundEnabled {
@@ -1349,7 +1349,7 @@ func GamePlayLoop(boardChanged bool) {
 				VideoWriteText(Board.Stats[0].X-1, Board.Stats[0].Y-1, ElementDefs[E_PLAYER].Color, string(ElementDefs[E_PLAYER].Character))
 			} else {
 				if Board.Tiles[Board.Stats[0].X][Board.Stats[0].Y].Element == E_PLAYER {
-					VideoWriteText(Board.Stats[0].X-1, Board.Stats[0].Y-1, 0x0F, ' ')
+					VideoWriteText(Board.Stats[0].X-1, Board.Stats[0].Y-1, 0x0F, " ")
 				} else {
 					BoardDrawTile(int16(Board.Stats[0].X), int16(Board.Stats[0].Y))
 				}
