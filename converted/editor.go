@@ -89,17 +89,17 @@ func EditorLoop() {
 		VideoWriteText(61, 19, 0x30, " C ")
 		VideoWriteText(64, 19, 0x1F, " Color:")
 		for i = 9; i <= 15; i++ {
-			VideoWriteText(61+i, 22, i, 'Û')
+			VideoWriteText(byte(61+i), 22, byte(i), 'Û')
 		}
 		for i = 1; i <= EditorPatternCount; i++ {
-			VideoWriteText(61+i, 22, 0x0F, ElementDefs[EditorPatterns[i-1]].Character)
+			VideoWriteText(byte(61+i), 22, 0x0F, string(ElementDefs[EditorPatterns[i-1]].Character))
 		}
 		if ElementDefs[copiedTile.Element].HasDrawProc {
 			ElementDefs[copiedTile.Element].DrawProc(copiedX, copiedY, &copiedChr)
 		} else {
 			copiedChr = Ord(ElementDefs[copiedTile.Element].Character)
 		}
-		VideoWriteText(62+EditorPatternCount, 22, copiedTile.Color, Chr(copiedChr))
+		VideoWriteText(byte(62+EditorPatternCount), 22, copiedTile.Color, Chr(copiedChr))
 		VideoWriteText(61, 24, 0x1F, " Mode:")
 	}
 
@@ -125,8 +125,8 @@ func EditorLoop() {
 		}
 
 		VideoWriteText(72, 19, 0x1E, ColorNames[(cursorColor-8)-1])
-		VideoWriteText(61+cursorPattern, 21, 0x1F, '\x1f')
-		VideoWriteText(61+cursorColor, 21, 0x1F, '\x1f')
+		VideoWriteText(byte(61+cursorPattern), 21, 0x1F, '\x1f')
+		VideoWriteText(byte(61+cursorColor), 21, 0x1F, '\x1f')
 	}
 
 	EditorDrawRefresh := func() {
@@ -149,7 +149,7 @@ func EditorLoop() {
 		copiedHasStat = false
 		copiedX = x
 		copiedY = y
-		EditorDrawTileAndNeighborsAt(x, y)
+		EditorDrawTileAndNeighborsAt(int16(x), int16(y))
 	}
 
 	EditorAskSaveChanged := func() {
@@ -189,7 +189,7 @@ func EditorLoop() {
 			}
 		} else if copiedHasStat {
 			if EditorPrepareModifyStatAtCursor() {
-				AddStat(x, y, copiedTile.Element, copiedTile.Color, copiedStat.Cycle, copiedStat)
+				AddStat(x, y, copiedTile.Element, int16(copiedTile.Color), copiedStat.Cycle, copiedStat)
 			}
 		} else {
 			if EditorPrepareModifyTile(x, y) {
@@ -237,7 +237,7 @@ func EditorLoop() {
 			state.Lines[1] = "      Can fire: " + numStr + " shots."
 			state.Lines[2] = " Board is dark: " + BoolToString(Board.Info.IsDark)
 			for i = 4; i <= 7; i++ {
-				state.Lines[i-1] = NeighborBoardStrs[i-4] + ": " + EditorGetBoardName(Board.Info.NeighborBoards[i-4], true)
+				state.Lines[i-1] = NeighborBoardStrs[i-4] + ": " + EditorGetBoardName(int16(Board.Info.NeighborBoards[i-4]), true)
 			}
 			state.Lines[7] = "Re-enter when zapped: " + BoolToString(Board.Info.ReenterWhenZapped)
 			Str(Board.Info.TimeLimitSec, numStr)
@@ -263,7 +263,7 @@ func EditorLoop() {
 				case 3:
 					Board.Info.IsDark = !Board.Info.IsDark
 				case 4, 5, 6, 7:
-					Board.Info.NeighborBoards[state.LinePos-4] = EditorSelectBoard(NeighborBoardStrs[state.LinePos-4], Board.Info.NeighborBoards[state.LinePos-4], true)
+					Board.Info.NeighborBoards[state.LinePos-4] = EditorSelectBoard(NeighborBoardStrs[state.LinePos-4], int16(Board.Info.NeighborBoards[state.LinePos-4]), true)
 					if Board.Info.NeighborBoards[state.LinePos-4] > World.BoardCount {
 						EditorAppendBoard()
 					}
@@ -351,9 +351,9 @@ func EditorLoop() {
 					if stat.P1 == 0 {
 						stat.P1 = World.EditorStatSettings[element].P1
 					}
-					BoardDrawTile(stat.X, stat.Y)
+					BoardDrawTile(int16(stat.X), int16(stat.Y))
 					SidebarPromptCharacter(selected, 63, iy, ElementDefs[element].Param1Name, &stat.P1)
-					BoardDrawTile(stat.X, stat.Y)
+					BoardDrawTile(int16(stat.X), int16(stat.Y))
 				}
 				if selected {
 					World.EditorStatSettings[element].P1 = stat.P1
@@ -393,7 +393,7 @@ func EditorLoop() {
 			}
 			if (InputKeyPressed != KEY_ESCAPE) && (Length(ElementDefs[element].ParamBoardName) != 0) {
 				if selected {
-					selectedBoard = EditorSelectBoard(ElementDefs[element].ParamBoardName, stat.P3, true)
+					selectedBoard = EditorSelectBoard(ElementDefs[element].ParamBoardName, int16(stat.P3), true)
 					if selectedBoard != 0 {
 						stat.P3 = selectedBoard
 						World.EditorStatSettings[element].P3 = World.Info.CurrentBoard
@@ -409,7 +409,7 @@ func EditorLoop() {
 					}
 					iy += 4
 				} else {
-					VideoWriteText(63, iy, 0x1F, "Room: "+Copy(EditorGetBoardName(stat.P3, true), 1, 10))
+					VideoWriteText(63, byte(iy), 0x1F, "Room: "+Copy(EditorGetBoardName(int16(stat.P3), true), 1, 10))
 				}
 			}
 
@@ -565,7 +565,7 @@ func EditorLoop() {
 			if cursorBlinker == 0 {
 				BoardDrawTile(cursorX, cursorY)
 			} else {
-				VideoWriteText(cursorX-1, cursorY-1, 0x0F, 'Å')
+				VideoWriteText(byte(cursorX-1), byte(cursorY-1), 0x0F, 'Å')
 			}
 			EditorUpdateSidebar()
 		} else {
@@ -616,7 +616,7 @@ func EditorLoop() {
 			if cursorY > BOARD_HEIGHT {
 				cursorY = BOARD_HEIGHT
 			}
-			VideoWriteText(cursorX-1, cursorY-1, 0x0F, 'Å')
+			VideoWriteText(byte(cursorX-1), byte(cursorY-1), 0x0F, 'Å')
 			if (InputKeyPressed == '\x00') && InputJoystickEnabled {
 				Delay(70)
 			}
@@ -714,7 +714,7 @@ func EditorLoop() {
 				drawMode = DrawingOff
 			}
 		case KEY_F1, KEY_F2, KEY_F3:
-			VideoWriteText(cursorX-1, cursorY-1, 0x0F, 'Å')
+			VideoWriteText(byte(cursorX-1), byte(cursorY-1), 0x0F, 'Å')
 			for i = 3; i <= 20; i++ {
 				SidebarClearLine(i)
 			}
@@ -731,11 +731,11 @@ func EditorLoop() {
 				if ElementDefs[iElem].EditorCategory == selectedCategory {
 					if Length(ElementDefs[iElem].CategoryName) != 0 {
 						i++
-						VideoWriteText(65, i, 0x1E, ElementDefs[iElem].CategoryName)
+						VideoWriteText(65, byte(i), 0x1E, ElementDefs[iElem].CategoryName)
 						i++
 					}
-					VideoWriteText(61, i, ((i%2)<<6)+0x30, ' '+ElementDefs[iElem].EditorShortcut+' ')
-					VideoWriteText(65, i, 0x1F, ElementDefs[iElem].Name)
+					VideoWriteText(61, byte(i), byte(((i%2)<<6)+0x30), ' '+ElementDefs[iElem].EditorShortcut+' ')
+					VideoWriteText(65, byte(i), 0x1F, ElementDefs[iElem].Name)
 					if ElementDefs[iElem].Color == COLOR_CHOICE_ON_BLACK {
 						elemMenuColor = (cursorColor % 0x10) + 0x10
 					} else if ElementDefs[iElem].Color == COLOR_WHITE_ON_CHOICE {
@@ -748,7 +748,7 @@ func EditorLoop() {
 						elemMenuColor = ElementDefs[iElem].Color
 					}
 
-					VideoWriteText(78, i, elemMenuColor, ElementDefs[iElem].Character)
+					VideoWriteText(78, byte(i), byte(elemMenuColor), string(ElementDefs[iElem].Character))
 					i++
 				}
 			}
@@ -772,11 +772,11 @@ func EditorLoop() {
 
 						if ElementDefs[iElem].Cycle == -1 {
 							if EditorPrepareModifyTile(cursorX, cursorY) {
-								EditorSetAndCopyTile(cursorX, cursorY, iElem, elemMenuColor)
+								EditorSetAndCopyTile(byte(cursorX), byte(cursorY), byte(iElem), byte(elemMenuColor))
 							}
 						} else {
 							if EditorPrepareModifyStatAtCursor() {
-								AddStat(cursorX, cursorY, iElem, elemMenuColor, ElementDefs[iElem].Cycle, StatTemplateDefault)
+								AddStat(cursorX, cursorY, byte(iElem), elemMenuColor, ElementDefs[iElem].Cycle, StatTemplateDefault)
 								stat := &Board.Stats[Board.StatCount]
 								if Length(ElementDefs[iElem].Param1Name) != 0 {
 									stat.P1 = World.EditorStatSettings[iElem].P1

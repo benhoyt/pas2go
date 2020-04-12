@@ -12,6 +12,7 @@ ISSUES:
 - OopParseDirection and OopCheckCondition calls themselves - causes naming issue with named return value
 
 NICE TO HAVES:
+- consider changing VideoWriteText x,y params to int16 instead of byte -- fewer type conversions
 - uses operator precedence rather than ParenExpr
 */
 
@@ -40,13 +41,13 @@ func Convert(file File, units []*Unit, w io.Writer) {
 
 	// Builtin functions
 	// TODO
-
-	// TODO: hack - TVideoLine is defined in VIDEO.PAS - do this in separate file
-	c.defineType("TVideoLine", &StringSpec{80})
-	c.defineType("VideoWriteText", &ProcSpec{[]*ParamGroup{
+	c.defineVar("VideoWriteText", &ProcSpec{[]*ParamGroup{
 		{false, []string{"x", "y", "color"}, &TypeIdent{"byte"}},
 		{false, []string{"text"}, &TypeIdent{"string"}},
 	}})
+
+	// TODO: hack - TVideoLine is defined in VIDEO.PAS - do this in separate file
+	c.defineType("TVideoLine", &StringSpec{80})
 
 	// TODO: turn panics into ConvertError and catch
 
@@ -650,12 +651,12 @@ func (c *converter) stmt(stmt Stmt) {
 		case "str":
 			if widthExpr, isWidth := stmt.Args[0].(*WidthExpr); isWidth {
 				c.print("StrWidth(")
-				c.procArg(false, stmt.Args[0])
+				c.procArg(false, KindUnknown, stmt.Args[0])
 				c.printf(", %d", widthExpr.Width.(*ConstExpr).Value.(int))
 				c.print(", ")
 			} else {
 				c.print("Str(")
-				c.procArg(false, stmt.Args[0])
+				c.procArg(false, KindUnknown, stmt.Args[0])
 				c.print(", ")
 			}
 			c.expr(stmt.Args[1])
@@ -731,9 +732,12 @@ func (c *converter) stmt(stmt Stmt) {
 
 func (c *converter) procArgs(params []*ParamGroup, args []Expr) {
 	isVars := []bool{}
+	kinds := []Kind{}
 	for _, group := range params {
 		for range group.Names {
 			isVars = append(isVars, group.IsVar)
+			spec := &IdentSpec{group.Type}
+			kinds = append(kinds, c.specToKind(spec))
 		}
 	}
 	for i, arg := range args {
@@ -743,14 +747,24 @@ func (c *converter) procArgs(params []*ParamGroup, args []Expr) {
 		if params != nil {
 			// TODO: this means builtin functions will have targetIsVar=false,
 			// but that's not true of some, eg: Dec() -- need to define these manually?
-			c.procArg(isVars[i], arg)
+			c.procArg(isVars[i], kinds[i], arg)
 		} else {
-			c.procArg(false, arg)
+			c.procArg(false, KindUnknown, arg)
 		}
 	}
 }
 
-func (c *converter) procArg(targetIsVar bool, arg Expr) {
+func (c *converter) procArg(targetIsVar bool, targetKind Kind, arg Expr) {
+	kind := c.exprKind(arg)
+	converted := false
+	if kind != KindUnknown && targetKind != KindUnknown && kind != targetKind {
+		if kind == KindNumber && (targetKind == KindByte || targetKind == KindInteger) {
+			// no need for conversion
+		} else {
+			converted = true
+			c.print(targetKind, "(")
+		}
+	}
 	switch arg := arg.(type) {
 	case *IdentExpr:
 		isVar := c.isVarParam(arg.Name)
@@ -781,6 +795,9 @@ func (c *converter) procArg(targetIsVar bool, arg Expr) {
 		c.expr(arg)
 	default:
 		c.expr(arg)
+	}
+	if converted {
+		c.print(")")
 	}
 }
 
@@ -1124,5 +1141,179 @@ func bitwiseOperatorStr(op Token) string {
 		return "^"
 	default:
 		panic(fmt.Sprintf("unexpected operator: %s", op))
+	}
+}
+
+type Kind uint8
+
+const (
+	KindUnknown Kind = iota
+	KindBoolean
+	KindByte
+	KindInteger
+	KindReal
+	KindNumber
+	KindString
+)
+
+func (k Kind) String() string {
+	switch k {
+	case KindBoolean:
+		return "bool"
+	case KindByte:
+		return "byte"
+	case KindInteger:
+		return "int16"
+	case KindReal:
+		return "float64"
+	case KindNumber:
+		return "number"
+	case KindString:
+		return "string"
+	default:
+		return "unknown"
+	}
+}
+
+func (c *converter) exprKind(expr Expr) Kind {
+	switch expr := expr.(type) {
+	case *BinaryExpr:
+		switch expr.Op {
+		case EQUALS, NOT_EQUALS, LESS, LTE, GREATER, GTE, IN:
+			return KindBoolean
+		case PLUS:
+			left := c.exprKind(expr.Left)
+			right := c.exprKind(expr.Right)
+			if left == KindString || right == KindString {
+				return KindString
+			}
+			fallthrough
+		case MINUS, OR, XOR, STAR, SLASH, DIV, MOD, AND:
+			left := c.exprKind(expr.Left)
+			right := c.exprKind(expr.Right)
+			for _, kind := range []Kind{KindReal, KindInteger, KindByte, KindBoolean} {
+				if left == kind || right == kind {
+					return kind
+				}
+			}
+			return KindNumber
+		case SHL, SHR:
+			return c.exprKind(expr.Left)
+		default:
+			return KindUnknown
+		}
+	case *ConstExpr:
+		switch expr.Value.(type) {
+		case bool:
+			return KindBoolean
+		case int:
+			return KindNumber
+		case float64:
+			return KindReal
+		case string:
+			return KindString // TODO: may be char
+		default:
+			return KindUnknown
+		}
+	case *ConstArrayExpr:
+		if len(expr.Values) == 0 {
+			return KindUnknown
+		}
+		return c.exprKind(expr.Values[0])
+	case *ConstRecordExpr:
+		return KindUnknown
+	case *FuncExpr:
+		spec, _ := c.lookupVarExprType(expr.Func)
+		if spec == nil {
+			return KindUnknown
+		}
+		resultTypeName := spec.(*FuncSpec).Result.Name
+		spec = c.lookupType(resultTypeName)
+		return c.specToKind(spec) // TODO: could do some of the above in specToKind?
+	case *ParenExpr:
+		return c.exprKind(expr.Expr)
+	case *RangeExpr:
+		return c.exprKind(expr.Min)
+	case *SetExpr:
+		if len(expr.Values) == 0 {
+			return KindUnknown
+		}
+		return c.exprKind(expr.Values[0])
+	case *TypeConvExpr:
+		return c.specToKind(&IdentSpec{expr.Type})
+	case *UnaryExpr:
+		return c.exprKind(expr.Expr)
+	case *AtExpr:
+		return c.exprKind(expr.Expr) // TODO: hmmm
+	case *DotExpr:
+		spec, _ := c.lookupVarExprType(expr.Record)
+		if spec == nil {
+			return KindUnknown
+		}
+		spec = findField(spec.(*RecordSpec), expr.Field)
+		return c.specToKind(spec)
+	case *IdentExpr:
+		_, spec := c.lookupVarType(expr.Name)
+		return c.specToKind(spec)
+	case *IndexExpr:
+		spec, _ := c.lookupVarExprType(expr.Array)
+		switch specTyped := spec.(type) {
+		case *ArraySpec:
+			spec = specTyped.Of
+		case *StringSpec:
+			return KindByte
+		case *IdentSpec:
+		case *PointerSpec:
+			spec = &IdentSpec{specTyped.Type}
+		default:
+			spec = nil
+		}
+		return c.specToKind(spec)
+	case *PointerExpr:
+		spec, _ := c.lookupVarExprType(expr.Expr) // TODO: dereference?
+		return c.specToKind(spec)
+	case *WidthExpr:
+		return KindUnknown
+	default:
+		panic(fmt.Sprintf("exprKind: unexpected Expr type %T", expr))
+	}
+}
+
+func (c *converter) specToKind(spec TypeSpec) Kind {
+	switch spec := spec.(type) {
+	case *FuncSpec:
+		return c.specToKind(&IdentSpec{&TypeIdent{spec.Result.Name}})
+	case *ProcSpec:
+		return KindUnknown
+	case *ScalarSpec:
+		return KindByte
+	case *IdentSpec:
+		switch strings.ToLower(spec.Type.Name) {
+		case "byte", "char":
+			return KindByte
+		case "boolean":
+			return KindBoolean
+		case "integer":
+			return KindInteger
+		case "real":
+			return KindReal
+		case "string":
+			return KindString
+		default:
+			targetSpec := c.lookupType(spec.Type.Name)
+			return c.specToKind(targetSpec)
+		}
+	case *StringSpec:
+		return KindString
+	case *ArraySpec:
+		return KindUnknown
+	case *RecordSpec:
+		return KindUnknown
+	case *FileSpec:
+		return KindUnknown
+	case *PointerSpec:
+		return c.specToKind(&IdentSpec{&TypeIdent{spec.Type.Name}}) // TODO: hmm
+	default:
+		return KindUnknown
 	}
 }

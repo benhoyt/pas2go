@@ -100,7 +100,7 @@ func OopParseDirection(statId int16, position *int16, dx, dy *int16) (OopParseDi
 		*dx = 0
 		*dy = 0
 	} else if OopWord == "SEEK" {
-		CalcDirectionSeek(stat.X, stat.Y, dx, dy)
+		CalcDirectionSeek(int16(stat.X), int16(stat.Y), dx, dy)
 	} else if OopWord == "FLOW" {
 		*dx = stat.StepX
 		*dy = stat.StepY
@@ -398,7 +398,7 @@ func OopPlaceTile(x, y int16, tile *TTile) {
 		} else {
 			BoardDamageTile(x, y)
 			if ElementDefs[tile.Element].Cycle >= 0 {
-				AddStat(x, y, tile.Element, color, ElementDefs[tile.Element].Cycle, StatTemplateDefault)
+				AddStat(x, y, tile.Element, int16(color), ElementDefs[tile.Element].Cycle, StatTemplateDefault)
 			} else {
 				Board.Tiles[x][y].Element = tile.Element
 				Board.Tiles[x][y].Color = color
@@ -606,13 +606,13 @@ StartParsing:
 					}
 				} else if OopWord == "SHOOT" {
 					OopReadDirection(statId, position, &deltaX, &deltaY)
-					if BoardShoot(E_BULLET, stat.X, stat.Y, deltaX, deltaY, SHOT_SOURCE_ENEMY) {
+					if BoardShoot(E_BULLET, int16(stat.X), int16(stat.Y), deltaX, deltaY, SHOT_SOURCE_ENEMY) {
 						SoundQueue(2, "0\x01&\x01")
 					}
 					stopRunning = true
 				} else if OopWord == "THROWSTAR" {
 					OopReadDirection(statId, position, &deltaX, &deltaY)
-					if BoardShoot(E_STAR, stat.X, stat.Y, deltaX, deltaY, SHOT_SOURCE_ENEMY) {
+					if BoardShoot(E_STAR, int16(stat.X), int16(stat.Y), deltaX, deltaY, SHOT_SOURCE_ENEMY) {
 					}
 					stopRunning = true
 				} else if (OopWord == "GIVE") || (OopWord == "TAKE") {
@@ -744,7 +744,7 @@ StartParsing:
 					OopReadValue(statId, position)
 					if (OopValue > 0) && (OopValue <= 255) {
 						stat.P1 = OopValue
-						BoardDrawTile(stat.X, stat.Y)
+						BoardDrawTile(int16(stat.X), int16(stat.Y))
 					}
 				} else if OopWord == "DIE" {
 					replaceStat = true
