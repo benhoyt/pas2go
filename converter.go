@@ -1291,7 +1291,7 @@ func (c *converter) exprKind(expr Expr) Kind {
 func (c *converter) specToKind(spec TypeSpec) Kind {
 	switch spec := spec.(type) {
 	case *FuncSpec:
-		return c.specToKind(&IdentSpec{&TypeIdent{spec.Result.Name}})
+		return c.typeNameToKind(spec.Result.Name)
 	case *ProcSpec:
 		return KindUnknown
 	case *ScalarSpec:
@@ -1307,7 +1307,7 @@ func (c *converter) specToKind(spec TypeSpec) Kind {
 	case *FileSpec:
 		return KindUnknown
 	case *PointerSpec:
-		return c.specToKind(&IdentSpec{&TypeIdent{spec.Type.Name}}) // TODO: hmm
+		return c.typeNameToKind(spec.Type.Name)
 	default:
 		return KindUnknown
 	}
