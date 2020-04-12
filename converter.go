@@ -43,6 +43,10 @@ func Convert(file File, units []*Unit, w io.Writer) {
 
 	// TODO: hack - TVideoLine is defined in VIDEO.PAS - do this in separate file
 	c.defineType("TVideoLine", &StringSpec{80})
+	c.defineType("VideoWriteText", &ProcSpec{[]*ParamGroup{
+		{false, []string{"x", "y", "color"}, &TypeIdent{"byte"}},
+		{false, []string{"text"}, &TypeIdent{"string"}},
+	}})
 
 	// TODO: turn panics into ConvertError and catch
 
