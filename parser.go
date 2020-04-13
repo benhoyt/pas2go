@@ -683,7 +683,7 @@ func (p *parser) factor() Expr {
 		return &ConstExpr{nil, false}
 	case IDENT, AT:
 		ts := strings.ToLower(p.val)
-		if p.tok == IDENT && (ts == "char" || ts == "boolean" || ts == "integer" || ts == "real" || ts == "string") {
+		if p.tok == IDENT && (ts == "byte" || ts == "char" || ts == "boolean" || ts == "integer" || ts == "real" || ts == "string") {
 			val := p.val
 			p.next()
 			p.expect(LPAREN)

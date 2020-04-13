@@ -19,12 +19,9 @@
 ./elements.go:27:81: invalid operation: ' ' + Board.Info.Message (mismatched types rune and string)
 ./game.go:69:6: cannot use IoTmpBuf (type *TIoTmpBuf) as type uintptr in assignment
 ./game.go:107:37: type TStat is not an expression
-./game.go:317:45: cannot convert editable (type bool) to type int16
 ./game.go:322:9: cannot use *value - 4 (type byte) as type int16 in assignment
-./game.go:358:45: cannot convert editable (type bool) to type int16
 ./game.go:361:52: cannot convert "....:...." (type untyped string) to type byte
 ./game.go:361:52: invalid operation: startChar + "....:...." (mismatched types byte and string)
-./game.go:395:40: cannot convert editable (type bool) to type int16
 ./game.go:470:14: invalid operation: *buffer += InputKeyPressed (mismatched types string and byte)
 ./game.go:473:13: invalid operation: *buffer += InputKeyPressed (mismatched types string and byte)
 ./game.go:476:14: invalid operation: *buffer += UpCase(InputKeyPressed) (mismatched types string and byte)

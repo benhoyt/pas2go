@@ -109,6 +109,13 @@ func Trunc(x float64) int16 {
 	return int16(x)
 }
 
+func BoolToInt(b bool) int16 {
+	if b {
+		return 1
+	}
+	return 0
+}
+
 // File functions
 
 type File struct {

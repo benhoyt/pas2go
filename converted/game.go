@@ -314,7 +314,7 @@ func TransitionDrawToBoard() {
 func SidebarPromptCharacter(editable bool, x, y int16, prompt string, value *byte) {
 	var i, newValue int16
 	SidebarClearLine(y)
-	VideoWriteText(byte(x), byte(y), byte(int16(editable)+0x1E), prompt)
+	VideoWriteText(byte(x), byte(y), byte(BoolToInt(editable)+0x1E), prompt)
 	SidebarClearLine(y + 1)
 	VideoWriteText(byte(x+5), byte(y+1), 0x9F, "\x1f")
 	SidebarClearLine(y + 2)
@@ -355,7 +355,7 @@ func SidebarPromptSlider(editable bool, x, y int16, prompt string, value *byte) 
 		endChar = '9'
 	}
 	SidebarClearLine(y)
-	VideoWriteText(byte(x), byte(y), byte(int16(editable)+0x1E), prompt)
+	VideoWriteText(byte(x), byte(y), byte(BoolToInt(editable)+0x1E), prompt)
 	SidebarClearLine(y + 1)
 	SidebarClearLine(y + 2)
 	VideoWriteText(byte(x), byte(y+2), 0x1E, startChar+"....:...."+endChar)
@@ -392,7 +392,7 @@ func SidebarPromptChoice(editable bool, y int16, prompt, choiceStr string, resul
 	SidebarClearLine(y)
 	SidebarClearLine(y + 1)
 	SidebarClearLine(y + 2)
-	VideoWriteText(63, byte(y), byte(int16(editable)+0x1E), prompt)
+	VideoWriteText(63, byte(y), byte(BoolToInt(editable)+0x1E), prompt)
 	VideoWriteText(63, byte(y+2), 0x1E, choiceStr)
 	choiceCount = 1
 	for i = 1; i <= Length(choiceStr); i++ {
