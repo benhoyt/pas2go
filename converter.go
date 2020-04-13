@@ -697,13 +697,13 @@ func (c *converter) stmt(stmt Stmt) {
 			if widthExpr, isWidth := stmt.Args[0].(*WidthExpr); isWidth {
 				c.expr(stmt.Args[1])
 				c.print(" = StrWidth(")
-				c.procArg(false, KindUnknown, stmt.Args[0])
+				c.procArg(false, KindInteger, stmt.Args[0])
 				c.printf(", %d", widthExpr.Width.(*ConstExpr).Value.(int))
 				c.print(")")
 			} else {
 				c.expr(stmt.Args[1])
 				c.print(" = Str(")
-				c.procArg(false, KindUnknown, stmt.Args[0])
+				c.procArg(false, KindInteger, stmt.Args[0])
 				c.print(")")
 			}
 		case "val":

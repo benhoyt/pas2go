@@ -233,7 +233,7 @@ func EditorLoop() {
 				New(*state.Lines[i-1])
 			}
 			state.Lines[0] = "         Title: " + Board.Name
-			numStr = Str(Board.Info.MaxShots)
+			numStr = Str(int16(Board.Info.MaxShots))
 			state.Lines[1] = "      Can fire: " + numStr + " shots."
 			state.Lines[2] = " Board is dark: " + BoolToString(Board.Info.IsDark)
 			for i = 4; i <= 7; i++ {
@@ -254,7 +254,7 @@ func EditorLoop() {
 					exitRequested = true
 					TextWindowDrawClose(&state)
 				case 2:
-					numStr = Str(Board.Info.MaxShots)
+					numStr = Str(int16(Board.Info.MaxShots))
 					SidebarPromptString("Maximum shots?", "", &numStr, PROMPT_NUMERIC)
 					if Length(numStr) != 0 {
 						Board.Info.MaxShots, i = Val(numStr)
