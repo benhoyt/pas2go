@@ -42,7 +42,7 @@ func Convert(file File, units []*Unit, w io.Writer) {
 		c.units[strings.ToLower(unit.Name)] = unit
 	}
 	c.types = make(map[string]TypeSpec)
-	c.pushScope(ScopeGlobal, "")
+	c.pushScope(ScopeGlobal)
 
 	// Port is predefined by Turbo Pascal, fake it
 	min := &ConstExpr{0, false}
@@ -92,6 +92,7 @@ type converter struct {
 type Scope struct {
 	Type      ScopeType
 	WithName  string
+	WithExpr  Expr
 	Vars      map[string]TypeSpec
 	VarParams map[string]struct{}
 }
@@ -105,9 +106,19 @@ const (
 	ScopeWith
 )
 
-func (c *converter) pushScope(typ ScopeType, withName string) {
-	scope := Scope{typ, withName, make(map[string]TypeSpec), make(map[string]struct{})}
+func (c *converter) pushScope(typ ScopeType) {
+	scope := Scope{
+		Type:      typ,
+		Vars:      make(map[string]TypeSpec),
+		VarParams: make(map[string]struct{}),
+	}
 	c.scopes = append(c.scopes, scope)
+}
+
+func (c *converter) pushWithScope(withName string, withExpr Expr) {
+	c.pushScope(ScopeWith)
+	c.scopes[len(c.scopes)-1].WithName = withName
+	c.scopes[len(c.scopes)-1].WithExpr = withExpr
 }
 
 func (c *converter) popScope() {
@@ -184,6 +195,11 @@ func (c *converter) lookupVarExprType(expr Expr) (TypeSpec, string) {
 			panic(fmt.Sprintf("field not found: %q", expr.Field))
 		}
 	case *IdentExpr:
+		scope, varSpec := c.lookupVarType(expr.Name)
+		if varSpec != nil && scope.Type == ScopeWith {
+			fullExpr := &DotExpr{scope.WithExpr, expr.Name}
+			return c.lookupVarExprType(fullExpr)
+		}
 		fieldName = expr.Name
 		_, spec = c.lookupVarType(expr.Name)
 	case *IndexExpr:
@@ -216,7 +232,7 @@ func (c *converter) lookupIdentSpec(spec TypeSpec) TypeSpec {
 		return spec
 	}
 	n := strings.ToLower(ident.Type.Name)
-	if n == "char" || n == "boolean" || n == "integer" || n == "real" || n == "string" {
+	if n == "byte" || n == "char" || n == "boolean" || n == "integer" || n == "real" || n == "string" {
 		return spec // builtin type
 	}
 	spec = c.lookupType(ident.Type.Name)
@@ -412,7 +428,7 @@ func (c *converter) decl(decl DeclPart, isMain bool) {
 		c.typeIdent(decl.Result)
 		c.print(") {\n")
 
-		c.pushScope(ScopeLocal, "")
+		c.pushScope(ScopeLocal)
 		c.defineParams(decl.Params)
 		c.defineDecls(decl.Decls)
 		c.decls(decl.Decls, false)
@@ -434,7 +450,7 @@ func (c *converter) decl(decl DeclPart, isMain bool) {
 		c.params(decl.Params)
 		c.print(") {\n")
 
-		c.pushScope(ScopeLocal, "")
+		c.pushScope(ScopeLocal)
 		c.defineParams(decl.Params)
 		c.defineDecls(decl.Decls)
 		c.decls(decl.Decls, false)
@@ -516,7 +532,7 @@ func (c *converter) typeIdent(typ *TypeIdent) {
 	}
 	var s string
 	switch strings.ToLower(typ.Name) {
-	case "char":
+	case "byte", "char":
 		s = "byte"
 	case "boolean":
 		s = "bool"
@@ -745,7 +761,7 @@ func (c *converter) stmt(stmt Stmt) {
 			c.print("\n")
 			c.defineWithVar(withName)
 		}
-		c.pushScope(ScopeWith, withName)
+		c.pushWithScope(withName, stmt.Var)
 		for _, section := range record.Sections {
 			for _, name := range section.Names {
 				c.defineVar(name, section.Type)
@@ -1308,7 +1324,11 @@ func (c *converter) exprKind(expr Expr) Kind {
 		spec = findField(spec.(*RecordSpec), expr.Field)
 		return c.specToKind(spec)
 	case *IdentExpr:
-		_, spec := c.lookupVarType(expr.Name)
+		scope, spec := c.lookupVarType(expr.Name)
+		if spec != nil && scope.Type == ScopeWith {
+			fullExpr := &DotExpr{scope.WithExpr, expr.Name}
+			return c.exprKind(fullExpr)
+		}
 		return c.specToKind(spec)
 	case *IndexExpr:
 		spec, _ := c.lookupVarExprType(expr.Array)

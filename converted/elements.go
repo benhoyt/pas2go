@@ -671,7 +671,7 @@ func ElementSlimeTick(statId int16) {
 			if ElementDefs[Board.Tiles[startX+NeighborDeltaX[dir]][startY+NeighborDeltaY[dir]].Element].Walkable {
 				if changedTiles == 0 {
 					MoveStat(statId, startX+NeighborDeltaX[dir], startY+NeighborDeltaY[dir])
-					Board.Tiles[startX][startY].Color = color
+					Board.Tiles[startX][startY].Color = byte(color)
 					Board.Tiles[startX][startY].Element = E_BREAKABLE
 					BoardDrawTile(startX, startY)
 				} else {
@@ -684,7 +684,7 @@ func ElementSlimeTick(statId int16) {
 		if changedTiles == 0 {
 			RemoveStat(statId)
 			Board.Tiles[startX][startY].Element = E_BREAKABLE
-			Board.Tiles[startX][startY].Color = color
+			Board.Tiles[startX][startY].Color = byte(color)
 			BoardDrawTile(startX, startY)
 		}
 	}
@@ -696,7 +696,7 @@ func ElementSlimeTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16) {
 	color = int16(Board.Tiles[x][y].Color)
 	DamageStat(GetStatIdAt(x, y))
 	Board.Tiles[x][y].Element = E_BREAKABLE
-	Board.Tiles[x][y].Color = color
+	Board.Tiles[x][y].Color = byte(color)
 	BoardDrawTile(x, y)
 	SoundQueue(2, " \x01#\x01")
 }
@@ -778,7 +778,7 @@ func ElementBlinkWallTick(statId int16) {
 					}
 				}
 				if Board.Tiles[ix][iy].Element == E_EMPTY {
-					Board.Tiles[ix][iy].Element = el
+					Board.Tiles[ix][iy].Element = byte(el)
 					Board.Tiles[ix][iy].Color = Board.Tiles[stat.X][stat.Y].Color
 					BoardDrawTile(ix, iy)
 				} else {
@@ -1203,7 +1203,7 @@ func ElementPlayerTick(statId int16) {
 		if (CurrentTick % 2) != 0 {
 			Board.Tiles[stat.X][stat.Y].Color = 0x0F
 		} else {
-			Board.Tiles[stat.X][stat.Y].Color = (((CurrentTick % 7) + 1) * 16) + 0x0F
+			Board.Tiles[stat.X][stat.Y].Color = byte((((CurrentTick % 7) + 1) * 16) + 0x0F)
 		}
 		BoardDrawTile(int16(stat.X), int16(stat.Y))
 	} else if (Board.Tiles[stat.X][stat.Y].Color != 0x1F) || (ElementDefs[E_PLAYER].Character != '\x02') {

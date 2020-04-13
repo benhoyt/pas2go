@@ -326,7 +326,7 @@ func OopParseTile(statId, position *int16, tile *TTile) (OopParseTile bool) {
 	OopReadWord(*statId, position)
 	for i = 1; i <= 7; i++ {
 		if OopWord == OopStringToWord(ColorNames[i-1]) {
-			tile.Color = i + 0x08
+			tile.Color = byte(i + 0x08)
 			OopReadWord(*statId, position)
 			goto ColorFound
 		}
@@ -335,7 +335,7 @@ ColorFound:
 	for i = 0; i <= MAX_ELEMENT; i++ {
 		if OopWord == OopStringToWord(ElementDefs[i].Name) {
 			OopParseTile = true
-			tile.Element = i
+			tile.Element = byte(i)
 			return
 		}
 	}
@@ -743,7 +743,7 @@ StartParsing:
 				} else if OopWord == "CHAR" {
 					OopReadValue(statId, position)
 					if (OopValue > 0) && (OopValue <= 255) {
-						stat.P1 = OopValue
+						stat.P1 = byte(OopValue)
 						BoardDrawTile(int16(stat.X), int16(stat.Y))
 					}
 				} else if OopWord == "DIE" {

@@ -330,7 +330,7 @@ func SidebarPromptCharacter(editable bool, x, y int16, prompt string, value *byt
 			}
 			newValue = *value + InputDeltaX
 			if *value != newValue {
-				*value = (newValue + 0x100) % 0x100
+				*value = byte((newValue + 0x100) % 0x100)
 				SidebarClearLine(y + 2)
 			}
 		}
@@ -372,7 +372,7 @@ func SidebarPromptSlider(editable bool, x, y int16, prompt string, value *byte) 
 			} else {
 				newValue = *value + InputDeltaX
 				if (*value != newValue) && (newValue >= 0) && (newValue <= 8) {
-					*value = newValue
+					*value = byte(newValue)
 					SidebarClearLine(y + 1)
 				}
 			}
@@ -415,7 +415,7 @@ func SidebarPromptChoice(editable bool, y int16, prompt, choiceStr string, resul
 			InputUpdate()
 			newResult = *result + InputDeltaX
 			if (*result != newResult) && (newResult >= 0) && (newResult <= (choiceCount - 1)) {
-				*result = newResult
+				*result = byte(newResult)
 				SidebarClearLine(y + 1)
 			}
 		}
@@ -759,8 +759,8 @@ func AddStat(tx, ty int16, element byte, color, tcycle int16, template TStat) {
 		Board.StatCount++
 		Board.Stats[Board.StatCount] = template
 		stat := &Board.Stats[Board.StatCount]
-		stat.X = tx
-		stat.Y = ty
+		stat.X = byte(tx)
+		stat.Y = byte(ty)
 		stat.Cycle = tcycle
 		stat.Under = Board.Tiles[tx][ty]
 		stat.DataPos = 0
@@ -770,9 +770,9 @@ func AddStat(tx, ty int16, element byte, color, tcycle int16, template TStat) {
 			Move(*template.Data, *Board.Stats[Board.StatCount].Data, template.DataLen)
 		}
 		if ElementDefs[Board.Tiles[tx][ty].Element].PlaceableOnTop {
-			Board.Tiles[tx][ty].Color = (color & 0x0F) + (Board.Tiles[tx][ty].Color & 0x70)
+			Board.Tiles[tx][ty].Color = byte((color & 0x0F) + (Board.Tiles[tx][ty].Color & 0x70))
 		} else {
-			Board.Tiles[tx][ty].Color = color
+			Board.Tiles[tx][ty].Color = byte(color)
 		}
 		Board.Tiles[tx][ty].Element = element
 		if ty > 0 {
@@ -887,8 +887,8 @@ func MoveStat(statId int16, newX, newY int16) {
 	Board.Tiles[stat.X][stat.Y] = iUnder
 	oldX = int16(stat.X)
 	oldY = int16(stat.Y)
-	stat.X = newX
-	stat.Y = newY
+	stat.X = byte(newX)
+	stat.Y = byte(newY)
 	BoardDrawTile(int16(stat.X), int16(stat.Y))
 	BoardDrawTile(oldX, oldY)
 	if (statId == 0) && Board.Info.IsDark && (World.Info.TorchTicks > 0) {
@@ -1014,7 +1014,7 @@ func DisplayMessage(time int16, message string) {
 	}
 	if Length(message) != 0 {
 		AddStat(0, 0, E_MESSAGE_TIMER, 0, 1, StatTemplateDefault)
-		Board.Stats[Board.StatCount].P2 = Time / (TickTimeDuration + 1)
+		Board.Stats[Board.StatCount].P2 = byte(Time / (TickTimeDuration + 1))
 		Board.Info.Message = message
 	}
 }
@@ -1094,7 +1094,7 @@ func BoardShoot(element byte, tx, ty, deltaX, deltaY int16, source int16) (Board
 	if ElementDefs[Board.Tiles[tx+deltaX][ty+deltaY].Element].Walkable || (Board.Tiles[tx+deltaX][ty+deltaY].Element == E_WATER) {
 		AddStat(tx+deltaX, ty+deltaY, element, int16(ElementDefs[element].Color), 1, StatTemplateDefault)
 		stat := &Board.Stats[Board.StatCount]
-		stat.P1 = source
+		stat.P1 = byte(source)
 		stat.StepX = deltaX
 		stat.StepY = deltaY
 		stat.P2 = 100
@@ -1173,8 +1173,8 @@ func BoardPassageTeleport(x, y int16) {
 	Board.Tiles[Board.Stats[0].X][Board.Stats[0].Y].Element = E_EMPTY
 	Board.Tiles[Board.Stats[0].X][Board.Stats[0].Y].Color = 0
 	if newX != 0 {
-		Board.Stats[0].X = newX
-		Board.Stats[0].Y = newY
+		Board.Stats[0].X = byte(newX)
+		Board.Stats[0].Y = byte(newY)
 	}
 	GamePaused = true
 	SoundQueue(4, "0\x014\x017\x011\x015\x018\x012\x016\x019\x013\x017\x01:\x014\x018\x01@\x01")
@@ -1326,7 +1326,7 @@ func GamePlayLoop(boardChanged bool) {
 		BoardChange(0)
 		JustStarted = false
 	}
-	Board.Tiles[Board.Stats[0].X][Board.Stats[0].Y].Element = GameStateElement
+	Board.Tiles[Board.Stats[0].X][Board.Stats[0].Y].Element = byte(GameStateElement)
 	Board.Tiles[Board.Stats[0].X][Board.Stats[0].Y].Color = ElementDefs[GameStateElement].Color
 	if GameStateElement == E_MONITOR {
 		DisplayMessage(0, "")

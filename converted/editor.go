@@ -185,7 +185,7 @@ func EditorLoop() {
 		if cursorPattern <= EditorPatternCount {
 			if EditorPrepareModifyTile(x, y) {
 				tile.Element = EditorPatterns[cursorPattern-1]
-				tile.Color = cursorColor
+				tile.Color = byte(cursorColor)
 			}
 		} else if copiedHasStat {
 			if EditorPrepareModifyStatAtCursor() {
@@ -263,7 +263,7 @@ func EditorLoop() {
 				case 3:
 					Board.Info.IsDark = !Board.Info.IsDark
 				case 4, 5, 6, 7:
-					Board.Info.NeighborBoards[state.LinePos-4] = EditorSelectBoard(NeighborBoardStrs[state.LinePos-4], int16(Board.Info.NeighborBoards[state.LinePos-4]), true)
+					Board.Info.NeighborBoards[state.LinePos-4] = byte(EditorSelectBoard(NeighborBoardStrs[state.LinePos-4], int16(Board.Info.NeighborBoards[state.LinePos-4]), true))
 					if Board.Info.NeighborBoards[state.LinePos-4] > World.BoardCount {
 						EditorAppendBoard()
 					}
@@ -393,10 +393,10 @@ func EditorLoop() {
 			}
 			if (InputKeyPressed != KEY_ESCAPE) && (Length(ElementDefs[element].ParamBoardName) != 0) {
 				if selected {
-					selectedBoard = EditorSelectBoard(ElementDefs[element].ParamBoardName, int16(stat.P3), true)
+					selectedBoard = byte(EditorSelectBoard(ElementDefs[element].ParamBoardName, int16(stat.P3), true))
 					if selectedBoard != 0 {
 						stat.P3 = selectedBoard
-						World.EditorStatSettings[element].P3 = World.Info.CurrentBoard
+						World.EditorStatSettings[element].P3 = byte(World.Info.CurrentBoard)
 						if stat.P3 > World.BoardCount {
 							EditorAppendBoard()
 							copiedHasStat = false
@@ -574,7 +574,7 @@ func EditorLoop() {
 		if drawMode == TextEntry {
 			if (InputKeyPressed >= ' ') && (InputKeyPressed < '\u0080') {
 				if EditorPrepareModifyTile(cursorX, cursorY) {
-					Board.Tiles[cursorX][cursorY].Element = (cursorColor - 9) + E_TEXT_MIN
+					Board.Tiles[cursorX][cursorY].Element = byte((cursorColor - 9) + E_TEXT_MIN)
 					Board.Tiles[cursorX][cursorY].Color = Ord(InputKeyPressed)
 					EditorDrawTileAndNeighborsAt(cursorX, cursorY)
 					InputDeltaX = 1
