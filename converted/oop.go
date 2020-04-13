@@ -203,7 +203,7 @@ func OopIterateStat(statId int16, iStat *int16, lookup string) (OopIterateStat b
 				found = true
 			} else {
 				*iStat++
-				found = (*iStat <= Board.StatCount)
+				found = *iStat <= Board.StatCount
 			}
 		}
 	} else if lookup == "SELF" {
@@ -349,7 +349,7 @@ func GetColorForTileMatch(tile *TTile) (GetColorForTileMatch byte) {
 	} else if ElementDefs[tile.Element].Color == COLOR_WHITE_ON_CHOICE {
 		GetColorForTileMatch = ((tile.Color >> 4) & 0x0F) + 8
 	} else {
-		GetColorForTileMatch = (tile.Color & 0x0F)
+		GetColorForTileMatch = tile.Color & 0x0F
 	}
 
 	return

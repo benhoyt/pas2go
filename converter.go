@@ -2,16 +2,6 @@
 
 /*
 ISSUES:
-- string issues: String, TString50, etc
-- pointer issues
-- handle FILE and FILE OF
-- scalar type casting issues: eg i in: EDITOR.PAS:130: VideoWriteText(61+i, 22, i, #219)
-- handling of New(), eg: EDITOR.PAS:270 New(state.Lines[i]) -> state.Lines[i+1] = new(TTextWindowLine)
-- handling of other builtins, like Val, Move, GetMem, etc
-- distinguishing string constants vs char, eg: pArg[1] == "/"
-- OopParseDirection and OopCheckCondition calls themselves - causes naming issue with named return value
-
-KIND / TYPE ISSUES:
 - don't need byte() here: dataChar = byte(state.Lines[iLine-1][iChar-1])
 - bad things are going to happen here, eg in ELEMENTS.PAS:
   + TP implements "Cycle := (9 - P2) * 3;" as "Cycle = (9 - int16(P2)) * 3"
@@ -19,6 +9,7 @@ KIND / TYPE ISSUES:
   + similar with: "TickTimeDuration = int16(TickSpeed * 2)" in GAME.PAS
 - why string() here? (TXTWIND.PAS): input[i] = string(UpCase(input[i]))
 - why string() here? (TXTWIND.PAS): state.Lines[state.LinePos-1] = string(Copy(...))
+- OopParseDirection and OopCheckCondition calls themselves - causes naming issue with named return value
 
 NICE TO HAVES:
 - can we eliminate Chr() and Ord() seeing they're just identity functions?
@@ -609,15 +600,7 @@ func (c *converter) stmt(stmt Stmt) {
 			}
 		}
 		c.print(" = ")
-
-		kind := c.exprKind(stmt.Value)
-		spec, _ := c.lookupVarExprType(stmt.Var)
-		targetKind := c.specToKind(spec)
-		converted := c.startConvertExpr(kind, targetKind, stmt.Value)
-		c.expr(stmt.Value)
-		if converted {
-			c.print(")")
-		}
+		c.assignRhs(stmt.Var, stmt.Value)
 	case *CaseStmt:
 		c.print("switch ")
 		c.expr(stmt.Selector)
@@ -653,15 +636,16 @@ func (c *converter) stmt(stmt Stmt) {
 	case *EmptyStmt:
 		return
 	case *ForStmt:
+		varExpr := &IdentExpr{stmt.Var}
 		c.printf("for %s = ", stmt.Var)
-		c.expr(stmt.Initial)
+		c.assignRhs(varExpr, stmt.Initial)
 		if stmt.Down {
 			c.print("; ")
-			c.expr(&BinaryExpr{&IdentExpr{stmt.Var}, GTE, stmt.Final})
+			c.expr(&BinaryExpr{varExpr, GTE, stmt.Final})
 			c.printf("; %s-- {\n", stmt.Var)
 		} else {
 			c.print("; ")
-			c.expr(&BinaryExpr{&IdentExpr{stmt.Var}, LTE, stmt.Final})
+			c.expr(&BinaryExpr{varExpr, LTE, stmt.Final})
 			c.printf("; %s++ {\n", stmt.Var)
 		}
 		c.stmtNoBraces(stmt.Stmt)
@@ -791,6 +775,22 @@ func (c *converter) stmt(stmt Stmt) {
 		panic(fmt.Sprintf("unhandled Stmt: %T", stmt))
 	}
 	c.print("\n")
+}
+
+func (c *converter) assignRhs(left Expr, right Expr) {
+	kind := c.exprKind(right)
+	spec, _ := c.lookupVarExprType(left)
+	targetKind := c.specToKind(spec)
+	converted := c.startConvertExpr(kind, targetKind, right)
+
+	if parenExpr, isParen := right.(*ParenExpr); isParen {
+		right = parenExpr.Expr
+	}
+	c.expr(right)
+
+	if converted {
+		c.print(")")
+	}
 }
 
 func (c *converter) startConvertExpr(kind, targetKind Kind, expr Expr) bool {

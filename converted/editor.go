@@ -366,7 +366,7 @@ func EditorLoop() {
 				}
 			}
 			if (InputKeyPressed != KEY_ESCAPE) && (Length(ElementDefs[element].Param2Name) != 0) {
-				promptByte = (stat.P2 % 0x80)
+				promptByte = stat.P2 % 0x80
 				SidebarPromptSlider(selected, 63, iy, ElementDefs[element].Param2Name, &promptByte)
 				if selected {
 					stat.P2 = (stat.P2 & 0x80) + promptByte

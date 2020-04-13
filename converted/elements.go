@@ -1139,9 +1139,9 @@ func DrawPlayerSurroundings(x, y int16, bombPhase int16) {
 		istat  int16
 		result bool
 	)
-	for ix = ((x - TORCH_DX) - 1); ix <= ((x + TORCH_DX) + 1); ix++ {
+	for ix = (x - TORCH_DX) - 1; ix <= ((x + TORCH_DX) + 1); ix++ {
 		if (ix >= 1) && (ix <= BOARD_WIDTH) {
-			for iy = ((y - TORCH_DY) - 1); iy <= ((y + TORCH_DY) + 1); iy++ {
+			for iy = (y - TORCH_DY) - 1; iy <= ((y + TORCH_DY) + 1); iy++ {
 				if (iy >= 1) && (iy <= BOARD_HEIGHT) {
 					tile := &Board.Tiles[ix][iy]
 					if (bombPhase > 0) && ((Sqr(ix-x) + Sqr(iy-y)*2) < TORCH_DIST_SQR) {

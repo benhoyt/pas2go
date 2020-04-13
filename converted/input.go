@@ -297,7 +297,7 @@ func InputInitMouse() (InputInitMouse bool) {
 	var regs Registers
 	regs.AX = 0
 	Intr(0x33, regs)
-	InputInitMouse = (regs.AX == 0)
+	InputInitMouse = regs.AX == 0
 	InputInitMouse = true
 	return
 }

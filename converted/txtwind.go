@@ -71,7 +71,7 @@ func TextWindowDrawOpen(state *TTextWindowState) {
 	for iy = 1; iy <= (TextWindowHeight + 1); iy++ {
 		VideoMove(TextWindowX, iy+TextWindowY-1, TextWindowWidth, &state.ScreenCopy[iy-1], false)
 	}
-	for iy = (TextWindowHeight / 2); iy >= 0; iy-- {
+	for iy = TextWindowHeight / 2; iy >= 0; iy-- {
 		VideoWriteText(byte(TextWindowX), byte(TextWindowY+iy+1), 0x0F, TextWindowStrText)
 		VideoWriteText(byte(TextWindowX), byte(TextWindowY+TextWindowHeight-iy-1), 0x0F, TextWindowStrText)
 		VideoWriteText(byte(TextWindowX), byte(TextWindowY+iy), 0x0F, TextWindowStrTop)
@@ -187,7 +187,7 @@ func TextWindowPrint(state *TTextWindowState) {
 			switch line[1] {
 			case '$':
 				line = Delete(line, 1, 1)
-				for iChar = ((80 - Length(line)) / 2); iChar >= 1; iChar-- {
+				for iChar = (80 - Length(line)) / 2; iChar >= 1; iChar-- {
 					line = " " + line
 				}
 			case '!', ':':
@@ -327,7 +327,7 @@ func TextWindowEdit(state *TTextWindowState) {
 		var i int16
 		if state.LineCount > 1 {
 			Dispose(*state.Lines[state.LinePos-1])
-			for i = (state.LinePos + 1); i <= state.LineCount; i++ {
+			for i = state.LinePos + 1; i <= state.LineCount; i++ {
 				state.Lines[(i-1)-1] = state.Lines[i-1]
 			}
 			state.LineCount--
