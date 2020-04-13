@@ -599,7 +599,7 @@ func (c *converter) stmt(stmt Stmt) {
 					}
 				}
 				c.printf(" %s= ", operatorStr(binary.Op))
-				c.expr(binary.Right)
+				c.assignRhs(stmt.Var, binary.Right)
 				break
 			}
 		}

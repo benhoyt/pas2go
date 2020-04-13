@@ -66,8 +66,8 @@ func InputJoystickGetCoords(x, y *int16) {
 	startTicks = TimerTicks
 	Port[PORT_JOYSTICK] = 0
 	for {
-		*x += (Port[PORT_JOYSTICK] & 1)
-		*y += (Port[PORT_JOYSTICK] & 2)
+		*x += Port[PORT_JOYSTICK] & 1
+		*y += Port[PORT_JOYSTICK] & 2
 		if ((Port[PORT_JOYSTICK] & 3) == 0) || ((TimerTicks - startTicks) > 3) {
 			break
 		}
@@ -177,9 +177,9 @@ func InputUpdate() {
 	for KeyPressed {
 		InputKeyPressed = ReadKey
 		if (InputKeyPressed == '\x00') || (InputKeyPressed == '\x01') || (InputKeyPressed == '\x02') {
-			InputKeyBuffer += Chr(Ord(ReadKey) | 0x80)
+			InputKeyBuffer += string(Chr(Ord(ReadKey) | 0x80))
 		} else {
-			InputKeyBuffer += InputKeyPressed
+			InputKeyBuffer += string(InputKeyPressed)
 		}
 	}
 	if Length(InputKeyBuffer) != 0 {

@@ -467,13 +467,13 @@ func PromptString(x, y, arrowColor, color, width int16, mode byte, buffer *strin
 			switch mode {
 			case PROMPT_NUMERIC:
 				if InputKeyPressed >= '0' && InputKeyPressed <= '9' {
-					*buffer += InputKeyPressed
+					*buffer += string(InputKeyPressed)
 				}
 			case PROMPT_ANY:
-				*buffer += InputKeyPressed
+				*buffer += string(InputKeyPressed)
 			case PROMPT_ALPHANUM:
 				if (UpCase(InputKeyPressed) >= 'A' && UpCase(InputKeyPressed) <= 'Z') || (InputKeyPressed >= '0' && InputKeyPressed <= '9') || (InputKeyPressed == '-') {
-					*buffer += UpCase(InputKeyPressed)
+					*buffer += string(UpCase(InputKeyPressed))
 				}
 			}
 		} else if (InputKeyPressed == KEY_LEFT) || (InputKeyPressed == KEY_BACKSPACE) {
@@ -747,7 +747,7 @@ func CopyStatDataToTextWindow(statId int16, state *TTextWindowState) {
 			TextWindowAppend(state, dataStr)
 			dataStr = ""
 		} else {
-			dataStr += dataChr
+			dataStr += string(dataChr)
 		}
 		AdvancePointer(&dataPtr, 1)
 	}
@@ -1367,8 +1367,8 @@ func GamePlayLoop(boardChanged bool) {
 					MoveStat(0, int16(Board.Stats[0].X)+InputDeltaX, int16(Board.Stats[0].Y)+InputDeltaY)
 				} else {
 					BoardDrawTile(int16(Board.Stats[0].X), int16(Board.Stats[0].Y))
-					Board.Stats[0].X += InputDeltaX
-					Board.Stats[0].Y += InputDeltaY
+					Board.Stats[0].X += byte(InputDeltaX)
+					Board.Stats[0].Y += byte(InputDeltaY)
 					Board.Tiles[Board.Stats[0].X][Board.Stats[0].Y].Element = E_PLAYER
 					Board.Tiles[Board.Stats[0].X][Board.Stats[0].Y].Color = ElementDefs[E_PLAYER].Color
 					BoardDrawTile(int16(Board.Stats[0].X), int16(Board.Stats[0].Y))

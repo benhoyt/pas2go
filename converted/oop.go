@@ -34,7 +34,7 @@ func OopReadWord(statId int16, position *int16) {
 	OopChar = UpCase(OopChar)
 	if (OopChar < '0') || (OopChar > '9') {
 		for ((OopChar >= 'A') && (OopChar <= 'Z')) || (OopChar == ':') || ((OopChar >= '0') && (OopChar <= '9')) || (OopChar == '_') {
-			OopWord += OopChar
+			OopWord += string(OopChar)
 			OopReadChar(statId, position)
 			OopChar = UpCase(OopChar)
 		}
@@ -58,7 +58,7 @@ func OopReadValue(statId int16, position *int16) {
 	}
 	OopChar = UpCase(OopChar)
 	for (OopChar >= '0') && (OopChar <= '9') {
-		s += OopChar
+		s += string(OopChar)
 		OopReadChar(statId, position)
 		OopChar = UpCase(OopChar)
 	}
@@ -309,9 +309,9 @@ func OopStringToWord(input string) (OopStringToWord string) {
 	output = ""
 	for i = 1; i <= Length(input); i++ {
 		if ((input[i-1] >= 'A') && (input[i-1] <= 'Z')) || ((input[i-1] >= '0') && (input[i-1] <= '9')) {
-			output += input[i-1]
+			output += string(input[i-1])
 		} else if (input[i-1] >= 'a') && (input[i-1] <= 'z') {
-			output += Chr(Ord(input[i-1]) - 0x20)
+			output += string(Chr(Ord(input[i-1]) - 0x20))
 		}
 
 	}
@@ -446,7 +446,7 @@ func OopReadLineToEnd(statId int16, position *int16) (OopReadLineToEnd string) {
 	s = ""
 	OopReadChar(statId, position)
 	for (OopChar != '\x00') && (OopChar != '\r') {
-		s += OopChar
+		s += string(OopChar)
 		OopReadChar(statId, position)
 	}
 	OopReadLineToEnd = s
