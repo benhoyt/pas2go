@@ -421,7 +421,7 @@ func OopCheckCondition(statId int16, position *int16) (OopCheckCondition bool) {
 	} else if OopWord == "ALLIGNED" {
 		OopCheckCondition = (stat.X == Board.Stats[0].X) || (stat.Y == Board.Stats[0].Y)
 	} else if OopWord == "CONTACT" {
-		OopCheckCondition = (Sqr(stat.X-Board.Stats[0].X) + Sqr(stat.Y-Board.Stats[0].Y)) == 1
+		OopCheckCondition = (Sqr(int16(stat.X-Board.Stats[0].X)) + Sqr(int16(stat.Y-Board.Stats[0].Y))) == 1
 	} else if OopWord == "BLOCKED" {
 		OopReadDirection(statId, position, &deltaX, &deltaY)
 		OopCheckCondition = !ElementDefs[Board.Tiles[int16(stat.X)+deltaX][int16(stat.Y)+deltaY].Element].Walkable
