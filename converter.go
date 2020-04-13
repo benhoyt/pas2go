@@ -695,17 +695,17 @@ func (c *converter) stmt(stmt Stmt) {
 			c.print("++")
 		case "str":
 			if widthExpr, isWidth := stmt.Args[0].(*WidthExpr); isWidth {
-				c.print("StrWidth(")
+				c.expr(stmt.Args[1])
+				c.print(" = StrWidth(")
 				c.procArg(false, KindUnknown, stmt.Args[0])
 				c.printf(", %d", widthExpr.Width.(*ConstExpr).Value.(int))
-				c.print(", ")
+				c.print(")")
 			} else {
-				c.print("Str(")
+				c.expr(stmt.Args[1])
+				c.print(" = Str(")
 				c.procArg(false, KindUnknown, stmt.Args[0])
-				c.print(", ")
+				c.print(")")
 			}
-			c.expr(stmt.Args[1])
-			c.print(")")
 		case "val":
 			if len(stmt.Args) != 3 {
 				panic(fmt.Sprintf("Val() requires 3 args, got %d", len(stmt.Args)))

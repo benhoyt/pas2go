@@ -48,12 +48,14 @@ func Val(s string) (n int16, code int16) {
 	return nInt, 0
 }
 
-func Str(n int16, s string) {
+func Str(n int16) string {
 	// TODO
+	return ""
 }
 
-func StrWidth(n, width int16, s string) {
+func StrWidth(n, width int16) string {
 	// TODO
+	return ""
 }
 
 // NOTE: in Turbo Pascal Delete() is a procedure that modifies the string in-place
