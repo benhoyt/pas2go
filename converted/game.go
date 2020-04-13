@@ -724,7 +724,7 @@ func GameWorldLoad(extension string) (GameWorldLoad bool) {
 			entryName = Copy(entryName, 1, Pos(' ', entryName)-1)
 		}
 		GameWorldLoad = WorldLoad(entryName, extension, false)
-		TransitionDrawToFill(byte('Û'), 0x44)
+		TransitionDrawToFill('Û', 0x44)
 	}
 	TextWindowFree(&textWindow)
 	return
@@ -1136,7 +1136,7 @@ func CalcDirectionSeek(x, y int16, deltaX, deltaY *int16) {
 }
 
 func TransitionDrawBoardChange() {
-	TransitionDrawToFill(byte('Û'), 0x05)
+	TransitionDrawToFill('Û', 0x05)
 	TransitionDrawToBoard()
 }
 

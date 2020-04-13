@@ -585,7 +585,11 @@ func (c *converter) stmt(stmt Stmt) {
 		kind := c.exprKind(stmt.Value)
 		spec, _ := c.lookupVarExprType(stmt.Var)
 		targetKind := c.specToKind(spec)
-		c.convertExpr(kind, targetKind, stmt.Value)
+		converted := c.startConvertExpr(kind, targetKind, stmt.Value)
+		c.expr(stmt.Value)
+		if converted {
+			c.print(")")
+		}
 	case *CaseStmt:
 		c.print("switch ")
 		c.expr(stmt.Selector)
@@ -755,14 +759,13 @@ func (c *converter) stmt(stmt Stmt) {
 	c.print("\n")
 }
 
-func (c *converter) convertExpr(kind, targetKind Kind, expr Expr) {
+func (c *converter) startConvertExpr(kind, targetKind Kind, expr Expr) bool {
 	if targetKind == KindByte && kind == KindString {
 		constExpr, isConst := expr.(*ConstExpr)
 		if isConst {
 			str, isStr := constExpr.Value.(string)
 			if isStr && len(str) == 1 {
-				c.printf("%q", str[0]) // TODO: proper escaping
-				return
+				return false
 			}
 		}
 	}
@@ -770,11 +773,9 @@ func (c *converter) convertExpr(kind, targetKind Kind, expr Expr) {
 	convertKind := c.convertKind(kind, targetKind)
 	if convertKind != KindUnknown {
 		c.print(convertKind, "(")
+		return true
 	}
-	c.expr(expr)
-	if convertKind != KindUnknown {
-		c.print(")")
-	}
+	return false
 }
 
 func (c *converter) procArgs(params []*ParamGroup, args []Expr) {
@@ -813,10 +814,7 @@ func (c *converter) convertKind(kind, targetKind Kind) Kind {
 
 func (c *converter) procArg(targetIsVar bool, targetKind Kind, arg Expr) {
 	kind := c.exprKind(arg)
-	convertKind := c.convertKind(kind, targetKind)
-	if convertKind != KindUnknown {
-		c.print(convertKind, "(")
-	}
+	converted := c.startConvertExpr(kind, targetKind, arg)
 	switch arg := arg.(type) {
 	case *IdentExpr:
 		isVar := c.isVarParam(arg.Name)
@@ -855,7 +853,7 @@ func (c *converter) procArg(targetIsVar bool, targetKind Kind, arg Expr) {
 	default:
 		c.expr(arg)
 	}
-	if convertKind != KindUnknown {
+	if converted {
 		c.print(")")
 	}
 }
