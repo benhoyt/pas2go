@@ -16,8 +16,6 @@
 ./editor.go:655:56: cannot convert '!' (type untyped number) to type string
 ./editor.go:655:56: invalid operation: ("  " + World.Info.Name) + '!' (mismatched types string and rune)
 ./editor.go:737:94: cannot use ' ' + ElementDefs[iElem].EditorShortcut + ' ' (type byte) as type string in argument to VideoWriteText
-./editor.go:855:14: invalid operation: IOResult == 0 (mismatched types func() int16 and int)
-./editor.go:859:14: invalid operation: IOResult != 0 (mismatched types func() int16 and int)
 ./editor.go:932:25: cannot convert '*' (type untyped number) to type string
 ./editor.go:932:25: invalid operation: '*' + filename (mismatched types rune and string)
 ./elements.go:27:81: cannot convert ' ' (type untyped number) to type string
@@ -223,7 +221,6 @@
 ./game.go:470:14: invalid operation: *buffer += InputKeyPressed (mismatched types string and byte)
 ./game.go:473:13: invalid operation: *buffer += InputKeyPressed (mismatched types string and byte)
 ./game.go:476:14: invalid operation: *buffer += UpCase(InputKeyPressed) (mismatched types string and byte)
-./game.go:537:14: invalid operation: IOResult == 0 (mismatched types func() int16 and int)
 ./game.go:542:24: cannot use IOResult (type func() int16) as type int16 in argument to Str
 ./game.go:592:8: cannot use IoTmpBuf (type *TIoTmpBuf) as type uintptr in assignment
 ./game.go:642:7: cannot use IoTmpBuf (type *TIoTmpBuf) as type uintptr in assignment
@@ -286,7 +283,6 @@
 ./game.go:1508:12: invalid operation: "END" + Chr(49 + Random(4)) (mismatched types string and byte)
 ./game.go:1508:20: cannot use 49 + Random(4) (type int16) as type byte in argument to Chr
 ./game.go:1515:41: cannot use ResourceDataHeader.FileOffset[i - 1] (type int32) as type int16 in argument to Seek
-./game.go:1517:8: invalid operation: IOResult == 0 (mismatched types func() int16 and int)
 ./game.go:1519:14: undefined: Ptr
 ./game.go:1519:18: undefined: Seg
 ./game.go:1519:26: undefined: Ofs

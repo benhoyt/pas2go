@@ -54,6 +54,10 @@ func Convert(file File, units []*Unit, w io.Writer) {
 		[]*ParamGroup{{false, []string{"x"}, &TypeIdent{"byte"}}},
 		&TypeIdent{"char"},
 	})
+	c.defineVar("IOResult", &FuncSpec{
+		nil,
+		&TypeIdent{"integer"},
+	})
 	c.defineVar("Length", &FuncSpec{
 		[]*ParamGroup{{false, []string{"s"}, &TypeIdent{"string"}}},
 		&TypeIdent{"integer"},

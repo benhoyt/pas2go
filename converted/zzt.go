@@ -39,7 +39,7 @@ func GameConfigure() {
 	GameVersion = "3.2"
 	Assign(cfgFile, "zzt.cfg")
 	Reset(cfgFile)
-	if IOResult == 0 {
+	if IOResult() == 0 {
 		Readln(cfgFile, ConfigWorldFile)
 		Readln(cfgFile, ConfigRegistration)
 	}

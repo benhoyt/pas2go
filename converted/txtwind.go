@@ -202,7 +202,7 @@ func TextWindowPrint(state *TTextWindowState) {
 			}
 		}
 		WriteLn(Lst, line)
-		if IOResult != 0 {
+		if IOResult() != 0 {
 			Close(Lst)
 			return
 		}
@@ -476,10 +476,10 @@ func TextWindowOpenFile(filename string, state *TTextWindowState) {
 	if ResourceDataHeader.EntryCount == 0 {
 		Assign(f, ResourceDataFileName)
 		Reset(f, 1)
-		if IOResult == 0 {
+		if IOResult() == 0 {
 			BlockRead(f, ResourceDataHeader, SizeOf(ResourceDataHeader))
 		}
-		if IOResult != 0 {
+		if IOResult() != 0 {
 			ResourceDataHeader.EntryCount = -1
 		}
 		Close(f)
@@ -494,7 +494,7 @@ func TextWindowOpenFile(filename string, state *TTextWindowState) {
 	if entryPos <= 0 {
 		Assign(tf, filename)
 		Reset(tf)
-		for (IOResult == 0) && (!Eof(tf)) {
+		for (IOResult() == 0) && (!Eof(tf)) {
 			state.LineCount++
 			New(*state.Lines[state.LineCount-1])
 			ReadLn(tf, *state.Lines[state.LineCount-1])
@@ -504,9 +504,9 @@ func TextWindowOpenFile(filename string, state *TTextWindowState) {
 		Assign(f, ResourceDataFilename)
 		Reset(f, 1)
 		Seek(f, ResourceDataHeader.FileOffset[entryPos-1])
-		if IOResult == 0 {
+		if IOResult() == 0 {
 			retVal = true
-			for (IOResult == 0) && retVal {
+			for (IOResult() == 0) && retVal {
 				state.LineCount++
 				New(*state.Lines[state.LineCount-1])
 				BlockRead(f, *state.Lines[state.LineCount-1], 1)
@@ -535,12 +535,12 @@ func TextWindowSaveFile(filename string, state *TTextWindowState) {
 	)
 	Assign(f, filename)
 	Rewrite(f)
-	if IOResult != 0 {
+	if IOResult() != 0 {
 		return
 	}
 	for i = 1; i <= state.LineCount; i++ {
 		WriteLn(f, *state.Lines[i-1])
-		if IOResult != 0 {
+		if IOResult() != 0 {
 			return
 		}
 	}

@@ -534,7 +534,7 @@ func DisplayIOError() (DisplayIOError bool) {
 		errorNumStr string
 		textWindow  TTextWindowState
 	)
-	if IOResult == 0 {
+	if IOResult() == 0 {
 		DisplayIOError = false
 		return
 	}
@@ -1514,7 +1514,7 @@ func GamePrintRegisterMessage() {
 			Reset(f, 1)
 			Seek(f, ResourceDataHeader.FileOffset[i-1])
 			isReading = true
-			for (IOResult == 0) && isReading {
+			for (IOResult() == 0) && isReading {
 				BlockRead(f, s, 1)
 				strPtr = Ptr(Seg(s), Ofs(s)+1)
 				if Length(s) == 0 {

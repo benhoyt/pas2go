@@ -852,11 +852,11 @@ func HighScoresLoad() {
 	)
 	Assign(f, World.Info.Name+".HI")
 	Reset(f)
-	if IOResult == 0 {
+	if IOResult() == 0 {
 		Read(f, HighScoreList)
 	}
 	Close(f)
-	if IOResult != 0 {
+	if IOResult() != 0 {
 		for i = 1; i <= 30; i++ {
 			HighScoreList[i-1].Name = ""
 			HighScoreList[i-1].Score = -1
