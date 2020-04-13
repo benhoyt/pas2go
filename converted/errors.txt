@@ -193,12 +193,8 @@
 ./game.go:19:46: cannot use -1 (type int) as type string in array or slice literal
 ./game.go:19:50: cannot use 1 (type int) as type string in array or slice literal
 ./game.go:19:53: cannot use 0 (type int) as type string in array or slice literal
-./game.go:60:13: undefined: Ptr
-./game.go:60:17: undefined: Seg
-./game.go:60:32: undefined: Ofs
 ./game.go:69:6: cannot use IoTmpBuf (type *TIoTmpBuf) as type uintptr in assignment
 ./game.go:107:37: type TStat is not an expression
-./game.go:117:44: undefined: Ofs
 ./game.go:267:139: invalid operation: Board.Stats[0].X - x (mismatched types byte and int16)
 ./game.go:267:165: invalid operation: Board.Stats[0].Y - y (mismatched types byte and int16)
 ./game.go:317:45: cannot convert editable (type bool) to type int16
@@ -282,9 +278,6 @@
 ./game.go:1508:12: invalid operation: "END" + Chr(49 + Random(4)) (mismatched types string and byte)
 ./game.go:1508:20: cannot use 49 + Random(4) (type int16) as type byte in argument to Chr
 ./game.go:1515:41: cannot use ResourceDataHeader.FileOffset[i - 1] (type int32) as type int16 in argument to Seek
-./game.go:1519:14: undefined: Ptr
-./game.go:1519:18: undefined: Seg
-./game.go:1519:26: undefined: Ofs
 ./game.go:1524:11: cannot convert '@' (type untyped number) to type string
 ./game.go:1524:11: invalid operation: s != '@' (mismatched types string and rune)
 ./game.go:1534:4: undefined: TextColor
@@ -344,9 +337,6 @@
 ./input.go:344:3: undefined: Writeln
 ./keys.go:15:11: undefined: Registers
 ./keys.go:17:2: undefined: Intr
-./oop.go:18:8: undefined: Ptr
-./oop.go:18:12: undefined: Seg
-./oop.go:18:29: undefined: Ofs
 ./oop.go:37:12: invalid operation: OopWord += OopChar (mismatched types string and byte)
 ./oop.go:61:5: invalid operation: s += OopChar (mismatched types string and byte)
 ./oop.go:87:5: cannot convert 'N' (type untyped number) to type string

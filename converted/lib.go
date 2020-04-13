@@ -206,3 +206,15 @@ func SizeOf(val interface{}) int16 {
 func FillChar(dest interface{}, count int16, c byte) {
 	// TODO
 }
+
+func Ptr(seg, ofs int16) uintptr {
+	return 0 // TODO
+}
+
+func Seg(seg interface{}) int16 {
+	return 0
+}
+
+func Ofs(ofs interface{}) int16 {
+	return 0
+}
