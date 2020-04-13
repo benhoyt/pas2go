@@ -408,7 +408,10 @@ func (c *converter) decl(decl DeclPart, isMain bool) {
 				c.printf("%s ", d.Name)
 				c.typeSpec(d.Type)
 				c.print(" = ")
-				if _, isConstRecord := d.Value.(*ConstRecordExpr); isConstRecord {
+				switch d.Value.(type) {
+				case *ConstRecordExpr:
+					c.typeSpec(d.Type)
+				case *ConstArrayExpr:
 					c.typeSpec(d.Type)
 				}
 				c.expr(d.Value)
@@ -970,7 +973,7 @@ func (c *converter) expr(expr Expr) {
 			}
 		}
 	case *ConstArrayExpr:
-		c.print("[...]string{") // TODO: not necessarily string
+		c.print("{")
 		c.exprs(expr.Values)
 		c.print("}")
 	case *ConstRecordExpr:

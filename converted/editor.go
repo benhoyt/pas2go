@@ -12,7 +12,7 @@ const (
 	TextEntry
 )
 
-var NeighborBoardStrs [4]string = [...]string{"       Board \x18", "       Board \x19", "       Board \x1b", "       Board \x1a"}
+var NeighborBoardStrs [4]string = [4]string{"       Board \x18", "       Board \x19", "       Board \x1b", "       Board \x1a"}
 
 func EditorAppendBoard() {
 	if World.BoardCount < MAX_BOARD {

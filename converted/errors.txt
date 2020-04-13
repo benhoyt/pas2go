@@ -165,34 +165,6 @@
 ./elements.go:1268:57: invalid operation: stat.Y + InputDeltaY (mismatched types byte and int16)
 ./elements.go:1272:23: invalid operation: stat.X + InputDeltaX (mismatched types byte and int16)
 ./elements.go:1272:43: invalid operation: stat.Y + InputDeltaY (mismatched types byte and int16)
-./game.go:13:2: cannot use [8]string literal (type [8]string) as type [8]byte in assignment
-./game.go:13:46: cannot use 20 (type int) as type string in array or slice literal
-./game.go:13:52: cannot use 28 (type int) as type string in array or slice literal
-./game.go:13:58: cannot use 21 (type int) as type string in array or slice literal
-./game.go:13:64: cannot use 29 (type int) as type string in array or slice literal
-./game.go:13:70: cannot use 22 (type int) as type string in array or slice literal
-./game.go:13:76: cannot use 30 (type int) as type string in array or slice literal
-./game.go:13:82: cannot use 23 (type int) as type string in array or slice literal
-./game.go:13:88: cannot use 31 (type int) as type string in array or slice literal
-./game.go:16:2: cannot use [8]string literal (type [8]string) as type [8]int16 in assignment
-./game.go:16:46: cannot use -1 (type int) as type string in array or slice literal
-./game.go:16:50: cannot use 0 (type int) as type string in array or slice literal
-./game.go:16:53: cannot use 1 (type int) as type string in array or slice literal
-./game.go:16:62: cannot use 0 (type int) as type string in array or slice literal
-./game.go:16:65: cannot use -1 (type int) as type string in array or slice literal
-./game.go:17:2: cannot use [8]string literal (type [8]string) as type [8]int16 in assignment
-./game.go:17:46: cannot use 1 (type int) as type string in array or slice literal
-./game.go:17:55: cannot use 0 (type int) as type string in array or slice literal
-./game.go:17:58: cannot use -1 (type int) as type string in array or slice literal
-./game.go:17:70: cannot use 0 (type int) as type string in array or slice literal
-./game.go:18:2: cannot use [4]string literal (type [4]string) as type [4]int16 in assignment
-./game.go:18:46: cannot use 0 (type int) as type string in array or slice literal
-./game.go:18:52: cannot use -1 (type int) as type string in array or slice literal
-./game.go:18:56: cannot use 1 (type int) as type string in array or slice literal
-./game.go:19:2: cannot use [4]string literal (type [4]string) as type [4]int16 in assignment
-./game.go:19:46: cannot use -1 (type int) as type string in array or slice literal
-./game.go:19:50: cannot use 1 (type int) as type string in array or slice literal
-./game.go:19:53: cannot use 0 (type int) as type string in array or slice literal
 ./game.go:69:6: cannot use IoTmpBuf (type *TIoTmpBuf) as type uintptr in assignment
 ./game.go:107:37: type TStat is not an expression
 ./game.go:267:139: invalid operation: Board.Stats[0].X - x (mismatched types byte and int16)
