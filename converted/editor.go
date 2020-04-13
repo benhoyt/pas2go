@@ -420,7 +420,7 @@ func EditorLoop() {
 		element = Board.Tiles[stat.X][stat.Y].Element
 		wasModified = true
 		categoryName = ""
-		for i = 0; i <= element; i++ {
+		for i = 0; i <= int16(element); i++ {
 			if (ElementDefs[i].EditorCategory == ElementDefs[element].EditorCategory) && (Length(ElementDefs[i].CategoryName) != 0) {
 				categoryName = ElementDefs[i].CategoryName
 			}

@@ -651,12 +651,12 @@ func (c *converter) stmt(stmt Stmt) {
 		c.printf("for %s = ", stmt.Var)
 		c.expr(stmt.Initial)
 		if stmt.Down {
-			c.printf("; %s >= ", stmt.Var)
-			c.expr(stmt.Final)
+			c.print("; ")
+			c.expr(&BinaryExpr{&IdentExpr{stmt.Var}, GTE, stmt.Final})
 			c.printf("; %s-- {\n", stmt.Var)
 		} else {
-			c.printf("; %s <= ", stmt.Var)
-			c.expr(stmt.Final)
+			c.print("; ")
+			c.expr(&BinaryExpr{&IdentExpr{stmt.Var}, LTE, stmt.Final})
 			c.printf("; %s++ {\n", stmt.Var)
 		}
 		c.stmtNoBraces(stmt.Stmt)

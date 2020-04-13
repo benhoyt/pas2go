@@ -319,7 +319,7 @@ func SidebarPromptCharacter(editable bool, x, y int16, prompt string, value *byt
 	VideoWriteText(byte(x+5), byte(y+1), 0x9F, "\x1f")
 	SidebarClearLine(y + 2)
 	for {
-		for i = (*value - 4); i <= (*value + 4); i++ {
+		for i = (*value - 4); i <= int16(*value+4); i++ {
 			VideoWriteText(byte(((x+i)-int16(*value))+5), byte(y+2), 0x1E, string(Chr(byte((i+0x100)%0x100))))
 		}
 		if editable {
@@ -893,9 +893,9 @@ func MoveStat(statId int16, newX, newY int16) {
 	BoardDrawTile(oldX, oldY)
 	if (statId == 0) && Board.Info.IsDark && (World.Info.TorchTicks > 0) {
 		if (Sqr(oldX-int16(stat.X)) + Sqr(oldY-int16(stat.Y))) == 1 {
-			for ix = (stat.X - TORCH_DX - 3); ix <= (stat.X + TORCH_DX + 3); ix++ {
+			for ix = (stat.X - TORCH_DX - 3); ix <= int16(stat.X+TORCH_DX+3); ix++ {
 				if (ix >= 1) && (ix <= BOARD_WIDTH) {
-					for iy = (stat.Y - TORCH_DY - 3); iy <= (stat.Y + TORCH_DY + 3); iy++ {
+					for iy = (stat.Y - TORCH_DY - 3); iy <= int16(stat.Y+TORCH_DY+3); iy++ {
 						if (iy >= 1) && (iy <= BOARD_HEIGHT) {
 							if (((Sqr(ix - oldX)) + (Sqr(iy-oldY) * 2)) < TORCH_DIST_SQR) != (((Sqr(ix - newX)) + (Sqr(iy-newY) * 2)) < TORCH_DIST_SQR) {
 								BoardDrawTile(ix, iy)
