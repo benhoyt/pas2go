@@ -501,8 +501,8 @@ func ElementBombTick(statId int16) {
 			SoundQueue(1, "`\x01P\x01@\x010\x01 \x01\x10\x01")
 			DrawPlayerSurroundings(int16(stat.X), int16(stat.Y), 1)
 		} else if stat.P1 == 0 {
-			oldX = stat.X
-			oldY = stat.Y
+			oldX = int16(stat.X)
+			oldY = int16(stat.Y)
 			RemoveStat(statId)
 			DrawPlayerSurroundings(oldX, oldY, 2)
 		} else {
@@ -540,8 +540,8 @@ func ElementTransporterMove(x, y, deltaX, deltaY int16) {
 	)
 	stat := &Board.Stats[GetStatIdAt(x+deltaX, y+deltaY)]
 	if (deltaX == stat.StepX) && (deltaY == stat.StepY) {
-		ix = stat.X
-		iy = stat.Y
+		ix = int16(stat.X)
+		iy = int16(stat.Y)
 		newX = -1
 		finishSearch = false
 		isValidDest = true
@@ -662,10 +662,10 @@ func ElementSlimeTick(statId int16) {
 	if stat.P1 < stat.P2 {
 		stat.P1++
 	} else {
-		color = Board.Tiles[stat.X][stat.Y].Color
+		color = int16(Board.Tiles[stat.X][stat.Y].Color)
 		stat.P1 = 0
-		startX = stat.X
-		startY = stat.Y
+		startX = int16(stat.X)
+		startY = int16(stat.Y)
 		changedTiles = 0
 		for dir = 0; dir <= 3; dir++ {
 			if ElementDefs[Board.Tiles[startX+NeighborDeltaX[dir]][startY+NeighborDeltaY[dir]].Element].Walkable {
@@ -693,7 +693,7 @@ func ElementSlimeTick(statId int16) {
 
 func ElementSlimeTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16) {
 	var color int16
-	color = Board.Tiles[x][y].Color
+	color = int16(Board.Tiles[x][y].Color)
 	DamageStat(GetStatIdAt(x, y))
 	Board.Tiles[x][y].Element = E_BREAKABLE
 	Board.Tiles[x][y].Color = color
@@ -913,7 +913,7 @@ func ElementDuplicatorTick(statId int16) {
 		stat.P1 = 0
 		BoardDrawTile(int16(stat.X), int16(stat.Y))
 	}
-	stat.Cycle = (9 - stat.P2) * 3
+	stat.Cycle = int16((9 - stat.P2) * 3)
 
 }
 
@@ -946,7 +946,7 @@ func ElementScrollTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16) {
 
 func ElementKeyTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16) {
 	var key int16
-	key = Board.Tiles[x][y].Color % 8
+	key = int16(Board.Tiles[x][y].Color % 8)
 	if World.Info.Keys[key-1] {
 		DisplayMessage(200, "You already have a "+ColorNames[key-1]+" key!")
 		SoundQueue(2, "0\x02 \x02")
@@ -991,7 +991,7 @@ func ElementPassageTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16) 
 
 func ElementDoorTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16) {
 	var key int16
-	key = (Board.Tiles[x][y].Color / 16) % 8
+	key = int16((Board.Tiles[x][y].Color / 16) % 8)
 	if World.Info.Keys[key-1] {
 		Board.Tiles[x][y].Element = E_EMPTY
 		BoardDrawTile(x, y)
@@ -1027,8 +1027,8 @@ func ElementPusherDraw(x, y int16, ch *byte) {
 func ElementPusherTick(statId int16) {
 	var i, startX, startY int16
 	stat := &Board.Stats[statId]
-	startX = stat.X
-	startY = stat.Y
+	startX = int16(stat.X)
+	startY = int16(stat.Y)
 	if !ElementDefs[Board.Tiles[stat.X+stat.StepX][stat.Y+stat.StepY].Element].Walkable {
 		ElementPushablePush(stat.X+stat.StepX, stat.Y+stat.StepY, stat.StepX, stat.StepY)
 	}
@@ -1092,8 +1092,8 @@ func ElementBoardEdgeTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16
 		boardId        int16
 		entryX, entryY int16
 	)
-	entryX = Board.Stats[0].X
-	entryY = Board.Stats[0].Y
+	entryX = int16(Board.Stats[0].X)
+	entryY = int16(Board.Stats[0].Y)
 	if *deltaY == -1 {
 		neighborId = 0
 		entryY = BOARD_HEIGHT

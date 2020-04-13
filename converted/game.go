@@ -872,7 +872,7 @@ func MoveStat(statId int16, newX, newY int16) {
 		oldBgColor int16
 	)
 	stat := &Board.Stats[statId]
-	oldBgColor = Board.Tiles[newX][newY].Color & 0xF0
+	oldBgColor = int16(Board.Tiles[newX][newY].Color & 0xF0)
 	iUnder = Board.Stats[statId].Under
 	Board.Stats[statId].Under = Board.Tiles[newX][newY]
 	if Board.Tiles[stat.X][stat.Y].Element == E_PLAYER {
@@ -885,8 +885,8 @@ func MoveStat(statId int16, newX, newY int16) {
 
 	Board.Tiles[newX][newY].Element = Board.Tiles[stat.X][stat.Y].Element
 	Board.Tiles[stat.X][stat.Y] = iUnder
-	oldX = stat.X
-	oldY = stat.Y
+	oldX = int16(stat.X)
+	oldY = int16(stat.Y)
 	stat.X = newX
 	stat.Y = newY
 	BoardDrawTile(int16(stat.X), int16(stat.Y))
@@ -1034,8 +1034,8 @@ func DamageStat(attackerStatId int16) {
 					SoundQueue(4, " \x01#\x01'\x010\x01\x10\x01")
 					Board.Tiles[stat.X][stat.Y].Element = E_EMPTY
 					BoardDrawTile(int16(stat.X), int16(stat.Y))
-					oldX = stat.X
-					oldY = stat.Y
+					oldX = int16(stat.X)
+					oldY = int16(stat.Y)
 					stat.X = Board.Info.StartPlayerX
 					stat.Y = Board.Info.StartPlayerY
 					DrawPlayerSurroundings(oldX, oldY, 0)
@@ -1193,7 +1193,7 @@ func GameDebugPrompt() {
 	SidebarClearLine(5)
 	PromptString(63, 5, 0x1E, 0x0F, 11, PROMPT_ANY, &input)
 	for i = 1; i <= Length(input); i++ {
-		input[i-1] = UpCase(input[i-1])
+		input[i-1] = string(UpCase(input[i-1]))
 	}
 	toggle = true
 	if (input[0] == '+') || (input[0] == '-') {
@@ -1335,7 +1335,7 @@ func GamePlayLoop(boardChanged bool) {
 	if boardChanged {
 		TransitionDrawBoardChange()
 	}
-	TickTimeDuration = TickSpeed * 2
+	TickTimeDuration = int16(TickSpeed * 2)
 	GamePlayExitRequested = false
 	exitLoop = false
 	CurrentTick = Random(100)

@@ -820,8 +820,8 @@ StartParsing:
 	}
 
 	if replaceStat {
-		ix = stat.X
-		iy = stat.Y
+		ix = int16(stat.X)
+		iy = int16(stat.Y)
 		DamageStat(statId)
 		OopPlaceTile(ix, iy, &replaceTile)
 	}

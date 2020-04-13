@@ -147,8 +147,8 @@ func EditorLoop() {
 		Board.Tiles[x][y].Color = color
 		copiedTile = Board.Tiles[x][y]
 		copiedHasStat = false
-		copiedX = x
-		copiedY = y
+		copiedX = int16(x)
+		copiedY = int16(y)
 		EditorDrawTileAndNeighborsAt(int16(x), int16(y))
 	}
 
@@ -317,7 +317,7 @@ func EditorLoop() {
 		dataPtr = stat.Data
 		for iLine = 1; iLine <= state.LineCount; iLine++ {
 			for iChar = 1; iChar <= Length(*state.Lines[iLine-1]); iChar++ {
-				dataChar = state.Lines[iLine-1][iChar-1]
+				dataChar = byte(state.Lines[iLine-1][iChar-1])
 				Move(dataChar, dataPtr, 1)
 				AdvancePointer(&dataPtr, 1)
 			}
@@ -433,8 +433,8 @@ func EditorLoop() {
 			copiedHasStat = true
 			copiedStat = Board.Stats[statId]
 			copiedTile = Board.Tiles[stat.X][stat.Y]
-			copiedX = stat.X
-			copiedY = stat.Y
+			copiedX = int16(stat.X)
+			copiedY = int16(stat.Y)
 		}
 
 	}
@@ -743,9 +743,9 @@ func EditorLoop() {
 					} else if ElementDefs[iElem].Color == COLOR_CHOICE_ON_CHOICE {
 						elemMenuColor = ((cursorColor - 8) * 0x11) + 8
 					} else if (ElementDefs[iElem].Color & 0x70) == 0x00 {
-						elemMenuColor = (ElementDefs[iElem].Color % 0x10) + 0x10
+						elemMenuColor = int16((ElementDefs[iElem].Color % 0x10) + 0x10)
 					} else {
-						elemMenuColor = ElementDefs[iElem].Color
+						elemMenuColor = int16(ElementDefs[iElem].Color)
 					}
 
 					VideoWriteText(78, byte(i), byte(elemMenuColor), string(ElementDefs[iElem].Character))
@@ -767,7 +767,7 @@ func EditorLoop() {
 						} else if ElementDefs[iElem].Color == COLOR_CHOICE_ON_CHOICE {
 							elemMenuColor = ((cursorColor - 8) * 0x11) + 8
 						} else {
-							elemMenuColor = ElementDefs[iElem].Color
+							elemMenuColor = int16(ElementDefs[iElem].Color)
 						}
 
 						if ElementDefs[iElem].Cycle == -1 {

@@ -1,8 +1,6 @@
 # _/Users/ben.hoyt/Home/zzt/pas2go/converted
 ./editor.go:139:64: cannot convert ' ' (type untyped number) to type string
 ./editor.go:139:64: invalid operation: ' ' + Board.Name (mismatched types rune and string)
-./editor.go:150:11: cannot use x (type byte) as type int16 in assignment
-./editor.go:151:11: cannot use y (type byte) as type int16 in assignment
 ./editor.go:188:16: cannot use cursorColor (type int16) as type byte in assignment
 ./editor.go:235:19: cannot use "         Title: " + Board.Name (type string) as type *string in assignment
 ./editor.go:236:18: cannot use Board.Info.MaxShots (type byte) as type int16 in argument to Str
@@ -17,13 +15,11 @@
 ./editor.go:266:49: cannot use EditorSelectBoard(NeighborBoardStrs[state.LinePos - 4], int16(Board.Info.NeighborBoards[state.LinePos - 4]), true) (type int16) as type byte in assignment
 ./editor.go:267:52: invalid operation: Board.Info.NeighborBoards[state.LinePos - 4] > World.BoardCount (mismatched types byte and int16)
 ./editor.go:317:11: cannot use stat.Data (type *string) as type uintptr in assignment
-./editor.go:320:36: invalid operation: state.Lines[iLine - 1][iChar - 1] (type *string does not support indexing)
+./editor.go:320:41: invalid operation: state.Lines[iLine - 1][iChar - 1] (type *string does not support indexing)
 ./editor.go:396:20: cannot use EditorSelectBoard(ElementDefs[element].ParamBoardName, int16(stat.P3), true) (type int16) as type byte in assignment
 ./editor.go:399:44: cannot use World.Info.CurrentBoard (type int16) as type byte in assignment
 ./editor.go:400:18: invalid operation: stat.P3 > World.BoardCount (mismatched types byte and int16)
 ./editor.go:423:16: invalid operation: i <= element (mismatched types int16 and byte)
-./editor.go:436:12: cannot use stat.X (type byte) as type int16 in assignment
-./editor.go:437:12: cannot use stat.Y (type byte) as type int16 in assignment
 ./editor.go:453:12: cannot use f (type File) as type *File in argument to Assign
 ./editor.go:454:11: cannot use f (type File) as type *File in argument to Reset
 ./editor.go:460:15: cannot use f (type File) as type *File in argument to BlockRead
@@ -37,9 +33,6 @@
 ./editor.go:655:56: cannot convert '!' (type untyped number) to type string
 ./editor.go:655:56: invalid operation: ("  " + World.Info.Name) + '!' (mismatched types string and rune)
 ./editor.go:737:94: cannot use ' ' + ElementDefs[iElem].EditorShortcut + ' ' (type byte) as type string in argument to VideoWriteText
-./editor.go:746:21: cannot use ElementDefs[iElem].Color % 16 + 16 (type byte) as type int16 in assignment
-./editor.go:748:21: cannot use ElementDefs[iElem].Color (type byte) as type int16 in assignment
-./editor.go:770:22: cannot use ElementDefs[iElem].Color (type byte) as type int16 in assignment
 ./editor.go:853:8: cannot use f (type File) as type *File in argument to Assign
 ./editor.go:854:7: cannot use f (type File) as type *File in argument to Reset
 ./editor.go:855:14: invalid operation: IOResult == 0 (mismatched types func() int16 and int)
@@ -121,10 +114,6 @@
 ./elements.go:295:43: invalid operation: stat.Y - stat.StepX (mismatched types byte and int16)
 ./elements.go:353:15: invalid operation: Random(9) < stat.P2 % 128 (mismatched types int16 and byte)
 ./elements.go:354:16: invalid operation: Random(9) <= stat.P1 (mismatched types int16 and byte)
-./elements.go:504:9: cannot use stat.X (type byte) as type int16 in assignment
-./elements.go:505:9: cannot use stat.Y (type byte) as type int16 in assignment
-./elements.go:543:6: cannot use stat.X (type byte) as type int16 in assignment
-./elements.go:544:6: cannot use stat.Y (type byte) as type int16 in assignment
 ./elements.go:580:22: invalid operation: stat.X - deltaX (mismatched types byte and int16)
 ./elements.go:580:37: invalid operation: stat.Y - deltaY (mismatched types byte and int16)
 ./elements.go:624:30: invalid operation: stat.X + stat.StepX (mismatched types byte and int16)
@@ -135,12 +124,8 @@
 ./elements.go:629:50: invalid operation: stat.Y + stat.StepY (mismatched types byte and int16)
 ./elements.go:632:28: invalid operation: stat.X + stat.StepX (mismatched types byte and int16)
 ./elements.go:632:47: invalid operation: stat.Y + stat.StepY (mismatched types byte and int16)
-./elements.go:665:9: cannot use Board.Tiles[stat.X][stat.Y].Color (type byte) as type int16 in assignment
-./elements.go:667:10: cannot use stat.X (type byte) as type int16 in assignment
-./elements.go:668:10: cannot use stat.Y (type byte) as type int16 in assignment
 ./elements.go:674:40: cannot use color (type int16) as type byte in assignment
 ./elements.go:687:38: cannot use color (type int16) as type byte in assignment
-./elements.go:696:8: cannot use Board.Tiles[x][y].Color (type byte) as type int16 in assignment
 ./elements.go:699:26: cannot use color (type int16) as type byte in assignment
 ./elements.go:707:13: invalid operation: stat.P1 < Random(10) (mismatched types byte and int16)
 ./elements.go:712:23: invalid operation: stat.X + deltaX (mismatched types byte and int16)
@@ -189,11 +174,6 @@
 ./elements.go:904:95: invalid operation: stat.Y + stat.StepY (mismatched types byte and int16)
 ./elements.go:905:26: invalid operation: stat.X - stat.StepX (mismatched types byte and int16)
 ./elements.go:905:45: invalid operation: stat.Y - stat.StepY (mismatched types byte and int16)
-./elements.go:916:13: cannot use (9 - stat.P2) * 3 (type byte) as type int16 in assignment
-./elements.go:949:6: cannot use Board.Tiles[x][y].Color % 8 (type byte) as type int16 in assignment
-./elements.go:994:6: cannot use Board.Tiles[x][y].Color / 16 % 8 (type byte) as type int16 in assignment
-./elements.go:1030:9: cannot use stat.X (type byte) as type int16 in assignment
-./elements.go:1031:9: cannot use stat.Y (type byte) as type int16 in assignment
 ./elements.go:1032:36: invalid operation: stat.X + stat.StepX (mismatched types byte and int16)
 ./elements.go:1032:55: invalid operation: stat.Y + stat.StepY (mismatched types byte and int16)
 ./elements.go:1033:29: invalid operation: stat.X + stat.StepX (mismatched types byte and int16)
@@ -206,8 +186,6 @@
 ./elements.go:1041:50: invalid operation: stat2.Y - stat2.StepY * 2 (mismatched types byte and int16)
 ./elements.go:1042:27: invalid operation: stat2.X - stat2.StepX * 2 (mismatched types byte and int16)
 ./elements.go:1042:52: invalid operation: stat2.Y - stat2.StepY * 2 (mismatched types byte and int16)
-./elements.go:1095:9: cannot use Board.Stats[0].X (type byte) as type int16 in assignment
-./elements.go:1096:9: cannot use Board.Stats[0].Y (type byte) as type int16 in assignment
 ./elements.go:1160:20: cannot use 9 + Random(7) (type int16) as type byte in assignment
 ./elements.go:1206:38: cannot use (CurrentTick % 7 + 1) * 16 + 15 (type int16) as type byte in assignment
 ./elements.go:1248:20: invalid operation: bulletCount < Board.Info.MaxShots (mismatched types int16 and byte)
@@ -312,9 +290,6 @@
 ./game.go:775:30: cannot use color (type int16) as type byte in assignment
 ./game.go:832:7: invalid operation: Board.Stats[i].X == x (mismatched types byte and int16)
 ./game.go:832:34: invalid operation: Board.Stats[i].Y == y (mismatched types byte and int16)
-./game.go:875:13: cannot use Board.Tiles[newX][newY].Color & 240 (type byte) as type int16 in assignment
-./game.go:888:7: cannot use stat.X (type byte) as type int16 in assignment
-./game.go:889:7: cannot use stat.Y (type byte) as type int16 in assignment
 ./game.go:890:9: cannot use newX (type int16) as type byte in assignment
 ./game.go:891:9: cannot use newY (type int16) as type byte in assignment
 ./game.go:895:15: invalid operation: oldX - stat.X (mismatched types int16 and byte)
@@ -337,8 +312,6 @@
 ./game.go:1005:35: cannot convert 'm' (type untyped number) to type string
 ./game.go:1005:35: invalid operation: 'm' + numStr (mismatched types rune and string)
 ./game.go:1017:35: cannot use Time / (TickTimeDuration + 1) (type int16) as type byte in assignment
-./game.go:1037:11: cannot use stat.X (type byte) as type int16 in assignment
-./game.go:1038:11: cannot use stat.Y (type byte) as type int16 in assignment
 ./game.go:1097:11: cannot use source (type int16) as type byte in assignment
 ./game.go:1103:210: cannot convert source (type int16) to type bool
 ./game.go:1126:24: invalid operation: Board.Stats[0].Y == y (mismatched types byte and int16)
@@ -354,7 +327,6 @@
 ./game.go:1232:34: invalid operation: Board.Stats[0].X + NeighborDeltaX[i] (mismatched types byte and int16)
 ./game.go:1232:70: invalid operation: Board.Stats[0].Y + NeighborDeltaY[i] (mismatched types byte and int16)
 ./game.go:1329:58: cannot use GameStateElement (type int16) as type byte in assignment
-./game.go:1338:19: cannot use TickSpeed * 2 (type byte) as type int16 in assignment
 ./game.go:1363:45: invalid operation: Board.Stats[0].X + InputDeltaX (mismatched types byte and int16)
 ./game.go:1363:75: invalid operation: Board.Stats[0].Y + InputDeltaY (mismatched types byte and int16)
 ./game.go:1363:124: invalid operation: Board.Stats[0].X + InputDeltaX (mismatched types byte and int16)
@@ -512,8 +484,6 @@
 ./oop.go:714:41: invalid operation: stat.Y + deltaY (mismatched types byte and int16)
 ./oop.go:746:15: cannot use OopValue (type int16) as type byte in assignment
 ./oop.go:784:23: invalid operation: OopChar + OopReadLineToEnd(statId, position) (mismatched types byte and string)
-./oop.go:823:6: cannot use stat.X (type byte) as type int16 in assignment
-./oop.go:824:6: cannot use stat.Y (type byte) as type int16 in assignment
 ./sounds.go:62:24: invalid operation: octave * ln2 (mismatched types int16 and float64)
 ./sounds.go:64:39: cannot use Trunc(noteBase) (type int16) as type uint16 in assignment
 ./sounds.go:78:31: cannot use i * 100 + 1000 (type int16) as type uint16 in assignment

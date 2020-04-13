@@ -11,6 +11,15 @@ ISSUES:
 - distinguishing string constants vs char, eg: pArg[1] == "/"
 - OopParseDirection and OopCheckCondition calls themselves - causes naming issue with named return value
 
+KIND / TYPE ISSUES:
+- don't need byte() here: dataChar = byte(state.Lines[iLine-1][iChar-1])
+- bad things are going to happen here, eg in ELEMENTS.PAS:
+  + TP implements "Cycle := (9 - P2) * 3;" as "Cycle = (9 - int16(P2)) * 3"
+  + not "Cycle = int16((9 - P2) * 3)"
+  + similar with: "TickTimeDuration = int16(TickSpeed * 2)" in GAME.PAS
+- why string() here? (TXTWIND.PAS): input[i] = string(UpCase(input[i]))
+- why string() here? (TXTWIND.PAS): state.Lines[state.LinePos-1] = string(Copy(...))
+
 NICE TO HAVES:
 - can we eliminate Chr() and Ord() seeing they're just identity functions?
 - consider changing VideoWriteText x,y params to int16 instead of byte -- fewer type conversions
@@ -547,7 +556,7 @@ func (c *converter) stmtNoBraces(stmt Stmt) {
 func (c *converter) stmt(stmt Stmt) {
 	switch stmt := stmt.(type) {
 	case *AssignStmt:
-		// TODO: handle TypeConv?
+		// TODO: handle stmt.TypeConv?
 		c.varExpr(stmt.Var, false)
 
 		// Simplify expressions like "x := x + n"
@@ -572,7 +581,11 @@ func (c *converter) stmt(stmt Stmt) {
 			}
 		}
 		c.print(" = ")
-		c.expr(stmt.Value)
+
+		kind := c.exprKind(stmt.Value)
+		spec, _ := c.lookupVarExprType(stmt.Var)
+		targetKind := c.specToKind(spec)
+		c.convertExpr(kind, targetKind, stmt.Value)
 	case *CaseStmt:
 		c.print("switch ")
 		c.expr(stmt.Selector)
@@ -742,6 +755,28 @@ func (c *converter) stmt(stmt Stmt) {
 	c.print("\n")
 }
 
+func (c *converter) convertExpr(kind, targetKind Kind, expr Expr) {
+	if targetKind == KindByte && kind == KindString {
+		constExpr, isConst := expr.(*ConstExpr)
+		if isConst {
+			str, isStr := constExpr.Value.(string)
+			if isStr && len(str) == 1 {
+				c.printf("%q", str[0]) // TODO: proper escaping
+				return
+			}
+		}
+	}
+	// c.printf("/* TODO %s -> %s */", kind, targetKind)
+	convertKind := c.convertKind(kind, targetKind)
+	if convertKind != KindUnknown {
+		c.print(convertKind, "(")
+	}
+	c.expr(expr)
+	if convertKind != KindUnknown {
+		c.print(")")
+	}
+}
+
 func (c *converter) procArgs(params []*ParamGroup, args []Expr) {
 	isVars := []bool{}
 	kinds := []Kind{}
@@ -766,16 +801,21 @@ func (c *converter) procArgs(params []*ParamGroup, args []Expr) {
 	}
 }
 
-func (c *converter) procArg(targetIsVar bool, targetKind Kind, arg Expr) {
-	kind := c.exprKind(arg)
-	converted := false
+func (c *converter) convertKind(kind, targetKind Kind) Kind {
 	if kind != KindUnknown && targetKind != KindUnknown && kind != targetKind {
 		if kind == KindNumber && (targetKind == KindByte || targetKind == KindInteger) {
-			// no need for conversion
-		} else {
-			converted = true
-			c.print(targetKind, "(")
+			return KindUnknown
 		}
+		return targetKind
+	}
+	return KindUnknown
+}
+
+func (c *converter) procArg(targetIsVar bool, targetKind Kind, arg Expr) {
+	kind := c.exprKind(arg)
+	convertKind := c.convertKind(kind, targetKind)
+	if convertKind != KindUnknown {
+		c.print(convertKind, "(")
 	}
 	switch arg := arg.(type) {
 	case *IdentExpr:
@@ -815,7 +855,7 @@ func (c *converter) procArg(targetIsVar bool, targetKind Kind, arg Expr) {
 	default:
 		c.expr(arg)
 	}
-	if converted {
+	if convertKind != KindUnknown {
 		c.print(")")
 	}
 }
@@ -1230,7 +1270,7 @@ func (c *converter) exprKind(expr Expr) Kind {
 		case float64:
 			return KindReal
 		case string:
-			return KindString // TODO: may be char
+			return KindString
 		default:
 			return KindUnknown
 		}

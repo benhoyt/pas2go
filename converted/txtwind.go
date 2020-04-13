@@ -48,7 +48,7 @@ var (
 func UpCaseString(input string) (UpCaseString string) {
 	var i int16
 	for i = 1; i <= Length(input); i++ {
-		input[i] = UpCase(input[i])
+		input[i] = string(UpCase(input[i]))
 	}
 	UpCaseString = input
 	return
@@ -398,7 +398,7 @@ func TextWindowEdit(state *TTextWindowState) {
 			}
 		case KEY_BACKSPACE:
 			if charPos > 1 {
-				state.Lines[state.LinePos-1] = Copy(*state.Lines[state.LinePos-1], 1, charPos-2) + Copy(*state.Lines[state.LinePos-1], charPos, Length(*state.Lines[state.LinePos-1])-charPos+1)
+				state.Lines[state.LinePos-1] = string(Copy(*state.Lines[state.LinePos-1], 1, charPos-2) + Copy(*state.Lines[state.LinePos-1], charPos, Length(*state.Lines[state.LinePos-1])-charPos+1))
 				charPos--
 			} else if Length(*state.Lines[state.LinePos-1]) == 0 {
 				DeleteCurrLine()
@@ -409,17 +409,17 @@ func TextWindowEdit(state *TTextWindowState) {
 		case KEY_INSERT:
 			insertMode = !insertMode
 		case KEY_DELETE:
-			state.Lines[state.LinePos-1] = Copy(*state.Lines[state.LinePos-1], 1, charPos-1) + Copy(*state.Lines[state.LinePos-1], charPos+1, Length(*state.Lines[state.LinePos-1])-charPos)
+			state.Lines[state.LinePos-1] = string(Copy(*state.Lines[state.LinePos-1], 1, charPos-1) + Copy(*state.Lines[state.LinePos-1], charPos+1, Length(*state.Lines[state.LinePos-1])-charPos))
 		case KEY_CTRL_Y:
 			DeleteCurrLine()
 		default:
 			if (InputKeyPressed >= ' ') && (charPos < (TextWindowWidth - 7)) {
 				if !insertMode {
-					state.Lines[state.LinePos-1] = Copy(*state.Lines[state.LinePos-1], 1, charPos-1) + InputKeyPressed + Copy(*state.Lines[state.LinePos-1], charPos+1, Length(*state.Lines[state.LinePos-1])-charPos)
+					state.Lines[state.LinePos-1] = string(Copy(*state.Lines[state.LinePos-1], 1, charPos-1) + InputKeyPressed + Copy(*state.Lines[state.LinePos-1], charPos+1, Length(*state.Lines[state.LinePos-1])-charPos))
 					charPos++
 				} else {
 					if Length(*state.Lines[state.LinePos-1]) < (TextWindowWidth - 8) {
-						state.Lines[state.LinePos-1] = Copy(*state.Lines[state.LinePos-1], 1, charPos-1) + InputKeyPressed + Copy(*state.Lines[state.LinePos-1], charPos, Length(*state.Lines[state.LinePos-1])-charPos+1)
+						state.Lines[state.LinePos-1] = string(Copy(*state.Lines[state.LinePos-1], 1, charPos-1) + InputKeyPressed + Copy(*state.Lines[state.LinePos-1], charPos, Length(*state.Lines[state.LinePos-1])-charPos+1))
 						charPos++
 					}
 				}
