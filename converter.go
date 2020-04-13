@@ -1033,6 +1033,12 @@ func (c *converter) expr(expr Expr) {
 			c.print(")")
 			break
 		}
+		if expr.Type.String() == "Boolean" {
+			c.print("(")
+			c.expr(expr.Expr)
+			c.print(" != 0)")
+			break
+		}
 		c.typeIdent(expr.Type)
 		c.print("(")
 		c.expr(expr.Expr)

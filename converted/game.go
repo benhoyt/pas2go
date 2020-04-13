@@ -1100,7 +1100,7 @@ func BoardShoot(element byte, tx, ty, deltaX, deltaY int16, source int16) (Board
 		stat.P2 = 100
 
 		BoardShoot = true
-	} else if (Board.Tiles[tx+deltaX][ty+deltaY].Element == E_BREAKABLE) || (ElementDefs[Board.Tiles[tx+deltaX][ty+deltaY].Element].Destructible && ((Board.Tiles[tx+deltaX][ty+deltaY].Element == E_PLAYER) == bool(source)) && (World.Info.EnergizerTicks <= 0)) {
+	} else if (Board.Tiles[tx+deltaX][ty+deltaY].Element == E_BREAKABLE) || (ElementDefs[Board.Tiles[tx+deltaX][ty+deltaY].Element].Destructible && ((Board.Tiles[tx+deltaX][ty+deltaY].Element == E_PLAYER) == (source != 0)) && (World.Info.EnergizerTicks <= 0)) {
 		BoardDamageTile(tx+deltaX, ty+deltaY)
 		SoundQueue(2, "\x10\x01")
 		BoardShoot = true

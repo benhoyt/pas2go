@@ -51,7 +51,6 @@
 ./game.go:979:38: invalid operation: numStr + ' ' (mismatched types string and rune)
 ./game.go:1005:35: cannot convert 'm' (type untyped number) to type string
 ./game.go:1005:35: invalid operation: 'm' + numStr (mismatched types rune and string)
-./game.go:1103:210: cannot convert source (type int16) to type bool
 ./game.go:1196:14: cannot assign to input[i - 1]
 ./game.go:1370:23: invalid operation: Board.Stats[0].X += InputDeltaX (mismatched types byte and int16)
 ./game.go:1371:23: invalid operation: Board.Stats[0].Y += InputDeltaY (mismatched types byte and int16)
