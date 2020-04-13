@@ -181,7 +181,7 @@ func Seek(f *File, offset int16) {
 
 // Memory functions
 
-var MemAvail = 32767
+var MemAvail int16 = 32767
 
 func New(p interface{}) {
 	// TODO

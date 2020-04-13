@@ -259,7 +259,6 @@
 ./game.go:977:38: invalid operation: numStr + ' ' (mismatched types string and rune)
 ./game.go:979:38: cannot convert ' ' (type untyped number) to type string
 ./game.go:979:38: invalid operation: numStr + ' ' (mismatched types string and rune)
-./game.go:1004:7: cannot use MemAvail (type int) as type int16 in argument to Str
 ./game.go:1005:35: cannot convert 'm' (type untyped number) to type string
 ./game.go:1005:35: invalid operation: 'm' + numStr (mismatched types rune and string)
 ./game.go:1103:210: cannot convert source (type int16) to type bool
