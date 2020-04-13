@@ -450,7 +450,7 @@ func TextWindowEdit(state *TTextWindowState) {
 
 func TextWindowOpenFile(filename string, state *TTextWindowState) {
 	var (
-		f        File
+		f        *File
 		tf       text
 		i        int16
 		entryPos int16

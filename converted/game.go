@@ -567,7 +567,7 @@ func WorldUnload() {
 
 func WorldLoad(filename, extension string, titleOnly bool) (WorldLoad bool) {
 	var (
-		f            File
+		f            *File
 		ptr          uintptr
 		boardId      int16
 		loadProgress int16
@@ -628,7 +628,7 @@ func WorldLoad(filename, extension string, titleOnly bool) (WorldLoad bool) {
 
 func WorldSave(filename, extension string) {
 	var (
-		f       File
+		f       *File
 		i       int16
 		unk1    int16
 		ptr     uintptr
@@ -1497,7 +1497,7 @@ func GameTitleLoop() {
 func GamePrintRegisterMessage() {
 	var (
 		s         string
-		f         File
+		f         *File
 		i         int16
 		ix, iy    int16
 		color     int16

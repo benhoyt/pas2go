@@ -442,7 +442,7 @@ func EditorLoop() {
 	EditorTransferBoard := func() {
 		var (
 			i byte
-			f File
+			f *File
 		)
 		i = 1
 		SidebarPromptChoice(true, 3, "Transfer board:", "Import Export", &i)
@@ -847,7 +847,7 @@ func EditorLoop() {
 
 func HighScoresLoad() {
 	var (
-		f File
+		f *File
 		i int16
 	)
 	Assign(f, World.Info.Name+".HI")
@@ -865,7 +865,7 @@ func HighScoresLoad() {
 }
 
 func HighScoresSave() {
-	var f File
+	var f *File
 	Assign(f, World.Info.Name+".HI")
 	Rewrite(f)
 	Write(f, HighScoreList)

@@ -1153,7 +1153,7 @@ func (c *converter) typeSpec(spec TypeSpec) {
 		c.print("}")
 	case *FileSpec:
 		// TODO: handle spec.Of
-		c.print("File")
+		c.print("*File")
 	case *PointerSpec:
 		c.print("*")
 		c.typeIdent(spec.Type)

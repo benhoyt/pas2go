@@ -20,29 +20,12 @@
 ./editor.go:399:44: cannot use World.Info.CurrentBoard (type int16) as type byte in assignment
 ./editor.go:400:18: invalid operation: stat.P3 > World.BoardCount (mismatched types byte and int16)
 ./editor.go:423:16: invalid operation: i <= element (mismatched types int16 and byte)
-./editor.go:453:12: cannot use f (type File) as type *File in argument to Assign
-./editor.go:454:11: cannot use f (type File) as type *File in argument to Reset
-./editor.go:460:15: cannot use f (type File) as type *File in argument to BlockRead
-./editor.go:463:16: cannot use f (type File) as type *File in argument to BlockRead
-./editor.go:480:12: cannot use f (type File) as type *File in argument to Assign
-./editor.go:481:13: cannot use f (type File) as type *File in argument to Rewrite
-./editor.go:486:16: cannot use f (type File) as type *File in argument to BlockWrite
-./editor.go:487:16: cannot use f (type File) as type *File in argument to BlockWrite
-./editor.go:491:12: cannot use f (type File) as type *File in argument to Close
 ./editor.go:577:44: cannot use cursorColor - 9 + E_TEXT_MIN (type int16) as type byte in assignment
 ./editor.go:655:56: cannot convert '!' (type untyped number) to type string
 ./editor.go:655:56: invalid operation: ("  " + World.Info.Name) + '!' (mismatched types string and rune)
 ./editor.go:737:94: cannot use ' ' + ElementDefs[iElem].EditorShortcut + ' ' (type byte) as type string in argument to VideoWriteText
-./editor.go:853:8: cannot use f (type File) as type *File in argument to Assign
-./editor.go:854:7: cannot use f (type File) as type *File in argument to Reset
 ./editor.go:855:14: invalid operation: IOResult == 0 (mismatched types func() int16 and int)
-./editor.go:856:7: cannot use f (type File) as type *File in argument to Read
-./editor.go:858:7: cannot use f (type File) as type *File in argument to Close
 ./editor.go:859:14: invalid operation: IOResult != 0 (mismatched types func() int16 and int)
-./editor.go:869:8: cannot use f (type File) as type *File in argument to Assign
-./editor.go:870:9: cannot use f (type File) as type *File in argument to Rewrite
-./editor.go:871:7: cannot use f (type File) as type *File in argument to Write
-./editor.go:872:7: cannot use f (type File) as type *File in argument to Close
 ./editor.go:932:25: cannot convert '*' (type untyped number) to type string
 ./editor.go:932:25: invalid operation: '*' + filename (mismatched types rune and string)
 ./elements.go:27:81: cannot convert ' ' (type untyped number) to type string
@@ -258,22 +241,8 @@
 ./game.go:476:14: invalid operation: *buffer += UpCase(InputKeyPressed) (mismatched types string and byte)
 ./game.go:537:14: invalid operation: IOResult == 0 (mismatched types func() int16 and int)
 ./game.go:542:5: cannot use IOResult (type func() int16) as type int16 in argument to Str
-./game.go:586:8: cannot use f (type File) as type *File in argument to Assign
-./game.go:587:7: cannot use f (type File) as type *File in argument to Reset
-./game.go:590:12: cannot use f (type File) as type *File in argument to BlockRead
 ./game.go:592:8: cannot use IoTmpBuf (type *TIoTmpBuf) as type uintptr in assignment
-./game.go:614:14: cannot use f (type File) as type *File in argument to BlockRead
-./game.go:616:14: cannot use f (type File) as type *File in argument to BlockRead
-./game.go:618:9: cannot use f (type File) as type *File in argument to Close
-./game.go:639:8: cannot use f (type File) as type *File in argument to Assign
-./game.go:640:9: cannot use f (type File) as type *File in argument to Rewrite
 ./game.go:642:7: cannot use IoTmpBuf (type *TIoTmpBuf) as type uintptr in assignment
-./game.go:651:13: cannot use f (type File) as type *File in argument to BlockWrite
-./game.go:656:14: cannot use f (type File) as type *File in argument to BlockWrite
-./game.go:660:14: cannot use f (type File) as type *File in argument to BlockWrite
-./game.go:668:7: cannot use f (type File) as type *File in argument to Close
-./game.go:671:7: cannot use f (type File) as type *File in argument to Close
-./game.go:673:7: cannot use f (type File) as type *File in argument to Erase
 ./game.go:694:17: undefined: SearchRec
 ./game.go:706:2: undefined: FindFirst
 ./game.go:706:15: cannot convert '*' (type untyped number) to type string
@@ -343,19 +312,13 @@
 ./game.go:1508:12: cannot convert "END" (type untyped string) to type byte
 ./game.go:1508:12: invalid operation: "END" + Chr(49 + Random(4)) (mismatched types string and byte)
 ./game.go:1508:20: cannot use 49 + Random(4) (type int16) as type byte in argument to Chr
-./game.go:1513:10: cannot use f (type File) as type *File in argument to Assign
-./game.go:1514:9: cannot use f (type File) as type *File in argument to Reset
-./game.go:1515:8: cannot use f (type File) as type *File in argument to Seek
 ./game.go:1515:41: cannot use ResourceDataHeader.FileOffset[i - 1] (type int32) as type int16 in argument to Seek
 ./game.go:1517:8: invalid operation: IOResult == 0 (mismatched types func() int16 and int)
-./game.go:1518:14: cannot use f (type File) as type *File in argument to BlockRead
 ./game.go:1519:14: undefined: Ptr
 ./game.go:1519:18: undefined: Seg
 ./game.go:1519:26: undefined: Ofs
-./game.go:1523:15: cannot use f (type File) as type *File in argument to BlockRead
 ./game.go:1524:11: cannot convert '@' (type untyped number) to type string
 ./game.go:1524:11: invalid operation: s != '@' (mismatched types string and rune)
-./game.go:1532:9: cannot use f (type File) as type *File in argument to Close
 ./game.go:1534:4: undefined: TextColor
 ./game.go:1534:14: undefined: LightGray
 ./game.go:1536:8: undefined: KeyPressed
