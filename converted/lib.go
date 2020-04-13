@@ -6,7 +6,6 @@ import (
 	"math"
 	"math/rand"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -40,12 +39,10 @@ func Pos(b byte, s string) int16 {
 	return int16(strings.IndexByte(s, b) + 1)
 }
 
-func Val(s string) (n int16, code int16) {
-	nInt, err := strconv.Atoi(s)
-	if err != nil {
-		return int16(nInt), 1 // TODO: code should be 1-based position of first non-number char
-	}
-	return nInt, 0
+func Val(s string, code *int16) int16 {
+	// TODO: code should be 1-based position of first non-number char
+	*code = 0
+	return 0
 }
 
 func Str(n int16) string {

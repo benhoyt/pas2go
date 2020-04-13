@@ -8,7 +8,6 @@
 ./editor.go:242:19: cannot use "Re-enter when zapped: " + BoolToString(Board.Info.ReenterWhenZapped) (type string) as type *string in assignment
 ./editor.go:244:19: cannot use "  Time limit, 0=None: " + numStr + " sec." (type string) as type *string in assignment
 ./editor.go:245:21: cannot use "          Quit!" (type string) as type *string in assignment
-./editor.go:260:30: cannot assign int16 to Board.Info.MaxShots (type byte) in multiple assignment
 ./editor.go:267:52: invalid operation: Board.Info.NeighborBoards[state.LinePos - 4] > World.BoardCount (mismatched types byte and int16)
 ./editor.go:317:11: cannot use stat.Data (type *string) as type uintptr in assignment
 ./editor.go:320:41: invalid operation: state.Lines[iLine - 1][iChar - 1] (type *string does not support indexing)
@@ -350,7 +349,6 @@
 ./input.go:344:3: undefined: Writeln
 ./keys.go:15:11: undefined: Registers
 ./keys.go:17:2: undefined: Intr
-./lib.go:48:2: cannot use nInt (type int) as type int16 in return argument
 ./oop.go:18:8: undefined: Ptr
 ./oop.go:18:12: undefined: Seg
 ./oop.go:18:29: undefined: Ofs

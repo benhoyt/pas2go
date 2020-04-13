@@ -707,15 +707,21 @@ func (c *converter) stmt(stmt Stmt) {
 				c.print(")")
 			}
 		case "val":
-			if len(stmt.Args) != 3 {
-				panic(fmt.Sprintf("Val() requires 3 args, got %d", len(stmt.Args)))
-			}
 			c.expr(stmt.Args[1])
+			c.print(" = ")
+			spec, _ := c.lookupVarExprType(stmt.Args[1])
+			targetKind := c.specToKind(spec)
+			if targetKind != KindInteger {
+				c.printf("%s(", targetKind)
+			}
+			c.print("Val(")
+			c.procArg(false, KindString, stmt.Args[0])
 			c.print(", ")
-			c.expr(stmt.Args[2])
-			c.print(" = Val(")
-			c.expr(stmt.Args[0])
+			c.procArg(true, KindInteger, stmt.Args[2])
 			c.print(")")
+			if targetKind != KindInteger {
+				c.print(")")
+			}
 		default:
 			if procStr == "delete" {
 				c.varExpr(stmt.Args[0], false)

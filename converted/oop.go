@@ -66,7 +66,7 @@ func OopReadValue(statId int16, position *int16) {
 		*position--
 	}
 	if Length(s) != 0 {
-		OopValue, code = Val(s)
+		OopValue = Val(s, &code)
 	} else {
 		OopValue = -1
 	}

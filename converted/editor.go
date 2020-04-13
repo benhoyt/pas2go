@@ -257,7 +257,7 @@ func EditorLoop() {
 					numStr = Str(int16(Board.Info.MaxShots))
 					SidebarPromptString("Maximum shots?", "", &numStr, PROMPT_NUMERIC)
 					if Length(numStr) != 0 {
-						Board.Info.MaxShots, i = Val(numStr)
+						Board.Info.MaxShots = byte(Val(numStr, &i))
 					}
 					EditorDrawSidebar()
 				case 3:
@@ -274,7 +274,7 @@ func EditorLoop() {
 					numStr = Str(Board.Info.TimeLimitSec)
 					SidebarPromptString("Time limit?", " Sec", &numStr, PROMPT_NUMERIC)
 					if Length(numStr) != 0 {
-						Board.Info.TimeLimitSec, i = Val(numStr)
+						Board.Info.TimeLimitSec = Val(numStr, &i)
 					}
 					EditorDrawSidebar()
 				case 10:
