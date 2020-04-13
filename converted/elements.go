@@ -43,7 +43,7 @@ func ElementDamagingTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16)
 func ElementLionTick(statId int16) {
 	var deltaX, deltaY int16
 	stat := &Board.Stats[statId]
-	if stat.P1 < Random(10) {
+	if int16(stat.P1) < Random(10) {
 		CalcDirectionRnd(&deltaX, &deltaY)
 	} else {
 		CalcDirectionSeek(int16(stat.X), int16(stat.Y), &deltaX, &deltaY)
@@ -66,7 +66,7 @@ func ElementTigerTick(statId int16) {
 	if stat.P2 >= 0x80 {
 		element = E_STAR
 	}
-	if (Random(10) * 3) <= (stat.P2 % 0x80) {
+	if (Random(10) * 3) <= int16(stat.P2%0x80) {
 		if Difference(int16(stat.X), int16(Board.Stats[0].X)) <= 2 {
 			shot = BoardShoot(element, int16(stat.X), int16(stat.Y), 0, Signum(int16(Board.Stats[0].Y-stat.Y)), SHOT_SOURCE_ENEMY)
 		} else {
@@ -85,15 +85,15 @@ func ElementTigerTick(statId int16) {
 func ElementRuffianTick(statId int16) {
 	stat := &Board.Stats[statId]
 	if (stat.StepX == 0) && (stat.StepY == 0) {
-		if (stat.P2 + 8) <= Random(17) {
-			if stat.P1 >= Random(9) {
+		if int16(stat.P2+8) <= Random(17) {
+			if int16(stat.P1) >= Random(9) {
 				CalcDirectionSeek(int16(stat.X), int16(stat.Y), &stat.StepX, &stat.StepY)
 			} else {
 				CalcDirectionRnd(&stat.StepX, &stat.StepY)
 			}
 		}
 	} else {
-		if ((stat.Y == Board.Stats[0].Y) || (stat.X == Board.Stats[0].X)) && (Random(9) <= stat.P1) {
+		if ((stat.Y == Board.Stats[0].Y) || (stat.X == Board.Stats[0].X)) && (Random(9) <= int16(stat.P1)) {
 			CalcDirectionSeek(int16(stat.X), int16(stat.Y), &stat.StepX, &stat.StepY)
 		}
 		tile := &Board.Tiles[int16(stat.X)+stat.StepX][int16(stat.Y)+stat.StepY]
@@ -101,7 +101,7 @@ func ElementRuffianTick(statId int16) {
 			BoardAttack(statId, int16(stat.X)+stat.StepX, int16(stat.Y)+stat.StepY)
 		} else if ElementDefs[tile.Element].Walkable {
 			MoveStat(statId, int16(stat.X)+stat.StepX, int16(stat.Y)+stat.StepY)
-			if (stat.P2 + 8) <= Random(17) {
+			if int16(stat.P2+8) <= Random(17) {
 				stat.StepX = 0
 				stat.StepY = 0
 			}
@@ -148,13 +148,13 @@ func ElementCentipedeHeadTick(statId int16) {
 		tmp    int16
 	)
 	stat := &Board.Stats[statId]
-	if (stat.X == Board.Stats[0].X) && (Random(10) < stat.P1) {
+	if (stat.X == Board.Stats[0].X) && (Random(10) < int16(stat.P1)) {
 		stat.StepY = Signum(int16(Board.Stats[0].Y - stat.Y))
 		stat.StepX = 0
-	} else if (stat.Y == Board.Stats[0].Y) && (Random(10) < stat.P1) {
+	} else if (stat.Y == Board.Stats[0].Y) && (Random(10) < int16(stat.P1)) {
 		stat.StepX = Signum(int16(Board.Stats[0].X - stat.X))
 		stat.StepY = 0
-	} else if ((Random(10) * 4) < stat.P2) || ((stat.StepX == 0) && (stat.StepY == 0)) {
+	} else if ((Random(10) * 4) < int16(stat.P2)) || ((stat.StepX == 0) && (stat.StepY == 0)) {
 		CalcDirectionRnd(&stat.StepX, &stat.StepY)
 	}
 
@@ -350,8 +350,8 @@ func ElementSpinningGunTick(statId int16) {
 	if stat.P2 >= 0x80 {
 		element = E_STAR
 	}
-	if Random(9) < (stat.P2 % 0x80) {
-		if Random(9) <= stat.P1 {
+	if Random(9) < int16(stat.P2%0x80) {
+		if Random(9) <= int16(stat.P1) {
 			if Difference(int16(stat.X), int16(Board.Stats[0].X)) <= 2 {
 				shot = BoardShoot(element, int16(stat.X), int16(stat.Y), 0, Signum(int16(Board.Stats[0].Y-stat.Y)), SHOT_SOURCE_ENEMY)
 			} else {
@@ -704,7 +704,7 @@ func ElementSlimeTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16) {
 func ElementSharkTick(statId int16) {
 	var deltaX, deltaY int16
 	stat := &Board.Stats[statId]
-	if stat.P1 < Random(10) {
+	if int16(stat.P1) < Random(10) {
 		CalcDirectionRnd(&deltaX, &deltaY)
 	} else {
 		CalcDirectionSeek(int16(stat.X), int16(stat.Y), &deltaX, &deltaY)
@@ -1157,7 +1157,7 @@ func DrawPlayerSurroundings(x, y int16, bombPhase int16) {
 							}
 							if (tile.Element == E_EMPTY) || (tile.Element == E_BREAKABLE) {
 								tile.Element = E_BREAKABLE
-								tile.Color = 0x09 + Random(7)
+								tile.Color = byte(0x09 + Random(7))
 								BoardDrawTile(ix, iy)
 							}
 						} else {

@@ -17,19 +17,6 @@
 ./editor.go:932:25: invalid operation: '*' + filename (mismatched types rune and string)
 ./elements.go:27:81: cannot convert ' ' (type untyped number) to type string
 ./elements.go:27:81: invalid operation: ' ' + Board.Info.Message (mismatched types rune and string)
-./elements.go:46:13: invalid operation: stat.P1 < Random(10) (mismatched types byte and int16)
-./elements.go:69:22: invalid operation: Random(10) * 3 <= stat.P2 % 128 (mismatched types int16 and byte)
-./elements.go:88:20: invalid operation: stat.P2 + 8 <= Random(17) (mismatched types byte and int16)
-./elements.go:89:15: invalid operation: stat.P1 >= Random(9) (mismatched types byte and int16)
-./elements.go:96:72: invalid operation: Random(9) <= stat.P1 (mismatched types int16 and byte)
-./elements.go:104:21: invalid operation: stat.P2 + 8 <= Random(17) (mismatched types byte and int16)
-./elements.go:151:37: invalid operation: Random(10) < stat.P1 (mismatched types int16 and byte)
-./elements.go:154:44: invalid operation: Random(10) < stat.P1 (mismatched types int16 and byte)
-./elements.go:157:12: invalid operation: Random(10) * 4 < stat.P2 (mismatched types int16 and byte)
-./elements.go:353:15: invalid operation: Random(9) < stat.P2 % 128 (mismatched types int16 and byte)
-./elements.go:354:16: invalid operation: Random(9) <= stat.P1 (mismatched types int16 and byte)
-./elements.go:707:13: invalid operation: stat.P1 < Random(10) (mismatched types byte and int16)
-./elements.go:1160:20: cannot use 9 + Random(7) (type int16) as type byte in assignment
 ./game.go:69:6: cannot use IoTmpBuf (type *TIoTmpBuf) as type uintptr in assignment
 ./game.go:107:37: type TStat is not an expression
 ./game.go:317:45: cannot convert editable (type bool) to type int16
@@ -73,8 +60,7 @@
 ./game.go:1371:23: invalid operation: Board.Stats[0].Y += InputDeltaY (mismatched types byte and int16)
 ./game.go:1507:2: undefined: SetCBreak
 ./game.go:1508:12: cannot convert "END" (type untyped string) to type byte
-./game.go:1508:12: invalid operation: "END" + Chr(49 + Random(4)) (mismatched types string and byte)
-./game.go:1508:20: cannot use 49 + Random(4) (type int16) as type byte in argument to Chr
+./game.go:1508:12: invalid operation: "END" + Chr(byte(49 + Random(4))) (mismatched types string and byte)
 ./game.go:1515:41: cannot use ResourceDataHeader.FileOffset[i - 1] (type int32) as type int16 in argument to Seek
 ./game.go:1524:11: cannot convert '@' (type untyped number) to type string
 ./game.go:1524:11: invalid operation: s != '@' (mismatched types string and rune)

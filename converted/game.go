@@ -1505,7 +1505,7 @@ func GamePrintRegisterMessage() {
 		strPtr    uintptr
 	)
 	SetCBreak(false)
-	s = "END" + Chr(49+Random(4)) + ".MSG"
+	s = "END" + Chr(byte(49+Random(4))) + ".MSG"
 	iy = 0
 	color = 0x0F
 	for i = 1; i <= ResourceDataHeader.EntryCount; i++ {

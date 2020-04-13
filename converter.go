@@ -62,6 +62,10 @@ func Convert(file File, units []*Unit, w io.Writer) {
 		[]*ParamGroup{{false, []string{"s"}, &TypeIdent{"string"}}},
 		&TypeIdent{"integer"},
 	})
+	c.defineVar("Random", &FuncSpec{
+		[]*ParamGroup{{false, []string{"end"}, &TypeIdent{"integer"}}},
+		&TypeIdent{"integer"},
+	})
 	c.defineVar("UpCase", &FuncSpec{
 		[]*ParamGroup{{false, []string{"ch"}, &TypeIdent{"char"}}},
 		&TypeIdent{"char"},
