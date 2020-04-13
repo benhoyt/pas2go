@@ -31,7 +31,6 @@
 ./game.go:1534:4: undefined: TextColor
 ./game.go:1534:14: undefined: LightGray
 ./game.go:1536:8: undefined: KeyPressed
-./game.go:1540:22: undefined: ReadKey
 ./game.go:1542:4: undefined: GotoXY
 ./input.go:58:34: undefined: Port
 ./input.go:67:2: undefined: Port
@@ -42,9 +41,7 @@
 	have (string)
 	want (*File, interface {})
 ./input.go:88:6: undefined: KeyPressed
-./input.go:89:16: undefined: ReadKey
 ./input.go:99:7: undefined: KeyPressed
-./input.go:100:17: undefined: ReadKey
 ./input.go:111:2: undefined: WriteLn
 ./input.go:112:2: undefined: WriteLn
 ./input.go:134:2: undefined: WriteLn
@@ -54,12 +51,9 @@
 	have (string)
 	want (*File, interface {})
 ./input.go:155:7: undefined: KeyPressed
-./input.go:159:15: undefined: ReadKey
 ./input.go:160:3: undefined: WriteLn
 ./input.go:171:20: undefined: Registers
 ./input.go:177:6: undefined: KeyPressed
-./input.go:178:21: undefined: ReadKey
-./input.go:180:37: undefined: ReadKey
 ./input.go:244:3: undefined: Intr
 ./input.go:268:3: undefined: Intr
 ./input.go:297:11: undefined: Registers
@@ -78,7 +72,6 @@
 	have (string)
 	want (*File, interface {})
 ./input.go:325:8: undefined: KeyPressed
-./input.go:329:23: undefined: ReadKey
 ./input.go:334:3: undefined: Writeln
 ./input.go:344:3: undefined: Writeln
 ./keys.go:15:11: undefined: Registers

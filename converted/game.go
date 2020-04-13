@@ -1537,7 +1537,7 @@ func GamePrintRegisterMessage() {
 					break
 				}
 			}
-			InputKeyPressed = ReadKey
+			InputKeyPressed = ReadKey()
 			VideoWriteText(28, 24, 0x00, "                        ")
 			GotoXY(1, 23)
 		}

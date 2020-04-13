@@ -58,6 +58,10 @@ func Convert(file File, units []*Unit, w io.Writer) {
 		[]*ParamGroup{{false, []string{"end"}, &TypeIdent{"integer"}}},
 		&TypeIdent{"integer"},
 	})
+	c.defineVar("ReadKey", &FuncSpec{
+		nil,
+		&TypeIdent{"char"},
+	})
 	c.defineVar("Sqr", &FuncSpec{
 		[]*ParamGroup{{false, []string{"n"}, &TypeIdent{"integer"}}},
 		&TypeIdent{"integer"},

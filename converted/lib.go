@@ -225,3 +225,10 @@ func Seg(seg interface{}) int16 {
 func Ofs(ofs interface{}) int16 {
 	return 0
 }
+
+// Keyboard functions
+
+func ReadKey() byte {
+	// TODO
+	return 0
+}
