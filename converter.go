@@ -934,21 +934,36 @@ func (c *converter) expr(expr Expr) {
 			c.inExpr(expr)
 			return
 		}
-		c.expr(expr.Left)
-		var opStr string
 		if expr.Op == AND || expr.Op == OR || expr.Op == XOR {
 			// This is cheating; should really use types, but this works with most code
+			c.expr(expr.Left)
 			_, isConst := expr.Right.(*ConstExpr)
 			if isConst {
-				opStr = bitwiseOperatorStr(expr.Op)
+				c.printf(" %s ", bitwiseOperatorStr(expr.Op))
 			} else {
-				opStr = operatorStr(expr.Op)
+				c.printf(" %s ", operatorStr(expr.Op))
 			}
-		} else {
-			opStr = operatorStr(expr.Op)
+			c.expr(expr.Right)
+			return
 		}
-		c.printf(" %s ", opStr)
-		c.expr(expr.Right)
+
+		opStr := operatorStr(expr.Op)
+		leftKind := c.exprKind(expr.Left)
+		rightKind := c.exprKind(expr.Right)
+		switch {
+		case leftKind == KindInteger && rightKind == KindByte:
+			c.expr(expr.Left)
+			c.printf(" %s ", opStr)
+			c.typeConversion(expr.Right, "int16")
+		case leftKind == KindByte && rightKind == KindInteger:
+			c.typeConversion(expr.Left, "int16")
+			c.printf(" %s ", opStr)
+			c.expr(expr.Right)
+		default:
+			c.expr(expr.Left)
+			c.printf(" %s ", opStr)
+			c.expr(expr.Right)
+		}
 	case *ConstExpr:
 		switch value := expr.Value.(type) {
 		case string:
@@ -1041,6 +1056,18 @@ func (c *converter) identExpr(expr *IdentExpr) {
 		c.print(".")
 	}
 	c.print(expr.Name)
+}
+
+func (c *converter) typeConversion(expr Expr, typeName string) {
+	if parenExpr, isParen := expr.(*ParenExpr); isParen {
+		c.printf("%s(", typeName)
+		c.expr(parenExpr.Expr)
+		c.print(")")
+	} else {
+		c.printf("%s(", typeName)
+		c.expr(expr)
+		c.print(")")
+	}
 }
 
 func (c *converter) varExpr(expr Expr, suppressStar bool) {

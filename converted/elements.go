@@ -48,10 +48,10 @@ func ElementLionTick(statId int16) {
 	} else {
 		CalcDirectionSeek(int16(stat.X), int16(stat.Y), &deltaX, &deltaY)
 	}
-	if ElementDefs[Board.Tiles[stat.X+deltaX][stat.Y+deltaY].Element].Walkable {
-		MoveStat(statId, stat.X+deltaX, stat.Y+deltaY)
-	} else if Board.Tiles[stat.X+deltaX][stat.Y+deltaY].Element == E_PLAYER {
-		BoardAttack(statId, stat.X+deltaX, stat.Y+deltaY)
+	if ElementDefs[Board.Tiles[int16(stat.X)+deltaX][int16(stat.Y)+deltaY].Element].Walkable {
+		MoveStat(statId, int16(stat.X)+deltaX, int16(stat.Y)+deltaY)
+	} else if Board.Tiles[int16(stat.X)+deltaX][int16(stat.Y)+deltaY].Element == E_PLAYER {
+		BoardAttack(statId, int16(stat.X)+deltaX, int16(stat.Y)+deltaY)
 	}
 
 }
@@ -96,11 +96,11 @@ func ElementRuffianTick(statId int16) {
 		if ((stat.Y == Board.Stats[0].Y) || (stat.X == Board.Stats[0].X)) && (Random(9) <= stat.P1) {
 			CalcDirectionSeek(int16(stat.X), int16(stat.Y), &stat.StepX, &stat.StepY)
 		}
-		tile := &Board.Tiles[stat.X+stat.StepX][stat.Y+stat.StepY]
+		tile := &Board.Tiles[int16(stat.X)+stat.StepX][int16(stat.Y)+stat.StepY]
 		if tile.Element == E_PLAYER {
-			BoardAttack(statId, stat.X+stat.StepX, stat.Y+stat.StepY)
+			BoardAttack(statId, int16(stat.X)+stat.StepX, int16(stat.Y)+stat.StepY)
 		} else if ElementDefs[tile.Element].Walkable {
-			MoveStat(statId, stat.X+stat.StepX, stat.Y+stat.StepY)
+			MoveStat(statId, int16(stat.X)+stat.StepX, int16(stat.Y)+stat.StepY)
 			if (stat.P2 + 8) <= Random(17) {
 				stat.StepX = 0
 				stat.StepY = 0
@@ -118,13 +118,13 @@ func ElementBearTick(statId int16) {
 	var deltaX, deltaY int16
 	stat := &Board.Stats[statId]
 	if stat.X != Board.Stats[0].X {
-		if Difference(int16(stat.Y), int16(Board.Stats[0].Y)) <= (8 - stat.P1) {
+		if Difference(int16(stat.Y), int16(Board.Stats[0].Y)) <= int16(8-stat.P1) {
 			deltaX = Signum(int16(Board.Stats[0].X - stat.X))
 			deltaY = 0
 			goto Movement
 		}
 	}
-	if Difference(int16(stat.X), int16(Board.Stats[0].X)) <= (8 - stat.P1) {
+	if Difference(int16(stat.X), int16(Board.Stats[0].X)) <= int16(8-stat.P1) {
 		deltaY = Signum(int16(Board.Stats[0].Y - stat.Y))
 		deltaX = 0
 	} else {
@@ -132,11 +132,11 @@ func ElementBearTick(statId int16) {
 		deltaY = 0
 	}
 Movement:
-	tile := &Board.Tiles[stat.X+deltaX][stat.Y+deltaY]
+	tile := &Board.Tiles[int16(stat.X)+deltaX][int16(stat.Y)+deltaY]
 	if ElementDefs[tile.Element].Walkable {
-		MoveStat(statId, stat.X+deltaX, stat.Y+deltaY)
+		MoveStat(statId, int16(stat.X)+deltaX, int16(stat.Y)+deltaY)
 	} else if (tile.Element == E_PLAYER) || (tile.Element == E_BREAKABLE) {
-		BoardAttack(statId, stat.X+deltaX, stat.Y+deltaY)
+		BoardAttack(statId, int16(stat.X)+deltaX, int16(stat.Y)+deltaY)
 	}
 
 }
@@ -158,17 +158,17 @@ func ElementCentipedeHeadTick(statId int16) {
 		CalcDirectionRnd(&stat.StepX, &stat.StepY)
 	}
 
-	if !ElementDefs[Board.Tiles[stat.X+stat.StepX][stat.Y+stat.StepY].Element].Walkable && (Board.Tiles[stat.X+stat.StepX][stat.Y+stat.StepY].Element != E_PLAYER) {
+	if !ElementDefs[Board.Tiles[int16(stat.X)+stat.StepX][int16(stat.Y)+stat.StepY].Element].Walkable && (Board.Tiles[int16(stat.X)+stat.StepX][int16(stat.Y)+stat.StepY].Element != E_PLAYER) {
 		ix = stat.StepX
 		iy = stat.StepY
 		tmp = ((Random(2) * 2) - 1) * stat.StepY
 		stat.StepY = ((Random(2) * 2) - 1) * stat.StepX
 		stat.StepX = tmp
-		if !ElementDefs[Board.Tiles[stat.X+stat.StepX][stat.Y+stat.StepY].Element].Walkable && (Board.Tiles[stat.X+stat.StepX][stat.Y+stat.StepY].Element != E_PLAYER) {
+		if !ElementDefs[Board.Tiles[int16(stat.X)+stat.StepX][int16(stat.Y)+stat.StepY].Element].Walkable && (Board.Tiles[int16(stat.X)+stat.StepX][int16(stat.Y)+stat.StepY].Element != E_PLAYER) {
 			stat.StepX = -stat.StepX
 			stat.StepY = -stat.StepY
-			if !ElementDefs[Board.Tiles[stat.X+stat.StepX][stat.Y+stat.StepY].Element].Walkable && (Board.Tiles[stat.X+stat.StepX][stat.Y+stat.StepY].Element != E_PLAYER) {
-				if ElementDefs[Board.Tiles[stat.X-ix][stat.Y-iy].Element].Walkable || (Board.Tiles[stat.X-ix][stat.Y-iy].Element == E_PLAYER) {
+			if !ElementDefs[Board.Tiles[int16(stat.X)+stat.StepX][int16(stat.Y)+stat.StepY].Element].Walkable && (Board.Tiles[int16(stat.X)+stat.StepX][int16(stat.Y)+stat.StepY].Element != E_PLAYER) {
+				if ElementDefs[Board.Tiles[int16(stat.X)-ix][int16(stat.Y)-iy].Element].Walkable || (Board.Tiles[int16(stat.X)-ix][int16(stat.Y)-iy].Element == E_PLAYER) {
 					stat.StepX = -ix
 					stat.StepY = -iy
 				} else {
@@ -189,24 +189,24 @@ func ElementCentipedeHeadTick(statId int16) {
 		}
 		Board.Stats[statId].Follower = Board.Stats[statId].Leader
 		Board.Tiles[Board.Stats[statId].X][Board.Stats[statId].Y].Element = E_CENTIPEDE_HEAD
-	} else if Board.Tiles[stat.X+stat.StepX][stat.Y+stat.StepY].Element == E_PLAYER {
+	} else if Board.Tiles[int16(stat.X)+stat.StepX][int16(stat.Y)+stat.StepY].Element == E_PLAYER {
 		if stat.Follower != -1 {
 			Board.Tiles[Board.Stats[stat.Follower].X][Board.Stats[stat.Follower].Y].Element = E_CENTIPEDE_HEAD
 			Board.Stats[stat.Follower].StepX = stat.StepX
 			Board.Stats[stat.Follower].StepY = stat.StepY
 			BoardDrawTile(int16(Board.Stats[stat.Follower].X), int16(Board.Stats[stat.Follower].Y))
 		}
-		BoardAttack(statId, stat.X+stat.StepX, stat.Y+stat.StepY)
+		BoardAttack(statId, int16(stat.X)+stat.StepX, int16(stat.Y)+stat.StepY)
 	} else {
-		MoveStat(statId, stat.X+stat.StepX, stat.Y+stat.StepY)
-		tx = stat.X - stat.StepX
-		ty = stat.Y - stat.StepY
+		MoveStat(statId, int16(stat.X)+stat.StepX, int16(stat.Y)+stat.StepY)
+		tx = int16(stat.X) - stat.StepX
+		ty = int16(stat.Y) - stat.StepY
 		ix = stat.StepX
 		iy = stat.StepY
 		for {
 			stat2 := &Board.Stats[statId]
-			tx = stat2.X - stat2.StepX
-			ty = stat2.Y - stat2.StepY
+			tx = int16(stat2.X) - stat2.StepX
+			ty = int16(stat2.Y) - stat2.StepY
 			ix = stat2.StepX
 			iy = stat2.StepY
 			if stat2.Follower < 0 {
@@ -223,8 +223,8 @@ func ElementCentipedeHeadTick(statId int16) {
 				Board.Stats[stat2.Follower].Leader = statId
 				Board.Stats[stat2.Follower].P1 = stat2.P1
 				Board.Stats[stat2.Follower].P2 = stat2.P2
-				Board.Stats[stat2.Follower].StepX = tx - Board.Stats[stat2.Follower].X
-				Board.Stats[stat2.Follower].StepY = ty - Board.Stats[stat2.Follower].Y
+				Board.Stats[stat2.Follower].StepX = tx - int16(Board.Stats[stat2.Follower].X)
+				Board.Stats[stat2.Follower].StepY = ty - int16(Board.Stats[stat2.Follower].Y)
 				MoveStat(stat2.Follower, tx, ty)
 			}
 			statId = stat2.Follower
@@ -259,9 +259,9 @@ func ElementBulletTick(statId int16) {
 	stat := &Board.Stats[statId]
 	firstTry = true
 TryMove:
-	ix = stat.X + stat.StepX
+	ix = int16(stat.X) + stat.StepX
 
-	iy = stat.Y + stat.StepY
+	iy = int16(stat.Y) + stat.StepY
 	iElem = Board.Tiles[ix][iy].Element
 	if ElementDefs[iElem].Walkable || (iElem == E_WATER) {
 		MoveStat(statId, ix, iy)
@@ -283,7 +283,7 @@ TryMove:
 		BoardAttack(statId, ix, iy)
 		return
 	}
-	if (Board.Tiles[stat.X+stat.StepY][stat.Y+stat.StepX].Element == E_RICOCHET) && firstTry {
+	if (Board.Tiles[int16(stat.X)+stat.StepY][int16(stat.Y)+stat.StepX].Element == E_RICOCHET) && firstTry {
 		ix = stat.StepX
 		stat.StepX = -stat.StepY
 		stat.StepY = -ix
@@ -292,7 +292,7 @@ TryMove:
 		goto TryMove
 		return
 	}
-	if (Board.Tiles[stat.X-stat.StepY][stat.Y-stat.StepX].Element == E_RICOCHET) && firstTry {
+	if (Board.Tiles[int16(stat.X)-stat.StepY][int16(stat.Y)-stat.StepX].Element == E_RICOCHET) && firstTry {
 		ix = stat.StepX
 		stat.StepX = stat.StepY
 		stat.StepY = ix
@@ -577,7 +577,7 @@ func ElementTransporterMove(x, y, deltaX, deltaY int16) {
 			}
 		}
 		if newX != -1 {
-			ElementMove(stat.X-deltaX, stat.Y-deltaY, newX, newY)
+			ElementMove(int16(stat.X)-deltaX, int16(stat.Y)-deltaY, newX, newY)
 			SoundQueue(3, "0\x01B\x014\x01F\x018\x01J\x01@\x01R\x01")
 		}
 	}
@@ -621,15 +621,15 @@ func ElementStarTick(statId int16) {
 		RemoveStat(statId)
 	} else if (stat.P2 % 2) == 0 {
 		CalcDirectionSeek(int16(stat.X), int16(stat.Y), &stat.StepX, &stat.StepY)
-		tile := &Board.Tiles[stat.X+stat.StepX][stat.Y+stat.StepY]
+		tile := &Board.Tiles[int16(stat.X)+stat.StepX][int16(stat.Y)+stat.StepY]
 		if (tile.Element == E_PLAYER) || (tile.Element == E_BREAKABLE) {
-			BoardAttack(statId, stat.X+stat.StepX, stat.Y+stat.StepY)
+			BoardAttack(statId, int16(stat.X)+stat.StepX, int16(stat.Y)+stat.StepY)
 		} else {
 			if !ElementDefs[tile.Element].Walkable {
-				ElementPushablePush(stat.X+stat.StepX, stat.Y+stat.StepY, stat.StepX, stat.StepY)
+				ElementPushablePush(int16(stat.X)+stat.StepX, int16(stat.Y)+stat.StepY, stat.StepX, stat.StepY)
 			}
 			if ElementDefs[tile.Element].Walkable || (tile.Element == E_WATER) {
-				MoveStat(statId, stat.X+stat.StepX, stat.Y+stat.StepY)
+				MoveStat(statId, int16(stat.X)+stat.StepX, int16(stat.Y)+stat.StepY)
 			}
 		}
 
@@ -709,10 +709,10 @@ func ElementSharkTick(statId int16) {
 	} else {
 		CalcDirectionSeek(int16(stat.X), int16(stat.Y), &deltaX, &deltaY)
 	}
-	if Board.Tiles[stat.X+deltaX][stat.Y+deltaY].Element == E_WATER {
-		MoveStat(statId, stat.X+deltaX, stat.Y+deltaY)
-	} else if Board.Tiles[stat.X+deltaX][stat.Y+deltaY].Element == E_PLAYER {
-		BoardAttack(statId, stat.X+deltaX, stat.Y+deltaY)
+	if Board.Tiles[int16(stat.X)+deltaX][int16(stat.Y)+deltaY].Element == E_WATER {
+		MoveStat(statId, int16(stat.X)+deltaX, int16(stat.Y)+deltaY)
+	} else if Board.Tiles[int16(stat.X)+deltaX][int16(stat.Y)+deltaY].Element == E_PLAYER {
+		BoardAttack(statId, int16(stat.X)+deltaX, int16(stat.Y)+deltaY)
 	}
 
 }
@@ -733,21 +733,21 @@ func ElementBlinkWallTick(statId int16) {
 		stat.P3 = stat.P1 + 1
 	}
 	if stat.P3 == 1 {
-		ix = stat.X + stat.StepX
-		iy = stat.Y + stat.StepY
+		ix = int16(stat.X) + stat.StepX
+		iy = int16(stat.Y) + stat.StepY
 		if stat.StepX != 0 {
 			el = E_BLINK_RAY_EW
 		} else {
 			el = E_BLINK_RAY_NS
 		}
-		for (Board.Tiles[ix][iy].Element == el) && (Board.Tiles[ix][iy].Color == Board.Tiles[stat.X][stat.Y].Color) {
+		for (int16(Board.Tiles[ix][iy].Element) == el) && (Board.Tiles[ix][iy].Color == Board.Tiles[stat.X][stat.Y].Color) {
 			Board.Tiles[ix][iy].Element = E_EMPTY
 			BoardDrawTile(ix, iy)
 			ix += stat.StepX
 			iy += stat.StepY
 			stat.P3 = (stat.P2)*2 + 1
 		}
-		if ((stat.X + stat.StepX) == ix) && ((stat.Y + stat.StepY) == iy) {
+		if ((int16(stat.X) + stat.StepX) == ix) && ((int16(stat.Y) + stat.StepY) == iy) {
 			hitBoundary = false
 			for {
 				if (Board.Tiles[ix][iy].Element != E_EMPTY) && (ElementDefs[Board.Tiles[ix][iy].Element].Destructible) {
@@ -857,8 +857,8 @@ func ElementObjectTick(statId int16) {
 		OopExecute(statId, &stat.DataPos, "Interaction")
 	}
 	if (stat.StepX != 0) || (stat.StepY != 0) {
-		if ElementDefs[Board.Tiles[stat.X+stat.StepX][stat.Y+stat.StepY].Element].Walkable {
-			MoveStat(statId, stat.X+stat.StepX, stat.Y+stat.StepY)
+		if ElementDefs[Board.Tiles[int16(stat.X)+stat.StepX][int16(stat.Y)+stat.StepY].Element].Walkable {
+			MoveStat(statId, int16(stat.X)+stat.StepX, int16(stat.Y)+stat.StepY)
 		} else {
 			retVal = OopSend(-statId, "THUD", false)
 		}
@@ -887,22 +887,22 @@ func ElementDuplicatorTick(statId int16) {
 		BoardDrawTile(int16(stat.X), int16(stat.Y))
 	} else {
 		stat.P1 = 0
-		if Board.Tiles[stat.X-stat.StepX][stat.Y-stat.StepY].Element == E_PLAYER {
-			ElementDefs[Board.Tiles[stat.X+stat.StepX][stat.Y+stat.StepY].Element].TouchProc(stat.X+stat.StepX, stat.Y+stat.StepY, 0, &InputDeltaX, &InputDeltaY)
+		if Board.Tiles[int16(stat.X)-stat.StepX][int16(stat.Y)-stat.StepY].Element == E_PLAYER {
+			ElementDefs[Board.Tiles[int16(stat.X)+stat.StepX][int16(stat.Y)+stat.StepY].Element].TouchProc(int16(stat.X)+stat.StepX, int16(stat.Y)+stat.StepY, 0, &InputDeltaX, &InputDeltaY)
 		} else {
-			if Board.Tiles[stat.X-stat.StepX][stat.Y-stat.StepY].Element != E_EMPTY {
-				ElementPushablePush(stat.X-stat.StepX, stat.Y-stat.StepY, -stat.StepX, -stat.StepY)
+			if Board.Tiles[int16(stat.X)-stat.StepX][int16(stat.Y)-stat.StepY].Element != E_EMPTY {
+				ElementPushablePush(int16(stat.X)-stat.StepX, int16(stat.Y)-stat.StepY, -stat.StepX, -stat.StepY)
 			}
-			if Board.Tiles[stat.X-stat.StepX][stat.Y-stat.StepY].Element == E_EMPTY {
-				sourceStatId = GetStatIdAt(stat.X+stat.StepX, stat.Y+stat.StepY)
+			if Board.Tiles[int16(stat.X)-stat.StepX][int16(stat.Y)-stat.StepY].Element == E_EMPTY {
+				sourceStatId = GetStatIdAt(int16(stat.X)+stat.StepX, int16(stat.Y)+stat.StepY)
 				if sourceStatId > 0 {
 					if Board.StatCount < 174 {
-						AddStat(stat.X-stat.StepX, stat.Y-stat.StepY, Board.Tiles[stat.X+stat.StepX][stat.Y+stat.StepY].Element, int16(Board.Tiles[stat.X+stat.StepX][stat.Y+stat.StepY].Color), Board.Stats[sourceStatId].Cycle, Board.Stats[sourceStatId])
-						BoardDrawTile(stat.X-stat.StepX, stat.Y-stat.StepY)
+						AddStat(int16(stat.X)-stat.StepX, int16(stat.Y)-stat.StepY, Board.Tiles[int16(stat.X)+stat.StepX][int16(stat.Y)+stat.StepY].Element, int16(Board.Tiles[int16(stat.X)+stat.StepX][int16(stat.Y)+stat.StepY].Color), Board.Stats[sourceStatId].Cycle, Board.Stats[sourceStatId])
+						BoardDrawTile(int16(stat.X)-stat.StepX, int16(stat.Y)-stat.StepY)
 					}
 				} else if sourceStatId != 0 {
-					Board.Tiles[stat.X-stat.StepX][stat.Y-stat.StepY] = Board.Tiles[stat.X+stat.StepX][stat.Y+stat.StepY]
-					BoardDrawTile(stat.X-stat.StepX, stat.Y-stat.StepY)
+					Board.Tiles[int16(stat.X)-stat.StepX][int16(stat.Y)-stat.StepY] = Board.Tiles[int16(stat.X)+stat.StepX][int16(stat.Y)+stat.StepY]
+					BoardDrawTile(int16(stat.X)-stat.StepX, int16(stat.Y)-stat.StepY)
 				}
 
 				SoundQueue(3, "0\x022\x024\x025\x027\x02")
@@ -1029,17 +1029,17 @@ func ElementPusherTick(statId int16) {
 	stat := &Board.Stats[statId]
 	startX = int16(stat.X)
 	startY = int16(stat.Y)
-	if !ElementDefs[Board.Tiles[stat.X+stat.StepX][stat.Y+stat.StepY].Element].Walkable {
-		ElementPushablePush(stat.X+stat.StepX, stat.Y+stat.StepY, stat.StepX, stat.StepY)
+	if !ElementDefs[Board.Tiles[int16(stat.X)+stat.StepX][int16(stat.Y)+stat.StepY].Element].Walkable {
+		ElementPushablePush(int16(stat.X)+stat.StepX, int16(stat.Y)+stat.StepY, stat.StepX, stat.StepY)
 	}
 
 	statId = GetStatIdAt(startX, startY)
 	stat2 := &Board.Stats[statId]
-	if ElementDefs[Board.Tiles[stat2.X+stat2.StepX][stat2.Y+stat2.StepY].Element].Walkable {
-		MoveStat(statId, stat2.X+stat2.StepX, stat2.Y+stat2.StepY)
+	if ElementDefs[Board.Tiles[int16(stat2.X)+stat2.StepX][int16(stat2.Y)+stat2.StepY].Element].Walkable {
+		MoveStat(statId, int16(stat2.X)+stat2.StepX, int16(stat2.Y)+stat2.StepY)
 		SoundQueue(2, "\x15\x01")
-		if Board.Tiles[stat2.X-(stat2.StepX*2)][stat2.Y-(stat2.StepY*2)].Element == E_PUSHER {
-			i = GetStatIdAt(stat2.X-(stat2.StepX*2), stat2.Y-(stat2.StepY*2))
+		if Board.Tiles[int16(stat2.X)-(stat2.StepX*2)][int16(stat2.Y)-(stat2.StepY*2)].Element == E_PUSHER {
+			i = GetStatIdAt(int16(stat2.X)-(stat2.StepX*2), int16(stat2.Y)-(stat2.StepY*2))
 			if (Board.Stats[i].StepX == stat2.StepX) && (Board.Stats[i].StepY == stat2.StepY) {
 				ElementDefs[E_PUSHER].TickProc(i)
 			}
@@ -1245,7 +1245,7 @@ func ElementPlayerTick(statId int16) {
 						bulletCount++
 					}
 				}
-				if bulletCount < Board.Info.MaxShots {
+				if bulletCount < int16(Board.Info.MaxShots) {
 					if BoardShoot(E_BULLET, int16(stat.X), int16(stat.Y), PlayerDirX, PlayerDirY, SHOT_SOURCE_PLAYER) {
 						World.Info.Ammo--
 						GameUpdateSidebar()
@@ -1260,16 +1260,16 @@ func ElementPlayerTick(statId int16) {
 	} else if (InputDeltaX != 0) || (InputDeltaY != 0) {
 		PlayerDirX = InputDeltaX
 		PlayerDirY = InputDeltaY
-		ElementDefs[Board.Tiles[stat.X+InputDeltaX][stat.Y+InputDeltaY].Element].TouchProc(stat.X+InputDeltaX, stat.Y+InputDeltaY, 0, &InputDeltaX, &InputDeltaY)
+		ElementDefs[Board.Tiles[int16(stat.X)+InputDeltaX][int16(stat.Y)+InputDeltaY].Element].TouchProc(int16(stat.X)+InputDeltaX, int16(stat.Y)+InputDeltaY, 0, &InputDeltaX, &InputDeltaY)
 		if (InputDeltaX != 0) || (InputDeltaY != 0) {
 			if SoundEnabled && !SoundIsPlaying {
 				Sound(110)
 			}
-			if ElementDefs[Board.Tiles[stat.X+InputDeltaX][stat.Y+InputDeltaY].Element].Walkable {
+			if ElementDefs[Board.Tiles[int16(stat.X)+InputDeltaX][int16(stat.Y)+InputDeltaY].Element].Walkable {
 				if SoundEnabled && !SoundIsPlaying {
 					NoSound()
 				}
-				MoveStat(0, stat.X+InputDeltaX, stat.Y+InputDeltaY)
+				MoveStat(0, int16(stat.X)+InputDeltaX, int16(stat.Y)+InputDeltaY)
 			} else if SoundEnabled && !SoundIsPlaying {
 				NoSound()
 			}

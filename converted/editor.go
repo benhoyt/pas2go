@@ -264,7 +264,7 @@ func EditorLoop() {
 					Board.Info.IsDark = !Board.Info.IsDark
 				case 4, 5, 6, 7:
 					Board.Info.NeighborBoards[state.LinePos-4] = byte(EditorSelectBoard(NeighborBoardStrs[state.LinePos-4], int16(Board.Info.NeighborBoards[state.LinePos-4]), true))
-					if Board.Info.NeighborBoards[state.LinePos-4] > World.BoardCount {
+					if int16(Board.Info.NeighborBoards[state.LinePos-4]) > World.BoardCount {
 						EditorAppendBoard()
 					}
 					exitRequested = true
@@ -397,7 +397,7 @@ func EditorLoop() {
 					if selectedBoard != 0 {
 						stat.P3 = selectedBoard
 						World.EditorStatSettings[element].P3 = byte(World.Info.CurrentBoard)
-						if stat.P3 > World.BoardCount {
+						if int16(stat.P3) > World.BoardCount {
 							EditorAppendBoard()
 							copiedHasStat = false
 							copiedTile.Element = 0

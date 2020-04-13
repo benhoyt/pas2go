@@ -264,7 +264,7 @@ func TransitionDrawToFill(chr byte, color int16) {
 func BoardDrawTile(x, y int16) {
 	var ch byte
 	tile := &Board.Tiles[x][y]
-	if !Board.Info.IsDark || (ElementDefs[Board.Tiles[x][y].Element].VisibleInDark) || ((World.Info.TorchTicks > 0) && ((Sqr(Board.Stats[0].X-x) + Sqr(Board.Stats[0].Y-y)*2) < TORCH_DIST_SQR)) || ForceDarknessOff {
+	if !Board.Info.IsDark || (ElementDefs[Board.Tiles[x][y].Element].VisibleInDark) || ((World.Info.TorchTicks > 0) && ((Sqr(int16(Board.Stats[0].X)-x) + Sqr(int16(Board.Stats[0].Y)-y)*2) < TORCH_DIST_SQR)) || ForceDarknessOff {
 		if tile.Element == E_EMPTY {
 			VideoWriteText(byte(x-1), byte(y-1), 0x0F, " ")
 		} else if ElementDefs[tile.Element].HasDrawProc {
@@ -320,7 +320,7 @@ func SidebarPromptCharacter(editable bool, x, y int16, prompt string, value *byt
 	SidebarClearLine(y + 2)
 	for {
 		for i = (*value - 4); i <= (*value + 4); i++ {
-			VideoWriteText(byte(((x+i)-*value)+5), byte(y+2), 0x1E, string(Chr(byte((i+0x100)%0x100))))
+			VideoWriteText(byte(((x+i)-int16(*value))+5), byte(y+2), 0x1E, string(Chr(byte((i+0x100)%0x100))))
 		}
 		if editable {
 			Delay(25)
@@ -328,8 +328,8 @@ func SidebarPromptCharacter(editable bool, x, y int16, prompt string, value *byt
 			if InputKeyPressed == KEY_TAB {
 				InputDeltaX = 9
 			}
-			newValue = *value + InputDeltaX
-			if *value != newValue {
+			newValue = int16(*value) + InputDeltaX
+			if int16(*value) != newValue {
 				*value = byte((newValue + 0x100) % 0x100)
 				SidebarClearLine(y + 2)
 			}
@@ -364,14 +364,14 @@ func SidebarPromptSlider(editable bool, x, y int16, prompt string, value *byte) 
 			if InputJoystickMoved {
 				Delay(45)
 			}
-			VideoWriteText(byte(x+*value+1), byte(y+1), 0x9F, "\x1f")
+			VideoWriteText(byte(x+int16(*value+1)), byte(y+1), 0x9F, "\x1f")
 			InputUpdate()
 			if (InputKeyPressed >= '1') && (InputKeyPressed <= '9') {
 				*value = Ord(InputKeyPressed) - 49
 				SidebarClearLine(y + 1)
 			} else {
-				newValue = *value + InputDeltaX
-				if (*value != newValue) && (newValue >= 0) && (newValue <= 8) {
+				newValue = int16(*value) + InputDeltaX
+				if (int16(*value) != newValue) && (newValue >= 0) && (newValue <= 8) {
 					*value = byte(newValue)
 					SidebarClearLine(y + 1)
 				}
@@ -381,7 +381,7 @@ func SidebarPromptSlider(editable bool, x, y int16, prompt string, value *byte) 
 			break
 		}
 	}
-	VideoWriteText(byte(x+*value+1), byte(y+1), 0x1F, "\x1f")
+	VideoWriteText(byte(x+int16(*value+1)), byte(y+1), 0x1F, "\x1f")
 }
 
 func SidebarPromptChoice(editable bool, y int16, prompt, choiceStr string, result *byte) {
@@ -403,7 +403,7 @@ func SidebarPromptChoice(editable bool, y int16, prompt, choiceStr string, resul
 	for {
 		j = 0
 		i = 1
-		for (j < *result) && (i < Length(choiceStr)) {
+		for (j < int16(*result)) && (i < Length(choiceStr)) {
 			if choiceStr[i] == ' ' {
 				j++
 			}
@@ -413,8 +413,8 @@ func SidebarPromptChoice(editable bool, y int16, prompt, choiceStr string, resul
 			VideoWriteText(byte(62+i), byte(y+1), 0x9F, "\x1f")
 			Delay(35)
 			InputUpdate()
-			newResult = *result + InputDeltaX
-			if (*result != newResult) && (newResult >= 0) && (newResult <= (choiceCount - 1)) {
+			newResult = int16(*result) + InputDeltaX
+			if (int16(*result) != newResult) && (newResult >= 0) && (newResult <= (choiceCount - 1)) {
 				*result = byte(newResult)
 				SidebarClearLine(y + 1)
 			}
@@ -770,7 +770,7 @@ func AddStat(tx, ty int16, element byte, color, tcycle int16, template TStat) {
 			Move(*template.Data, *Board.Stats[Board.StatCount].Data, template.DataLen)
 		}
 		if ElementDefs[Board.Tiles[tx][ty].Element].PlaceableOnTop {
-			Board.Tiles[tx][ty].Color = byte((color & 0x0F) + (Board.Tiles[tx][ty].Color & 0x70))
+			Board.Tiles[tx][ty].Color = byte((color & 0x0F) + int16(Board.Tiles[tx][ty].Color&0x70))
 		} else {
 			Board.Tiles[tx][ty].Color = byte(color)
 		}
@@ -829,7 +829,7 @@ func GetStatIdAt(x, y int16) (GetStatIdAt int16) {
 	i = -1
 	for {
 		i++
-		if ((Board.Stats[i].X == x) && (Board.Stats[i].Y == y)) || (i > Board.StatCount) {
+		if ((int16(Board.Stats[i].X) == x) && (int16(Board.Stats[i].Y) == y)) || (i > Board.StatCount) {
 			break
 		}
 	}
@@ -892,7 +892,7 @@ func MoveStat(statId int16, newX, newY int16) {
 	BoardDrawTile(int16(stat.X), int16(stat.Y))
 	BoardDrawTile(oldX, oldY)
 	if (statId == 0) && Board.Info.IsDark && (World.Info.TorchTicks > 0) {
-		if (Sqr(oldX-stat.X) + Sqr(oldY-stat.Y)) == 1 {
+		if (Sqr(oldX-int16(stat.X)) + Sqr(oldY-int16(stat.Y))) == 1 {
 			for ix = (stat.X - TORCH_DX - 3); ix <= (stat.X + TORCH_DX + 3); ix++ {
 				if (ix >= 1) && (ix <= BOARD_WIDTH) {
 					for iy = (stat.Y - TORCH_DY - 3); iy <= (stat.Y + TORCH_DY + 3); iy++ {
@@ -1123,11 +1123,11 @@ func CalcDirectionRnd(deltaX, deltaY *int16) {
 func CalcDirectionSeek(x, y int16, deltaX, deltaY *int16) {
 	*deltaX = 0
 	*deltaY = 0
-	if (Random(2) < 1) || (Board.Stats[0].Y == y) {
-		*deltaX = Signum(Board.Stats[0].X - x)
+	if (Random(2) < 1) || (int16(Board.Stats[0].Y) == y) {
+		*deltaX = Signum(int16(Board.Stats[0].X) - x)
 	}
 	if *deltaX == 0 {
-		*deltaY = Signum(Board.Stats[0].Y - y)
+		*deltaY = Signum(int16(Board.Stats[0].Y) - y)
 	}
 	if World.Info.EnergizerTicks > 0 {
 		*deltaX = -*deltaX
@@ -1227,9 +1227,9 @@ func GameDebugPrompt() {
 		TransitionDrawToBoard()
 	} else if input == "ZAP" {
 		for i = 0; i <= 3; i++ {
-			BoardDamageTile(Board.Stats[0].X+NeighborDeltaX[i], Board.Stats[0].Y+NeighborDeltaY[i])
-			Board.Tiles[Board.Stats[0].X+NeighborDeltaX[i]][Board.Stats[0].Y+NeighborDeltaY[i]].Element = E_EMPTY
-			BoardDrawTile(Board.Stats[0].X+NeighborDeltaX[i], Board.Stats[0].Y+NeighborDeltaY[i])
+			BoardDamageTile(int16(Board.Stats[0].X)+NeighborDeltaX[i], int16(Board.Stats[0].Y)+NeighborDeltaY[i])
+			Board.Tiles[int16(Board.Stats[0].X)+NeighborDeltaX[i]][int16(Board.Stats[0].Y)+NeighborDeltaY[i]].Element = E_EMPTY
+			BoardDrawTile(int16(Board.Stats[0].X)+NeighborDeltaX[i], int16(Board.Stats[0].Y)+NeighborDeltaY[i])
 		}
 	}
 
@@ -1360,11 +1360,11 @@ func GamePlayLoop(boardChanged bool) {
 				GamePromptEndPlay()
 			}
 			if (InputDeltaX != 0) || (InputDeltaY != 0) {
-				ElementDefs[Board.Tiles[Board.Stats[0].X+InputDeltaX][Board.Stats[0].Y+InputDeltaY].Element].TouchProc(Board.Stats[0].X+InputDeltaX, Board.Stats[0].Y+InputDeltaY, 0, &InputDeltaX, &InputDeltaY)
+				ElementDefs[Board.Tiles[int16(Board.Stats[0].X)+InputDeltaX][int16(Board.Stats[0].Y)+InputDeltaY].Element].TouchProc(int16(Board.Stats[0].X)+InputDeltaX, int16(Board.Stats[0].Y)+InputDeltaY, 0, &InputDeltaX, &InputDeltaY)
 			}
-			if ((InputDeltaX != 0) || (InputDeltaY != 0)) && ElementDefs[Board.Tiles[Board.Stats[0].X+InputDeltaX][Board.Stats[0].Y+InputDeltaY].Element].Walkable {
+			if ((InputDeltaX != 0) || (InputDeltaY != 0)) && ElementDefs[Board.Tiles[int16(Board.Stats[0].X)+InputDeltaX][int16(Board.Stats[0].Y)+InputDeltaY].Element].Walkable {
 				if Board.Tiles[Board.Stats[0].X][Board.Stats[0].Y].Element == E_PLAYER {
-					MoveStat(0, Board.Stats[0].X+InputDeltaX, Board.Stats[0].Y+InputDeltaY)
+					MoveStat(0, int16(Board.Stats[0].X)+InputDeltaX, int16(Board.Stats[0].Y)+InputDeltaY)
 				} else {
 					BoardDrawTile(int16(Board.Stats[0].X), int16(Board.Stats[0].Y))
 					Board.Stats[0].X += InputDeltaX
@@ -1373,7 +1373,7 @@ func GamePlayLoop(boardChanged bool) {
 					Board.Tiles[Board.Stats[0].X][Board.Stats[0].Y].Color = ElementDefs[E_PLAYER].Color
 					BoardDrawTile(int16(Board.Stats[0].X), int16(Board.Stats[0].Y))
 					DrawPlayerSurroundings(int16(Board.Stats[0].X), int16(Board.Stats[0].Y), 0)
-					DrawPlayerSurroundings(Board.Stats[0].X-InputDeltaX, Board.Stats[0].Y-InputDeltaY, 0)
+					DrawPlayerSurroundings(int16(Board.Stats[0].X)-InputDeltaX, int16(Board.Stats[0].Y)-InputDeltaY, 0)
 				}
 				GamePaused = false
 				SidebarClearLine(5)

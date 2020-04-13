@@ -424,7 +424,7 @@ func OopCheckCondition(statId int16, position *int16) (OopCheckCondition bool) {
 		OopCheckCondition = (Sqr(stat.X-Board.Stats[0].X) + Sqr(stat.Y-Board.Stats[0].Y)) == 1
 	} else if OopWord == "BLOCKED" {
 		OopReadDirection(statId, position, &deltaX, &deltaY)
-		OopCheckCondition = !ElementDefs[Board.Tiles[stat.X+deltaX][stat.Y+deltaY].Element].Walkable
+		OopCheckCondition = !ElementDefs[Board.Tiles[int16(stat.X)+deltaX][int16(stat.Y)+deltaY].Element].Walkable
 	} else if OopWord == "ENERGIZED" {
 		OopCheckCondition = World.Info.EnergizerTicks > 0
 	} else if OopWord == "ANY" {
@@ -537,11 +537,11 @@ StartParsing:
 			OopReadWord(statId, position)
 			if OopParseDirection(statId, position, &deltaX, &deltaY) {
 				if (deltaX != 0) || (deltaY != 0) {
-					if !ElementDefs[Board.Tiles[stat.X+deltaX][stat.Y+deltaY].Element].Walkable {
-						ElementPushablePush(stat.X+deltaX, stat.Y+deltaY, deltaX, deltaY)
+					if !ElementDefs[Board.Tiles[int16(stat.X)+deltaX][int16(stat.Y)+deltaY].Element].Walkable {
+						ElementPushablePush(int16(stat.X)+deltaX, int16(stat.Y)+deltaY, deltaX, deltaY)
 					}
-					if ElementDefs[Board.Tiles[stat.X+deltaX][stat.Y+deltaY].Element].Walkable {
-						MoveStat(statId, stat.X+deltaX, stat.Y+deltaY)
+					if ElementDefs[Board.Tiles[int16(stat.X)+deltaX][int16(stat.Y)+deltaY].Element].Walkable {
+						MoveStat(statId, int16(stat.X)+deltaX, int16(stat.Y)+deltaY)
 						repeatInsNextTick = false
 					}
 				} else {
@@ -569,22 +569,22 @@ StartParsing:
 			if Length(OopWord) != 0 {
 				if OopWord == "GO" {
 					OopReadDirection(statId, position, &deltaX, &deltaY)
-					if !ElementDefs[Board.Tiles[stat.X+deltaX][stat.Y+deltaY].Element].Walkable {
-						ElementPushablePush(stat.X+deltaX, stat.Y+deltaY, deltaX, deltaY)
+					if !ElementDefs[Board.Tiles[int16(stat.X)+deltaX][int16(stat.Y)+deltaY].Element].Walkable {
+						ElementPushablePush(int16(stat.X)+deltaX, int16(stat.Y)+deltaY, deltaX, deltaY)
 					}
-					if ElementDefs[Board.Tiles[stat.X+deltaX][stat.Y+deltaY].Element].Walkable {
-						MoveStat(statId, stat.X+deltaX, stat.Y+deltaY)
+					if ElementDefs[Board.Tiles[int16(stat.X)+deltaX][int16(stat.Y)+deltaY].Element].Walkable {
+						MoveStat(statId, int16(stat.X)+deltaX, int16(stat.Y)+deltaY)
 					} else {
 						repeatInsNextTick = true
 					}
 					stopRunning = true
 				} else if OopWord == "TRY" {
 					OopReadDirection(statId, position, &deltaX, &deltaY)
-					if !ElementDefs[Board.Tiles[stat.X+deltaX][stat.Y+deltaY].Element].Walkable {
-						ElementPushablePush(stat.X+deltaX, stat.Y+deltaY, deltaX, deltaY)
+					if !ElementDefs[Board.Tiles[int16(stat.X)+deltaX][int16(stat.Y)+deltaY].Element].Walkable {
+						ElementPushablePush(int16(stat.X)+deltaX, int16(stat.Y)+deltaY, deltaX, deltaY)
 					}
-					if ElementDefs[Board.Tiles[stat.X+deltaX][stat.Y+deltaY].Element].Walkable {
-						MoveStat(statId, stat.X+deltaX, stat.Y+deltaY)
+					if ElementDefs[Board.Tiles[int16(stat.X)+deltaX][int16(stat.Y)+deltaY].Element].Walkable {
+						MoveStat(statId, int16(stat.X)+deltaX, int16(stat.Y)+deltaY)
 						stopRunning = true
 					} else {
 						goto ReadCommand
@@ -707,11 +707,11 @@ StartParsing:
 						OopError(statId, "Bad #PUT")
 					} else if !OopParseTile(&statId, position, &argTile) {
 						OopError(statId, "Bad #PUT")
-					} else if ((stat.X + deltaX) > 0) && ((stat.X + deltaX) <= BOARD_WIDTH) && ((stat.Y + deltaY) > 0) && ((stat.Y + deltaY) < BOARD_HEIGHT) {
-						if !ElementDefs[Board.Tiles[stat.X+deltaX][stat.Y+deltaY].Element].Walkable {
-							ElementPushablePush(stat.X+deltaX, stat.Y+deltaY, deltaX, deltaY)
+					} else if ((int16(stat.X) + deltaX) > 0) && ((int16(stat.X) + deltaX) <= BOARD_WIDTH) && ((int16(stat.Y) + deltaY) > 0) && ((int16(stat.Y) + deltaY) < BOARD_HEIGHT) {
+						if !ElementDefs[Board.Tiles[int16(stat.X)+deltaX][int16(stat.Y)+deltaY].Element].Walkable {
+							ElementPushablePush(int16(stat.X)+deltaX, int16(stat.Y)+deltaY, deltaX, deltaY)
 						}
-						OopPlaceTile(stat.X+deltaX, stat.Y+deltaY, &argTile)
+						OopPlaceTile(int16(stat.X)+deltaX, int16(stat.Y)+deltaY, &argTile)
 					}
 
 				} else if OopWord == "CHANGE" {
