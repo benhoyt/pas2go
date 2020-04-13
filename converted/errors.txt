@@ -221,7 +221,6 @@
 ./game.go:470:14: invalid operation: *buffer += InputKeyPressed (mismatched types string and byte)
 ./game.go:473:13: invalid operation: *buffer += InputKeyPressed (mismatched types string and byte)
 ./game.go:476:14: invalid operation: *buffer += UpCase(InputKeyPressed) (mismatched types string and byte)
-./game.go:542:24: cannot use IOResult (type func() int16) as type int16 in argument to Str
 ./game.go:592:8: cannot use IoTmpBuf (type *TIoTmpBuf) as type uintptr in assignment
 ./game.go:642:7: cannot use IoTmpBuf (type *TIoTmpBuf) as type uintptr in assignment
 ./game.go:694:17: undefined: SearchRec

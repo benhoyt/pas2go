@@ -539,7 +539,7 @@ func DisplayIOError() (DisplayIOError bool) {
 		return
 	}
 	DisplayIOError = true
-	textWindow.Title = Str(IOResult)
+	textWindow.Title = Str(IOResult())
 	textWindow.Title = "Error # " + textWindow.Title
 	TextWindowInitState(&textWindow)
 	TextWindowAppend(&textWindow, "$DOS Error: ")

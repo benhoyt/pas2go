@@ -854,7 +854,7 @@ func (c *converter) procArg(targetIsVar bool, targetKind Kind, arg Expr) {
 			c.print("&")
 			c.identExpr(arg)
 		default: // !isVar && !targetIsVar
-			c.identExpr(arg)
+			c.expr(arg)
 		}
 	case *AtExpr, *DotExpr, *IndexExpr, *PointerExpr, *FuncExpr:
 		spec, _ := c.lookupVarExprType(arg)
