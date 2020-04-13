@@ -960,18 +960,26 @@ func (c *converter) expr(expr Expr) {
 		}
 
 		opStr := operatorStr(expr.Op)
-		leftKind := c.exprKind(expr.Left)
-		rightKind := c.exprKind(expr.Right)
+		lk := c.exprKind(expr.Left)
+		rk := c.exprKind(expr.Right)
 		switch {
-		case leftKind == KindInteger && rightKind == KindByte:
+		case lk == KindInteger && rk == KindByte:
 			c.expr(expr.Left)
 			c.printf(" %s ", opStr)
 			c.typeConversion(expr.Right, "int16")
-		case leftKind == KindByte && rightKind == KindInteger:
+		case lk == KindReal && rk == KindInteger:
+			c.expr(expr.Left)
+			c.printf(" %s ", opStr)
+			c.typeConversion(expr.Right, "float64")
+		case lk == KindByte && rk == KindInteger:
 			c.typeConversion(expr.Left, "int16")
 			c.printf(" %s ", opStr)
 			c.expr(expr.Right)
-		case leftKind == KindString && rightKind == KindString:
+		case lk == KindInteger && rk == KindReal:
+			c.typeConversion(expr.Left, "float64")
+			c.printf(" %s ", opStr)
+			c.expr(expr.Right)
+		case lk == KindString && rk == KindString:
 			c.strExpr(expr.Left)
 			c.printf(" %s ", opStr)
 			c.strExpr(expr.Right)

@@ -59,7 +59,7 @@ func SoundInitFreqTable() {
 	ln2 = Ln(2.0)
 	noteStep = Exp(ln2 / 12.0)
 	for octave = 1; octave <= 15; octave++ {
-		noteBase = Exp(octave*ln2) * freqC1
+		noteBase = Exp(float64(octave)*ln2) * freqC1
 		for note = 0; note <= 11; note++ {
 			SoundFreqTable[(octave*16+note)-1] = Trunc(noteBase)
 			noteBase = noteBase * noteStep

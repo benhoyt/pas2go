@@ -87,7 +87,6 @@
 ./oop.go:669:16: cannot use Board.Stats[labelStatId].Data (type *string) as type uintptr in assignment
 ./oop.go:678:17: cannot use Board.Stats[labelStatId].Data (type *string) as type uintptr in assignment
 ./oop.go:784:23: invalid operation: OopChar + OopReadLineToEnd(statId, position) (mismatched types byte and string)
-./sounds.go:62:24: invalid operation: octave * ln2 (mismatched types int16 and float64)
 ./sounds.go:64:39: cannot use Trunc(noteBase) (type int16) as type uint16 in assignment
 ./sounds.go:78:31: cannot use i * 100 + 1000 (type int16) as type uint16 in assignment
 ./sounds.go:81:31: cannot use i % 2 * 1600 + 1600 + i % 4 * 1600 (type int16) as type uint16 in assignment
