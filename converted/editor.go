@@ -136,7 +136,7 @@ func EditorLoop() {
 		boardNumStr = Str(World.Info.CurrentBoard)
 		TransitionDrawToBoard()
 		if Length(Board.Name) != 0 {
-			VideoWriteText(byte((59-Length(Board.Name))/2), 0, 0x70, ' '+Board.Name+' ')
+			VideoWriteText(byte((59-Length(Board.Name))/2), 0, 0x70, " "+Board.Name+" ")
 		} else {
 			VideoWriteText(26, 0, 0x70, " Untitled ")
 		}
@@ -652,7 +652,7 @@ func EditorLoop() {
 						if World.Info.IsSave {
 							VideoWriteText(63, 5, 0x1E, "a saved game!")
 						} else {
-							VideoWriteText(63, 5, 0x1E, "  "+World.Info.Name+'!')
+							VideoWriteText(63, 5, 0x1E, "  "+World.Info.Name+"!")
 						}
 						PauseOnError()
 						WorldUnload()
@@ -734,7 +734,7 @@ func EditorLoop() {
 						VideoWriteText(65, byte(i), 0x1E, ElementDefs[iElem].CategoryName)
 						i++
 					}
-					VideoWriteText(61, byte(i), byte(((i%2)<<6)+0x30), ' '+ElementDefs[iElem].EditorShortcut+' ')
+					VideoWriteText(61, byte(i), byte(((i%2)<<6)+0x30), " "+ElementDefs[iElem].EditorShortcut+' ')
 					VideoWriteText(65, byte(i), 0x1F, ElementDefs[iElem].Name)
 					if ElementDefs[iElem].Color == COLOR_CHOICE_ON_BLACK {
 						elemMenuColor = (cursorColor % 0x10) + 0x10
@@ -929,7 +929,7 @@ func EditorEditHelpFile() {
 	filename = ""
 	SidebarPromptString("File to edit", ".HLP", &filename, PROMPT_ALPHANUM)
 	if Length(filename) != 0 {
-		TextWindowOpenFile('*'+filename+".HLP", &textWindow)
+		TextWindowOpenFile("*"+filename+".HLP", &textWindow)
 		textWindow.Title = "Editing " + filename
 		TextWindowDrawOpen(&textWindow)
 		EditorOpenEditTextWindow(&textWindow)

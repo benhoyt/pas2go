@@ -188,7 +188,7 @@ func TextWindowPrint(state *TTextWindowState) {
 			case '$':
 				line = Delete(line, 1, 1)
 				for iChar = ((80 - Length(line)) / 2); iChar >= 1; iChar-- {
-					line = ' ' + line
+					line = " " + line
 				}
 			case '!', ':':
 				iChar = Pos(';', line)
@@ -232,7 +232,7 @@ func TextWindowSelect(state *TTextWindowState, hyperlinkAsSelect, viewingFile bo
 			newLinePos += InputDeltaY
 		} else if InputShiftPressed || (InputKeyPressed == KEY_ENTER) {
 			InputShiftAccepted = true
-			if (state.Lines[state.LinePos-1][0]) == '!' {
+			if (state.Lines[state.LinePos-1][0]) == "!" {
 				pointerStr = Copy(*state.Lines[state.LinePos-1], 2, Length(*state.Lines[state.LinePos-1])-1)
 				if Pos(';', pointerStr) > 0 {
 					pointerStr = Copy(pointerStr, 1, Pos(';', pointerStr)-1)
@@ -254,7 +254,7 @@ func TextWindowSelect(state *TTextWindowState, hyperlinkAsSelect, viewingFile bo
 					if hyperlinkAsSelect {
 						state.Hyperlink = pointerStr
 					} else {
-						pointerStr = ':' + pointerStr
+						pointerStr = ":" + pointerStr
 						for iLine = 1; iLine <= state.LineCount; iLine++ {
 							if Length(pointerStr) > Length(*state.Lines[iLine-1]) {
 							} else {
@@ -294,7 +294,7 @@ func TextWindowSelect(state *TTextWindowState, hyperlinkAsSelect, viewingFile bo
 		if newLinePos != state.LinePos {
 			state.LinePos = newLinePos
 			TextWindowDraw(state, false, viewingFile)
-			if (state.Lines[state.LinePos-1][0]) == '!' {
+			if (state.Lines[state.LinePos-1][0]) == "!" {
 				if hyperlinkAsSelect {
 					TextWindowDrawTitle(0x1E, "\xaePress ENTER to select this\xaf")
 				} else {
@@ -517,7 +517,7 @@ func TextWindowOpenFile(filename string, state *TTextWindowState) {
 				} else {
 					BlockRead(f, *line, Ord(state.Lines[state.LineCount-1][-1]))
 				}
-				if state.Lines[state.LineCount-1] == '@' {
+				if state.Lines[state.LineCount-1] == "@" {
 					retVal = false
 					state.Lines[state.LineCount-1] = ""
 				}
@@ -573,10 +573,10 @@ func TextWindowInit(x, y, width, height int16) {
 		TextWindowStrInnerEmpty += ' '
 		TextWindowStrInnerLine += 'Í'
 	}
-	TextWindowStrTop = "\xc6\xd1" + TextWindowStrInnerLine + 'Ñ' + 'µ'
-	TextWindowStrBottom = "\xc6\xcf" + TextWindowStrInnerLine + 'Ï' + 'µ'
-	TextWindowStrSep = " \xc6" + TextWindowStrInnerLine + 'µ' + ' '
-	TextWindowStrText = " \xb3" + TextWindowStrInnerEmpty + '³' + ' '
+	TextWindowStrTop = "\xc6\xd1" + TextWindowStrInnerLine + "\xd1" + "\xb5"
+	TextWindowStrBottom = "\xc6\xcf" + TextWindowStrInnerLine + "\xcf" + "\xb5"
+	TextWindowStrSep = " \xc6" + TextWindowStrInnerLine + "\xb5" + " "
+	TextWindowStrText = " \xb3" + TextWindowStrInnerEmpty + "\xb3" + " "
 	TextWindowStrInnerArrows = TextWindowStrInnerEmpty
 	TextWindowStrInnerArrows[0] = '¯'
 	TextWindowStrInnerArrows[Length(TextWindowStrInnerArrows)-1] = '®'

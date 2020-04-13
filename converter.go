@@ -24,6 +24,7 @@ NICE TO HAVES:
 - can we eliminate Chr() and Ord() seeing they're just identity functions?
 - consider changing VideoWriteText x,y params to int16 instead of byte -- fewer type conversions
 - uses operator precedence rather than ParenExpr
+- there's a blank line after with statement
 */
 
 package main
@@ -802,7 +803,6 @@ func (c *converter) startConvertExpr(kind, targetKind Kind, expr Expr) bool {
 			}
 		}
 	}
-	// c.printf("/* TODO %s -> %s */", kind, targetKind)
 	convertKind := c.convertKind(kind, targetKind)
 	if convertKind != KindUnknown {
 		c.print(convertKind, "(")
@@ -963,6 +963,10 @@ func (c *converter) expr(expr Expr) {
 			c.typeConversion(expr.Left, "int16")
 			c.printf(" %s ", opStr)
 			c.expr(expr.Right)
+		case leftKind == KindString && rightKind == KindString:
+			c.strExpr(expr.Left)
+			c.printf(" %s ", opStr)
+			c.strExpr(expr.Right)
 		default:
 			c.expr(expr.Left)
 			c.printf(" %s ", opStr)
@@ -1063,6 +1067,18 @@ func (c *converter) expr(expr Expr) {
 	default:
 		panic(fmt.Sprintf("unexpected Expr type %T", expr))
 	}
+}
+
+func (c *converter) strExpr(expr Expr) {
+	switch expr := expr.(type) {
+	case *ConstExpr:
+		switch value := expr.Value.(type) {
+		case string:
+			c.printf("%q", value)
+			return
+		}
+	}
+	c.expr(expr)
 }
 
 func (c *converter) identExpr(expr *IdentExpr) {

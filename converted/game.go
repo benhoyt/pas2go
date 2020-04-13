@@ -703,7 +703,7 @@ func GameWorldLoad(extension string) (GameWorldLoad bool) {
 	}
 	GameWorldLoad = false
 	textWindow.Selectable = true
-	FindFirst('*'+extension, AnyFile, fileSearchRec)
+	FindFirst("*"+extension, AnyFile, fileSearchRec)
 	for DosError == 0 {
 		entryName = Copy(fileSearchRec.Name, 1, Length(fileSearchRec.name)-4)
 		for i = 1; i <= WorldFileDescCount; i++ {
@@ -960,7 +960,7 @@ func GameUpdateSidebar() {
 		if Board.Info.TimeLimitSec > 0 {
 			VideoWriteText(64, 6, 0x1E, "   Time:")
 			numStr = Str(Board.Info.TimeLimitSec - World.Info.BoardTimeSec)
-			VideoWriteText(72, 6, 0x1E, numStr+' ')
+			VideoWriteText(72, 6, 0x1E, numStr+" ")
 		} else {
 			SidebarClearLine(6)
 		}
@@ -968,15 +968,15 @@ func GameUpdateSidebar() {
 			World.Info.Health = 0
 		}
 		numStr = Str(World.Info.Health)
-		VideoWriteText(72, 7, 0x1E, numStr+' ')
+		VideoWriteText(72, 7, 0x1E, numStr+" ")
 		numStr = Str(World.Info.Ammo)
 		VideoWriteText(72, 8, 0x1E, numStr+"  ")
 		numStr = Str(World.Info.Torches)
-		VideoWriteText(72, 9, 0x1E, numStr+' ')
+		VideoWriteText(72, 9, 0x1E, numStr+" ")
 		numStr = Str(World.Info.Gems)
-		VideoWriteText(72, 10, 0x1E, numStr+' ')
+		VideoWriteText(72, 10, 0x1E, numStr+" ")
 		numStr = Str(World.Info.Score)
-		VideoWriteText(72, 11, 0x1E, numStr+' ')
+		VideoWriteText(72, 11, 0x1E, numStr+" ")
 		if World.Info.TorchTicks == 0 {
 			VideoWriteText(75, 9, 0x16, "    ")
 		} else {
@@ -1002,7 +1002,7 @@ func GameUpdateSidebar() {
 		}
 		if DebugEnabled {
 			numStr = Str(MemAvail)
-			VideoWriteText(69, 4, 0x1E, 'm'+numStr+' ')
+			VideoWriteText(69, 4, 0x1E, "m"+numStr+" ")
 		}
 	}
 }
@@ -1521,7 +1521,7 @@ func GamePrintRegisterMessage() {
 					color--
 				} else {
 					BlockRead(f, strPtr, Length(s))
-					if s != '@' {
+					if s != "@" {
 						VideoWriteText(0, byte(iy), byte(color), s)
 					} else {
 						isReading = false

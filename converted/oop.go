@@ -84,19 +84,19 @@ func OopSkipLine(statId int16, position *int16) {
 func OopParseDirection(statId int16, position *int16, dx, dy *int16) (OopParseDirection bool) {
 	stat := &Board.Stats[statId]
 	OopParseDirection = true
-	if (OopWord == 'N') || (OopWord == "NORTH") {
+	if (OopWord == "N") || (OopWord == "NORTH") {
 		*dx = 0
 		*dy = -1
-	} else if (OopWord == 'S') || (OopWord == "SOUTH") {
+	} else if (OopWord == "S") || (OopWord == "SOUTH") {
 		*dx = 0
 		*dy = 1
-	} else if (OopWord == 'E') || (OopWord == "EAST") {
+	} else if (OopWord == "E") || (OopWord == "EAST") {
 		*dx = 1
 		*dy = 0
-	} else if (OopWord == 'W') || (OopWord == "WEST") {
+	} else if (OopWord == "W") || (OopWord == "WEST") {
 		*dx = -1
 		*dy = 0
-	} else if (OopWord == 'I') || (OopWord == "IDLE") {
+	} else if (OopWord == "I") || (OopWord == "IDLE") {
 		*dx = 0
 		*dy = 0
 	} else if OopWord == "SEEK" {
@@ -678,7 +678,7 @@ StartParsing:
 							labelPtr = Board.Stats[labelStatId].Data
 							AdvancePointer(&labelPtr, labelDataPos+1)
 							labelPtr = ':'
-							labelDataPos = OopFindString(labelStatId, "\r'"+OopWord+'\r')
+							labelDataPos = OopFindString(labelStatId, "\r'"+OopWord+"\r")
 							if labelDataPos <= 0 {
 								break
 							}
