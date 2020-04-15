@@ -55,6 +55,10 @@ func StrWidth(n, width int16) string {
 	return ""
 }
 
+func WriteLn(args ...interface{}) {
+	// TODO
+}
+
 // NOTE: in Turbo Pascal Delete() is a procedure that modifies the string in-place
 func Delete(s string, index, count int16) string {
 	return s[:index-1] + s[index-1+count:]

@@ -37,16 +37,10 @@
 	want (*File, interface {})
 ./input.go:88:6: undefined: KeyPressed
 ./input.go:99:7: undefined: KeyPressed
-./input.go:111:2: undefined: WriteLn
-./input.go:112:2: undefined: WriteLn
-./input.go:134:2: undefined: WriteLn
-./input.go:135:2: undefined: WriteLn
-./input.go:136:2: undefined: WriteLn
 ./input.go:153:8: not enough arguments in call to Write
 	have (string)
 	want (*File, interface {})
 ./input.go:155:7: undefined: KeyPressed
-./input.go:160:3: undefined: WriteLn
 ./input.go:171:20: undefined: Registers
 ./input.go:177:6: undefined: KeyPressed
 ./input.go:244:3: undefined: Intr
