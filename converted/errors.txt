@@ -90,7 +90,4 @@
 ./sounds.go:299:2: undefined: GetIntVec
 ./sounds.go:300:2: undefined: SetIntVec
 ./txtwind.go:51:12: cannot assign to input[i]
-./txtwind.go:72:3: undefined: VideoMove
-./txtwind.go:95:3: undefined: VideoMove
-./txtwind.go:96:3: undefined: VideoMove
 ./txtwind.go:120:31: invalid operation: state.Lines[lpos - 1][0] (type *string does not support indexing)

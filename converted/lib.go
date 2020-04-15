@@ -74,6 +74,10 @@ func VideoWriteText(x, y, color byte, text string) {
 	// TODO
 }
 
+func VideoMove(x, y, chars int16, data interface{}, toVideo bool) {
+	// TODO
+}
+
 var VideoMonochrome bool
 
 func Delay(milliseconds int16) {
