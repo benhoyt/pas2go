@@ -31,29 +31,11 @@
 ./game.go:1534:4: undefined: TextColor
 ./game.go:1534:14: undefined: LightGray
 ./game.go:1542:4: undefined: GotoXY
-./input.go:85:7: not enough arguments in call to Write
-	have (string)
-	want (*File, interface {})
-./input.go:153:8: not enough arguments in call to Write
-	have (string)
-	want (*File, interface {})
 ./input.go:171:20: undefined: Registers
 ./input.go:244:3: undefined: Intr
 ./input.go:268:3: undefined: Intr
 ./input.go:297:11: undefined: Registers
 ./input.go:299:2: undefined: Intr
-./input.go:315:8: not enough arguments in call to Write
-	have (string)
-	want (*File, interface {})
-./input.go:317:9: not enough arguments in call to Write
-	have (string)
-	want (*File, interface {})
-./input.go:320:9: not enough arguments in call to Write
-	have (string)
-	want (*File, interface {})
-./input.go:322:8: not enough arguments in call to Write
-	have (string)
-	want (*File, interface {})
 ./keys.go:15:11: undefined: Registers
 ./keys.go:17:2: undefined: Intr
 ./oop.go:121:40: cannot call non-function OopParseDirection (type bool)

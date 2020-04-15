@@ -175,9 +175,10 @@ func BlockWrite(f *File, buf interface{}, count int16) {
 	// TODO
 }
 
-func Write(f *File, data interface{}) {
-	err := binary.Write(f.file, binary.LittleEndian, data)
-	setIOResult(err)
+func Write(args ...interface{}) {
+	// TODO
+	// err := binary.Write(f.file, binary.LittleEndian, data)
+	// setIOResult(err)
 }
 
 func Close(f *File) {
