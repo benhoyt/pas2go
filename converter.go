@@ -91,10 +91,7 @@ func Convert(file File, units []*Unit, w io.Writer) {
 		{false, []string{"text"}, &TypeIdent{"string"}},
 	}})
 
-	// TODO: hack - TVideoLine is defined in VIDEO.PAS - do this in separate file
 	c.defineType("TVideoLine", &StringSpec{80})
-
-	// TODO: turn panics into ConvertError and catch
 
 	switch file := file.(type) {
 	case *Program:
@@ -599,7 +596,6 @@ func (c *converter) stmtNoBraces(stmt Stmt) {
 func (c *converter) stmt(stmt Stmt) {
 	switch stmt := stmt.(type) {
 	case *AssignStmt:
-		// TODO: handle stmt.TypeConv?
 		c.varExpr(stmt.Var, false)
 
 		// Simplify expressions like "x := x + n"
