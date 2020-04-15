@@ -111,7 +111,6 @@ func BoardClose() {
 			FreeMem(stat.Data, stat.DataLen)
 			AdvancePointer(&ptr, stat.DataLen)
 		}
-
 	}
 	FreeMem(World.BoardData[World.Info.CurrentBoard], World.BoardLen[World.Info.CurrentBoard])
 	World.BoardLen[World.Info.CurrentBoard] = Ofs(ptr) - Ofs(*IoTmpBuf)
@@ -286,7 +285,6 @@ func BoardDrawTile(x, y int16) {
 	} else {
 		VideoWriteText(byte(x-1), byte(y-1), 0x07, "\xb0")
 	}
-
 }
 
 func BoardDrawBorder() {
@@ -307,7 +305,6 @@ func TransitionDrawToBoard() {
 	for i = 1; i <= TransitionTableSize; i++ {
 		table := &TransitionTable[i-1]
 		BoardDrawTile(table.X, table.Y)
-
 	}
 }
 
@@ -751,7 +748,6 @@ func CopyStatDataToTextWindow(statId int16, state *TTextWindowState) {
 		}
 		AdvancePointer(&dataPtr, 1)
 	}
-
 }
 
 func AddStat(tx, ty int16, element byte, color, tcycle int16, template TStat) {
@@ -764,7 +760,6 @@ func AddStat(tx, ty int16, element byte, color, tcycle int16, template TStat) {
 		stat.Cycle = tcycle
 		stat.Under = Board.Tiles[tx][ty]
 		stat.DataPos = 0
-
 		if template.Data != nil {
 			GetMem(*Board.Stats[Board.StatCount].Data, template.DataLen)
 			Move(*template.Data, *Board.Stats[Board.StatCount].Data, template.DataLen)
@@ -821,7 +816,6 @@ StatDataInUse:
 		Board.Stats[i-1] = Board.Stats[i]
 	}
 	Board.StatCount--
-
 }
 
 func GetStatIdAt(x, y int16) (GetStatIdAt int16) {
@@ -909,7 +903,6 @@ func MoveStat(statId int16, newX, newY int16) {
 			DrawPlayerSurroundings(int16(stat.X), int16(stat.Y), 0)
 		}
 	}
-
 }
 
 func PopupPromptString(question string, buffer *string) {
@@ -1057,7 +1050,6 @@ func DamageStat(attackerStatId int16) {
 		}
 		RemoveStat(attackerStatId)
 	}
-
 }
 
 func BoardDamageTile(x, y int16) {
@@ -1098,7 +1090,6 @@ func BoardShoot(element byte, tx, ty, deltaX, deltaY int16, source int16) (Board
 		stat.StepX = deltaX
 		stat.StepY = deltaY
 		stat.P2 = 100
-
 		BoardShoot = true
 	} else if (Board.Tiles[tx+deltaX][ty+deltaY].Element == E_BREAKABLE) || (ElementDefs[Board.Tiles[tx+deltaX][ty+deltaY].Element].Destructible && ((Board.Tiles[tx+deltaX][ty+deltaY].Element == E_PLAYER) == (source != 0)) && (World.Info.EnergizerTicks <= 0)) {
 		BoardDamageTile(tx+deltaX, ty+deltaY)
@@ -1388,7 +1379,6 @@ func GamePlayLoop(boardChanged bool) {
 					ElementDefs[Board.Tiles[stat.X][stat.Y].Element].TickProc(CurrentStatTicked)
 				}
 				CurrentStatTicked++
-
 			}
 		}
 		if (CurrentStatTicked > Board.StatCount) && !GamePlayExitRequested {

@@ -2,20 +2,17 @@
 
 /*
 ISSUES:
-- don't need byte() here: dataChar = byte(state.Lines[iLine-1][iChar-1])
 - bad things are going to happen here, eg in ELEMENTS.PAS:
   + TP implements "Cycle := (9 - P2) * 3;" as "Cycle = (9 - int16(P2)) * 3"
   + not "Cycle = int16((9 - P2) * 3)"
   + similar with: "TickTimeDuration = int16(TickSpeed * 2)" in GAME.PAS
 - why string() here? (TXTWIND.PAS): input[i] = string(UpCase(input[i]))
-- why string() here? (TXTWIND.PAS): state.Lines[state.LinePos-1] = string(Copy(...))
 - OopParseDirection and OopCheckCondition calls themselves - causes naming issue with named return value
 
 NICE TO HAVES:
 - can we eliminate Chr() and Ord() seeing they're just identity functions?
 - consider changing VideoWriteText x,y params to int16 instead of byte -- fewer type conversions
-- uses operator precedence rather than ParenExpr
-- there's a blank line after with statement
+- use operator precedence rather than ParenExpr
 */
 
 package main
@@ -795,6 +792,7 @@ func (c *converter) stmt(stmt Stmt) {
 		}
 		c.stmtNoBraces(stmt.Stmt)
 		c.popScope()
+		return
 	default:
 		panic(fmt.Sprintf("unhandled Stmt: %T", stmt))
 	}

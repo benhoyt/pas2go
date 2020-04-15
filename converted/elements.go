@@ -33,7 +33,6 @@ func ElementMessageTimerTick(statId int16) {
 			Board.Info.Message = ""
 		}
 	}
-
 }
 
 func ElementDamagingTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16) {
@@ -79,7 +78,6 @@ func ElementTigerTick(statId int16) {
 		}
 	}
 	ElementLionTick(statId)
-
 }
 
 func ElementRuffianTick(statId int16) {
@@ -111,7 +109,6 @@ func ElementRuffianTick(statId int16) {
 		}
 
 	}
-
 }
 
 func ElementBearTick(statId int16) {
@@ -228,7 +225,6 @@ func ElementCentipedeHeadTick(statId int16) {
 				MoveStat(stat2.Follower, tx, ty)
 			}
 			statId = stat2.Follower
-
 			if statId == -1 {
 				break
 			}
@@ -246,7 +242,6 @@ func ElementCentipedeSegmentTick(statId int16) {
 			stat.Leader--
 		}
 	}
-
 }
 
 func ElementBulletTick(statId int16) {
@@ -308,7 +303,6 @@ TryMove:
 		if OopSend(-iStat, "SHOT", false) {
 		}
 	}
-
 }
 
 func ElementSpinningGunDraw(x, y int16, ch *byte) {
@@ -367,7 +361,6 @@ func ElementSpinningGunTick(statId int16) {
 			shot = BoardShoot(element, int16(stat.X), int16(stat.Y), deltaX, deltaY, SHOT_SOURCE_ENEMY)
 		}
 	}
-
 }
 
 func ElementConveyorTick(x, y int16, direction int16) {
@@ -458,7 +451,6 @@ func ElementConveyorCWTick(statId int16) {
 	stat := &Board.Stats[statId]
 	BoardDrawTile(int16(stat.X), int16(stat.Y))
 	ElementConveyorTick(int16(stat.X), int16(stat.Y), 1)
-
 }
 
 func ElementConveyorCCWDraw(x, y int16, ch *byte) {
@@ -478,7 +470,6 @@ func ElementConveyorCCWTick(statId int16) {
 	stat := &Board.Stats[statId]
 	BoardDrawTile(int16(stat.X), int16(stat.Y))
 	ElementConveyorTick(int16(stat.X), int16(stat.Y), -1)
-
 }
 
 func ElementBombDraw(x, y int16, ch *byte) {
@@ -488,7 +479,6 @@ func ElementBombDraw(x, y int16, ch *byte) {
 	} else {
 		*ch = 48 + stat.P1
 	}
-
 }
 
 func ElementBombTick(statId int16) {
@@ -514,7 +504,6 @@ func ElementBombTick(statId int16) {
 		}
 
 	}
-
 }
 
 func ElementBombTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16) {
@@ -527,7 +516,6 @@ func ElementBombTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16) {
 	} else {
 		ElementPushablePush(int16(stat.X), int16(stat.Y), *deltaX, *deltaY)
 	}
-
 }
 
 func ElementTransporterMove(x, y, deltaX, deltaY int16) {
@@ -571,7 +559,6 @@ func ElementTransporterMove(x, y, deltaX, deltaY int16) {
 					isValidDest = true
 				}
 			}
-
 			if finishSearch {
 				break
 			}
@@ -581,7 +568,6 @@ func ElementTransporterMove(x, y, deltaX, deltaY int16) {
 			SoundQueue(3, "0\x01B\x014\x01F\x018\x01J\x01@\x01R\x01")
 		}
 	}
-
 }
 
 func ElementTransporterTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16) {
@@ -593,7 +579,6 @@ func ElementTransporterTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int
 func ElementTransporterTick(statId int16) {
 	stat := &Board.Stats[statId]
 	BoardDrawTile(int16(stat.X), int16(stat.Y))
-
 }
 
 func ElementTransporterDraw(x, y int16, ch *byte) {
@@ -603,7 +588,6 @@ func ElementTransporterDraw(x, y int16, ch *byte) {
 	} else {
 		*ch = Ord(TransporterEWChars[stat.StepX*2+3+(CurrentTick/stat.Cycle)%4])
 	}
-
 }
 
 func ElementStarDraw(x, y int16, ch *byte) {
@@ -632,7 +616,6 @@ func ElementStarTick(statId int16) {
 				MoveStat(statId, int16(stat.X)+stat.StepX, int16(stat.Y)+stat.StepY)
 			}
 		}
-
 	} else {
 		BoardDrawTile(int16(stat.X), int16(stat.Y))
 	}
@@ -688,7 +671,6 @@ func ElementSlimeTick(statId int16) {
 			BoardDrawTile(startX, startY)
 		}
 	}
-
 }
 
 func ElementSlimeTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16) {
@@ -795,7 +777,6 @@ func ElementBlinkWallTick(statId int16) {
 	} else {
 		stat.P3--
 	}
-
 }
 
 func ElementMove(oldX, oldY, newX, newY int16) {
@@ -828,7 +809,6 @@ func ElementPushablePush(x, y int16, deltaX, deltaY int16) {
 			ElementMove(x, y, x+deltaX, y+deltaY)
 		}
 	}
-
 }
 
 func ElementDuplicatorDraw(x, y int16, ch *byte) {
@@ -847,7 +827,6 @@ func ElementDuplicatorDraw(x, y int16, ch *byte) {
 	default:
 		*ch = 250
 	}
-
 }
 
 func ElementObjectTick(statId int16) {
@@ -863,7 +842,6 @@ func ElementObjectTick(statId int16) {
 			retVal = OopSend(-statId, "THUD", false)
 		}
 	}
-
 }
 
 func ElementObjectDraw(x, y int16, ch *byte) {
@@ -914,7 +892,6 @@ func ElementDuplicatorTick(statId int16) {
 		BoardDrawTile(int16(stat.X), int16(stat.Y))
 	}
 	stat.Cycle = int16((9 - stat.P2) * 3)
-
 }
 
 func ElementScrollTick(statId int16) {
@@ -924,7 +901,6 @@ func ElementScrollTick(statId int16) {
 		Board.Tiles[stat.X][stat.Y].Color = 0x09
 	}
 	BoardDrawTile(int16(stat.X), int16(stat.Y))
-
 }
 
 func ElementScrollTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16) {
@@ -940,7 +916,6 @@ func ElementScrollTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16) {
 	SoundQueue(2, SoundParse("c-c+d-d+e-e+f-f+g-g"))
 	stat.DataPos = 0
 	OopExecute(statId, &stat.DataPos, "Scroll")
-
 	RemoveStat(GetStatIdAt(x, y))
 }
 
@@ -1032,7 +1007,6 @@ func ElementPusherTick(statId int16) {
 	if !ElementDefs[Board.Tiles[int16(stat.X)+stat.StepX][int16(stat.Y)+stat.StepY].Element].Walkable {
 		ElementPushablePush(int16(stat.X)+stat.StepX, int16(stat.Y)+stat.StepY, stat.StepX, stat.StepY)
 	}
-
 	statId = GetStatIdAt(startX, startY)
 	stat2 := &Board.Stats[statId]
 	if ElementDefs[Board.Tiles[int16(stat2.X)+stat2.StepX][int16(stat2.Y)+stat2.StepY].Element].Walkable {
@@ -1045,7 +1019,6 @@ func ElementPusherTick(statId int16) {
 			}
 		}
 	}
-
 }
 
 func ElementTorchTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16) {
@@ -1066,7 +1039,6 @@ func ElementInvisibleTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16
 	BoardDrawTile(x, y)
 	SoundQueue(3, "\x12\x01\x10\x01")
 	DisplayMessage(100, "You are blocked by an invisible wall.")
-
 }
 
 func ElementForestTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16) {
@@ -1167,7 +1139,6 @@ func DrawPlayerSurroundings(x, y int16, bombPhase int16) {
 						}
 					}
 					BoardDrawTile(ix, iy)
-
 				}
 			}
 		}
@@ -1353,7 +1324,6 @@ func ElementPlayerTick(statId int16) {
 			GameUpdateSidebar()
 		}
 	}
-
 }
 
 func ElementMonitorTick(statId int16) {
@@ -1403,7 +1373,6 @@ func InitElementDefs() {
 		def.ParamDirName = ""
 		def.ParamTextName = ""
 		def.ScoreValue = 0
-
 	}
 	ElementDefs[0].Character = ' '
 	ElementDefs[0].Color = 0x70
@@ -1785,7 +1754,6 @@ func InitEditorStatSettings() {
 		setting.P3 = 0
 		setting.StepX = 0
 		setting.StepY = -1
-
 	}
 	World.EditorStatSettings[E_OBJECT].P1 = 1
 	World.EditorStatSettings[E_BEAR].P1 = 8

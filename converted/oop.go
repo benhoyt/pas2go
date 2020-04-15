@@ -9,7 +9,6 @@ func OopError(statId int16, message string) {
 	DisplayMessage(200, "ERR: "+message)
 	SoundQueue(5, "P\n")
 	stat.DataPos = -1
-
 }
 
 func OopReadChar(statId int16, position *int16) {
@@ -20,7 +19,6 @@ func OopReadChar(statId int16, position *int16) {
 	} else {
 		OopChar = '\x00'
 	}
-
 }
 
 func OopReadWord(statId int16, position *int16) {
@@ -182,7 +180,6 @@ func OopFindString(statId int16, s string) (OopFindString int16) {
 
 	}
 	OopFindString = -1
-
 	return
 }
 
@@ -825,7 +822,6 @@ StartParsing:
 		DamageStat(statId)
 		OopPlaceTile(ix, iy, &replaceTile)
 	}
-
 }
 
 func init() {

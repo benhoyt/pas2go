@@ -58,7 +58,6 @@ func TextWindowInitState(state *TTextWindowState) {
 	state.LineCount = 0
 	state.LinePos = 1
 	state.LoadedFilename = ""
-
 }
 
 func TextWindowDrawTitle(color int16, title string) {
@@ -80,7 +79,6 @@ func TextWindowDrawOpen(state *TTextWindowState) {
 	}
 	VideoWriteText(byte(TextWindowX), byte(TextWindowY+2), 0x0F, TextWindowStrSep)
 	TextWindowDrawTitle(0x1E, state.Title)
-
 }
 
 func TextWindowDrawClose(state *TTextWindowState) {
@@ -95,7 +93,6 @@ func TextWindowDrawClose(state *TTextWindowState) {
 		VideoMove(TextWindowX, TextWindowY+iy, TextWindowWidth, &state.ScreenCopy[(iy+1)-1], true)
 		VideoMove(TextWindowX, TextWindowY+TextWindowHeight-iy, TextWindowWidth, &state.ScreenCopy[((TextWindowHeight-iy)+1)-1], true)
 	}
-
 }
 
 func TextWindowDrawLine(state *TTextWindowState, lpos int16, withoutFormatting, viewingFile bool) {
@@ -163,7 +160,6 @@ func TextWindowAppend(state *TTextWindowState, line string) {
 	state.LineCount++
 	New(*state.Lines[state.LineCount-1])
 	state.Lines[state.LineCount-1] = line
-
 }
 
 func TextWindowFree(state *TTextWindowState) {
@@ -172,7 +168,6 @@ func TextWindowFree(state *TTextWindowState) {
 		state.LineCount--
 	}
 	state.LoadedFilename = ""
-
 }
 
 func TextWindowPrint(state *TTextWindowState) {
@@ -212,7 +207,6 @@ func TextWindowPrint(state *TTextWindowState) {
 	}
 	Write(Lst, Chr(12))
 	Close(Lst)
-
 }
 
 func TextWindowSelect(state *TTextWindowState, hyperlinkAsSelect, viewingFile bool) {
@@ -313,7 +307,6 @@ func TextWindowSelect(state *TTextWindowState, hyperlinkAsSelect, viewingFile bo
 		InputKeyPressed = '\x00'
 		TextWindowRejected = true
 	}
-
 }
 
 func TextWindowEdit(state *TTextWindowState) {
@@ -339,7 +332,6 @@ func TextWindowEdit(state *TTextWindowState) {
 		} else {
 			state.Lines[0] = ""
 		}
-
 	}
 
 	if state.LineCount == 0 {
@@ -445,7 +437,6 @@ func TextWindowEdit(state *TTextWindowState) {
 		Dispose(*state.Lines[state.LineCount-1])
 		state.LineCount--
 	}
-
 }
 
 func TextWindowOpenFile(filename string, state *TTextWindowState) {
@@ -525,7 +516,6 @@ func TextWindowOpenFile(filename string, state *TTextWindowState) {
 			Close(f)
 		}
 	}
-
 }
 
 func TextWindowSaveFile(filename string, state *TTextWindowState) {
@@ -545,7 +535,6 @@ func TextWindowSaveFile(filename string, state *TTextWindowState) {
 		}
 	}
 	Close(f)
-
 }
 
 func TextWindowDisplayFile(filename, title string) {

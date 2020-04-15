@@ -198,7 +198,6 @@ func EditorLoop() {
 		}
 
 		EditorDrawTileAndNeighborsAt(x, y)
-
 	}
 
 	EditorEditBoardInfo := func() {
@@ -328,7 +327,6 @@ func EditorLoop() {
 		TextWindowFree(&state)
 		TextWindowDrawClose(&state)
 		InputKeyPressed = '\x00'
-
 	}
 
 	EditorEditStat := func(statId int16) {
@@ -412,7 +410,6 @@ func EditorLoop() {
 					VideoWriteText(63, byte(iy), 0x1F, "Room: "+Copy(EditorGetBoardName(int16(stat.P3), true), 1, 10))
 				}
 			}
-
 		}
 
 		stat := &Board.Stats[statId]
@@ -436,7 +433,6 @@ func EditorLoop() {
 			copiedX = int16(stat.X)
 			copiedY = int16(stat.Y)
 		}
-
 	}
 
 	EditorTransferBoard := func() {
@@ -520,7 +516,6 @@ func EditorLoop() {
 						yPosition[toFill] = y + NeighborDeltaY[i]
 						toFill++
 					}
-
 				}
 			}
 			filled++
@@ -791,7 +786,6 @@ func EditorLoop() {
 								if Length(ElementDefs[iElem].ParamBoardName) != 0 {
 									stat.P3 = World.EditorStatSettings[iElem].P3
 								}
-
 								EditorEditStat(Board.StatCount)
 								if InputKeyPressed == KEY_ESCAPE {
 									RemoveStat(Board.StatCount)
@@ -829,7 +823,6 @@ func EditorLoop() {
 			EditorEditBoardInfo()
 			TransitionDrawToBoard()
 		}
-
 		if editorExitRequested {
 			EditorAskSaveChanged()
 			if InputKeyPressed == KEY_ESCAPE {
