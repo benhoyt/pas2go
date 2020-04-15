@@ -132,10 +132,10 @@ func SoundHasTimeElapsed(counter *int16, duration int16) (SoundHasTimeElapsed bo
 	}
 	if UseSystemTimeForElapsed {
 		GetTime(hour, minute, sec, hSec)
-		hSecsTotal = sec*100 + hSec
+		hSecsTotal = int16(sec*100 + hSec)
 		hSecsDiff = Word((hSecsTotal-*counter)+6000) % 6000
 	} else {
-		hSecsTotal = TimerTicks * 6
+		hSecsTotal = int16(TimerTicks * 6)
 		hSecsDiff = hSecsTotal - *counter
 	}
 	if hSecsDiff >= duration {

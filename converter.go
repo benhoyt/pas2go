@@ -66,6 +66,10 @@ func Convert(file File, units []*Unit, w io.Writer) {
 		[]*ParamGroup{{false, []string{"n"}, &TypeIdent{"integer"}}},
 		&TypeIdent{"integer"},
 	})
+	c.defineVar("Trunc", &FuncSpec{
+		[]*ParamGroup{{false, []string{"x"}, &TypeIdent{"real"}}},
+		&TypeIdent{"integer"},
+	})
 	c.defineVar("UpCase", &FuncSpec{
 		[]*ParamGroup{{false, []string{"ch"}, &TypeIdent{"char"}}},
 		&TypeIdent{"char"},
@@ -1314,6 +1318,7 @@ const (
 	KindBoolean
 	KindByte
 	KindInteger
+	KindUnsigned
 	KindReal
 	KindNumber
 	KindString
@@ -1327,6 +1332,8 @@ func (k Kind) String() string {
 		return "byte"
 	case KindInteger:
 		return "int16"
+	case KindUnsigned:
+		return "uint16"
 	case KindReal:
 		return "float64"
 	case KindNumber:
@@ -1354,7 +1361,7 @@ func (c *converter) exprKind(expr Expr) Kind {
 		case MINUS, OR, XOR, STAR, SLASH, DIV, MOD, AND:
 			left := c.exprKind(expr.Left)
 			right := c.exprKind(expr.Right)
-			for _, kind := range []Kind{KindReal, KindInteger, KindByte, KindBoolean} {
+			for _, kind := range []Kind{KindReal, KindUnsigned, KindInteger, KindByte, KindBoolean} {
 				if left == kind || right == kind {
 					return kind
 				}
@@ -1486,6 +1493,8 @@ func (c *converter) typeNameToKind(name string) Kind {
 		return KindReal
 	case "string":
 		return KindString
+	case "word":
+		return KindUnsigned
 	default:
 		spec := c.lookupType(name)
 		return c.specToKind(spec)
