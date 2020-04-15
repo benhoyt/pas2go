@@ -967,20 +967,12 @@ func (c *converter) expr(expr Expr) {
 		lk := c.exprKind(expr.Left)
 		rk := c.exprKind(expr.Right)
 		switch {
-		case lk == KindInteger && rk == KindByte:
+		case lk.IsNumber() && rk.IsNumber() && lk > rk:
 			c.expr(expr.Left)
 			c.printf(" %s ", opStr)
-			c.typeConversion(expr.Right, "int16")
-		case lk == KindReal && rk == KindInteger:
-			c.expr(expr.Left)
-			c.printf(" %s ", opStr)
-			c.typeConversion(expr.Right, "float64")
-		case lk == KindByte && rk == KindInteger:
-			c.typeConversion(expr.Left, "int16")
-			c.printf(" %s ", opStr)
-			c.expr(expr.Right)
-		case lk == KindInteger && rk == KindReal:
-			c.typeConversion(expr.Left, "float64")
+			c.typeConversion(expr.Right, lk.String())
+		case lk.IsNumber() && rk.IsNumber() && rk > lk:
+			c.typeConversion(expr.Left, rk.String())
 			c.printf(" %s ", opStr)
 			c.expr(expr.Right)
 		case lk == KindString && rk == KindString:
@@ -1323,6 +1315,13 @@ const (
 	KindNumber
 	KindString
 )
+
+func (k Kind) IsNumber() bool {
+	if k == KindByte || k == KindInteger || k == KindUnsigned || k == KindReal {
+		return true
+	}
+	return false
+}
 
 func (k Kind) String() string {
 	switch k {

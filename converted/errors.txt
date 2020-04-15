@@ -101,7 +101,6 @@
 ./sounds.go:134:3: undefined: GetTime
 ./sounds.go:136:15: undefined: Word
 ./sounds.go:139:13: cannot use hSecsTotal - *counter (type int16) as type uint16 in assignment
-./sounds.go:141:15: invalid operation: hSecsDiff >= duration (mismatched types uint16 and int16)
 ./sounds.go:169:26: cannot use SoundFreqTable[Ord(SoundBuffer[SoundBufferPos]) - 1] (type uint16) as type int16 in argument to Sound
 ./sounds.go:184:2: undefined: SetIntVec
 ./sounds.go:272:11: invalid operation: output += '\u0000' + Chr(byte(noteDuration)) (mismatched types string and byte)

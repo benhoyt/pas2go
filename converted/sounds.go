@@ -138,7 +138,7 @@ func SoundHasTimeElapsed(counter *int16, duration int16) (SoundHasTimeElapsed bo
 		hSecsTotal = int16(TimerTicks * 6)
 		hSecsDiff = hSecsTotal - *counter
 	}
-	if hSecsDiff >= duration {
+	if hSecsDiff >= uint16(duration) {
 		SoundHasTimeElapsed = true
 		*counter = hSecsTotal
 	} else {
