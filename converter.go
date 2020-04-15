@@ -244,7 +244,7 @@ func (c *converter) lookupIdentSpec(spec TypeSpec) TypeSpec {
 		return spec
 	}
 	n := strings.ToLower(ident.Type.Name)
-	if n == "byte" || n == "char" || n == "boolean" || n == "integer" || n == "real" || n == "string" {
+	if n == "byte" || n == "char" || n == "boolean" || n == "integer" || n == "word" || n == "real" || n == "string" {
 		return spec // builtin type
 	}
 	spec = c.lookupType(ident.Type.Name)
@@ -849,7 +849,7 @@ func (c *converter) procArgs(params []*ParamGroup, args []Expr) {
 
 func (c *converter) convertKind(kind, targetKind Kind) Kind {
 	if kind != KindUnknown && targetKind != KindUnknown && kind != targetKind {
-		if kind == KindNumber && (targetKind == KindByte || targetKind == KindInteger) {
+		if kind == KindNumber && targetKind.IsNumber() {
 			return KindUnknown
 		}
 		return targetKind
