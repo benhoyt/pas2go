@@ -1054,8 +1054,7 @@ func (c *converter) expr(expr Expr) {
 	case *SetExpr:
 		panic("unexpected SetExpr: should be handled by 'in'")
 	case *TypeConvExpr:
-		spec, _ := c.lookupVarExprType(expr.Expr)
-		kind := c.specToKind(spec)
+		kind := c.exprKind(expr.Expr)
 		if kind == KindBoolean {
 			c.printf("BoolToInt(")
 			c.expr(expr.Expr)
