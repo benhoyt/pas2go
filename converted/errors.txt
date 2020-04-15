@@ -32,11 +32,6 @@
 ./game.go:1534:14: undefined: LightGray
 ./game.go:1536:8: undefined: KeyPressed
 ./game.go:1542:4: undefined: GotoXY
-./input.go:58:34: undefined: Port
-./input.go:67:2: undefined: Port
-./input.go:69:9: undefined: Port
-./input.go:70:9: undefined: Port
-./input.go:71:8: undefined: Port
 ./input.go:85:7: not enough arguments in call to Write
 	have (string)
 	want (*File, interface {})

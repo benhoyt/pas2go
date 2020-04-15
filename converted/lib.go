@@ -62,6 +62,8 @@ func Delete(s string, index, count int16) string {
 
 // Misc functions
 
+var Port [0x202]int16
+
 var Time int16 // TODO
 
 func VideoWriteText(x, y, color byte, text string) {

@@ -36,11 +36,6 @@ func Convert(file File, units []*Unit, w io.Writer) {
 	c.types = make(map[string]TypeSpec)
 	c.pushScope(ScopeGlobal)
 
-	// Port is predefined by Turbo Pascal, fake it
-	min := &ConstExpr{0, false}
-	max := &ConstExpr{1000, false}
-	c.defineVar("Port", &ArraySpec{min, max, &IdentSpec{&TypeIdent{"integer"}}})
-
 	// Builtin functions (or those in VIDEO.PAS)
 	c.defineVar("Chr", &FuncSpec{
 		[]*ParamGroup{{false, []string{"x"}, &TypeIdent{"byte"}}},
@@ -53,6 +48,11 @@ func Convert(file File, units []*Unit, w io.Writer) {
 	c.defineVar("Length", &FuncSpec{
 		[]*ParamGroup{{false, []string{"s"}, &TypeIdent{"string"}}},
 		&TypeIdent{"integer"},
+	})
+	c.defineVar("Port", &ArraySpec{
+		Min: &ConstExpr{0, false},
+		Max: &ConstExpr{1000, false},
+		Of: &IdentSpec{&TypeIdent{"integer"}},
 	})
 	c.defineVar("Random", &FuncSpec{
 		[]*ParamGroup{{false, []string{"end"}, &TypeIdent{"integer"}}},
