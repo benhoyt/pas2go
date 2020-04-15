@@ -242,3 +242,8 @@ func ReadKey() byte {
 	// TODO
 	return 0
 }
+
+func KeyPressed() bool {
+	// TODO
+	return false
+}

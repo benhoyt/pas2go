@@ -85,7 +85,7 @@ func InputCalibrateJoystickPosition(msg string, x, y *int16) (InputCalibrateJoys
 	Write(msg)
 	for {
 		InputJoystickGetCoords(x, y)
-		if KeyPressed {
+		if KeyPressed() {
 			charTyped = ReadKey()
 		}
 		if (charTyped == '\x1b') || (InputIsJoystickButtonPressed()) {
@@ -96,7 +96,7 @@ func InputCalibrateJoystickPosition(msg string, x, y *int16) (InputCalibrateJoys
 	if charTyped != '\x1b' {
 		InputCalibrateJoystickPosition = true
 		for {
-			if KeyPressed {
+			if KeyPressed() {
 				charTyped = ReadKey()
 			}
 			if (!InputIsJoystickButtonPressed()) || (charTyped == '\x1b') {
@@ -152,7 +152,7 @@ CalibrationStart:
 	} else {
 		Write("  Calibration failed - try again (y/N)? ")
 		for {
-			if KeyPressed {
+			if KeyPressed() {
 				break
 			}
 		}
@@ -174,7 +174,7 @@ func InputUpdate() {
 	InputDeltaY = 0
 	InputShiftPressed = false
 	InputJoystickMoved = false
-	for KeyPressed {
+	for KeyPressed() {
 		InputKeyPressed = ReadKey()
 		if (InputKeyPressed == '\x00') || (InputKeyPressed == '\x01') || (InputKeyPressed == '\x02') {
 			InputKeyBuffer += string(Chr(Ord(ReadKey()) | 0x80))
@@ -322,7 +322,7 @@ func InputConfigure() (InputConfigure bool) {
 		Write("?  ")
 		for {
 			for {
-				if KeyPressed {
+				if KeyPressed() {
 					break
 				}
 			}

@@ -30,19 +30,14 @@
 ./game.go:1515:41: cannot use ResourceDataHeader.FileOffset[i - 1] (type int32) as type int16 in argument to Seek
 ./game.go:1534:4: undefined: TextColor
 ./game.go:1534:14: undefined: LightGray
-./game.go:1536:8: undefined: KeyPressed
 ./game.go:1542:4: undefined: GotoXY
 ./input.go:85:7: not enough arguments in call to Write
 	have (string)
 	want (*File, interface {})
-./input.go:88:6: undefined: KeyPressed
-./input.go:99:7: undefined: KeyPressed
 ./input.go:153:8: not enough arguments in call to Write
 	have (string)
 	want (*File, interface {})
-./input.go:155:7: undefined: KeyPressed
 ./input.go:171:20: undefined: Registers
-./input.go:177:6: undefined: KeyPressed
 ./input.go:244:3: undefined: Intr
 ./input.go:268:3: undefined: Intr
 ./input.go:297:11: undefined: Registers
@@ -60,7 +55,6 @@
 ./input.go:322:8: not enough arguments in call to Write
 	have (string)
 	want (*File, interface {})
-./input.go:325:8: undefined: KeyPressed
 ./input.go:334:3: undefined: Writeln
 ./input.go:344:3: undefined: Writeln
 ./keys.go:15:11: undefined: Registers

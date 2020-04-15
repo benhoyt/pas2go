@@ -1533,7 +1533,7 @@ func GamePrintRegisterMessage() {
 			VideoWriteText(28, 24, 0x1F, "Press any key to exit...")
 			TextColor(LightGray)
 			for {
-				if KeyPressed {
+				if KeyPressed() {
 					break
 				}
 			}

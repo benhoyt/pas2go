@@ -45,6 +45,10 @@ func Convert(file File, units []*Unit, w io.Writer) {
 		nil,
 		&TypeIdent{"integer"},
 	})
+	c.defineVar("KeyPressed", &FuncSpec{
+		nil,
+		&TypeIdent{"boolean"},
+	})
 	c.defineVar("Length", &FuncSpec{
 		[]*ParamGroup{{false, []string{"s"}, &TypeIdent{"string"}}},
 		&TypeIdent{"integer"},
@@ -52,7 +56,7 @@ func Convert(file File, units []*Unit, w io.Writer) {
 	c.defineVar("Port", &ArraySpec{
 		Min: &ConstExpr{0, false},
 		Max: &ConstExpr{1000, false},
-		Of: &IdentSpec{&TypeIdent{"integer"}},
+		Of:  &IdentSpec{&TypeIdent{"integer"}},
 	})
 	c.defineVar("Random", &FuncSpec{
 		[]*ParamGroup{{false, []string{"end"}, &TypeIdent{"integer"}}},
