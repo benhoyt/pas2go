@@ -311,7 +311,7 @@ func InputConfigure() (InputConfigure bool) {
 	var charTyped byte
 	charTyped = ' '
 	if InputJoystickEnabled || InputMouseEnabled {
-		Writeln()
+		WriteLn()
 		Write("  Game controller:  K)eyboard")
 		if InputJoystickEnabled {
 			Write(",  J)oystick")
@@ -331,7 +331,7 @@ func InputConfigure() (InputConfigure bool) {
 				break
 			}
 		}
-		Writeln()
+		WriteLn()
 		InputJoystickEnabled = false
 		InputMouseEnabled = false
 		switch charTyped {
@@ -341,7 +341,7 @@ func InputConfigure() (InputConfigure bool) {
 		case 'M':
 			InputMouseEnabled = true
 		}
-		Writeln()
+		WriteLn()
 	}
 	InputConfigure = charTyped != '\x1b'
 	return

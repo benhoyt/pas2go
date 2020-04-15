@@ -744,7 +744,11 @@ func (c *converter) stmt(stmt Stmt) {
 				c.varExpr(stmt.Args[0], false)
 				c.print(" = ")
 			}
-			c.varExpr(stmt.Proc, false)
+			if procStr == "writeln" {
+				c.print("WriteLn") // It's sometimes spelled Writeln in the Pascal
+			} else {
+				c.varExpr(stmt.Proc, false)
+			}
 			spec, _ := c.lookupVarExprType(stmt.Proc)
 			var params []*ParamGroup
 			if spec != nil {

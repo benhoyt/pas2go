@@ -59,15 +59,15 @@ func GameConfigure() {
 	ClrScr()
 	TextColor(White)
 	TextColor(White)
-	Writeln()
-	Writeln("                                 <=-  ZZT  -=>")
+	WriteLn()
+	WriteLn("                                 <=-  ZZT  -=>")
 	TextColor(Yellow)
 	if Length(ConfigRegistration) == 0 {
-		Writeln("                             Shareware version 3.2")
+		WriteLn("                             Shareware version 3.2")
 	} else {
-		Writeln("                                  Version  3.2")
+		WriteLn("                                  Version  3.2")
 	}
-	Writeln("                            Created by Tim Sweeney")
+	WriteLn("                            Created by Tim Sweeney")
 	GotoXY(1, 7)
 	TextColor(Blue)
 	Write("================================================================================")
@@ -148,9 +148,9 @@ func main() {
 	if Length(ConfigRegistration) == 0 {
 		GamePrintRegisterMessage()
 	} else {
-		Writeln()
-		Writeln("  Registered version -- Thank you for playing ZZT.")
-		Writeln()
+		WriteLn()
+		WriteLn("  Registered version -- Thank you for playing ZZT.")
+		WriteLn()
 	}
 	VideoShowCursor()
 }

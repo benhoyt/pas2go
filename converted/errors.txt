@@ -42,7 +42,6 @@
 ./input.go:268:3: undefined: Intr
 ./input.go:297:11: undefined: Registers
 ./input.go:299:2: undefined: Intr
-./input.go:314:3: undefined: Writeln
 ./input.go:315:8: not enough arguments in call to Write
 	have (string)
 	want (*File, interface {})
@@ -55,8 +54,6 @@
 ./input.go:322:8: not enough arguments in call to Write
 	have (string)
 	want (*File, interface {})
-./input.go:334:3: undefined: Writeln
-./input.go:344:3: undefined: Writeln
 ./keys.go:15:11: undefined: Registers
 ./keys.go:17:2: undefined: Intr
 ./oop.go:121:40: cannot call non-function OopParseDirection (type bool)
