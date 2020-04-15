@@ -41,6 +41,9 @@ func Convert(file File, units []*Unit, w io.Writer) {
 		[]*ParamGroup{{false, []string{"x"}, &TypeIdent{"byte"}}},
 		&TypeIdent{"char"},
 	})
+	c.defineVar("GetTime", &ProcSpec{[]*ParamGroup{
+		{true, []string{"h", "m", "s", "s100"}, &TypeIdent{"uint16"}},
+	}})
 	c.defineVar("IOResult", &FuncSpec{
 		nil,
 		&TypeIdent{"integer"},

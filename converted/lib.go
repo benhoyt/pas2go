@@ -68,6 +68,27 @@ func Delete(s string, index, count int16) string {
 
 var Port [0x202]int16
 
+type Registers struct {
+	AX, BX, CX, DX uint16
+	AL, AH         byte
+}
+
+func Intr(n byte, regs Registers) {
+	// TODO
+}
+
+func GetIntVec(n byte, ptr interface{}) {
+	// TODO
+}
+
+func SetIntVec(n byte, ptr interface{}) {
+	// TODO
+}
+
+func GetTime(h, m, s, s100 *uint16) {
+	// TODO
+}
+
 var Time int16 // TODO
 
 func VideoWriteText(x, y, color byte, text string) {
@@ -78,18 +99,20 @@ func VideoMove(x, y, chars int16, data interface{}, toVideo bool) {
 	// TODO
 }
 
+func TextColor(color byte) {
+	// TODO
+}
+
+const LightGray byte = 7
+
+func GotoXY(x, y int16) {
+	// TODO
+}
+
 var VideoMonochrome bool
 
 func Delay(milliseconds int16) {
 	time.Sleep(time.Duration(milliseconds) * time.Millisecond)
-}
-
-func Random(end int16) int16 {
-	return int16(rand.Intn(int(end)))
-}
-
-func Sqr(n int16) int16 {
-	return n * n
 }
 
 func Sound(x int16) {
@@ -98,6 +121,20 @@ func Sound(x int16) {
 
 func NoSound() {
 	// TODO
+}
+
+func SetCBreak(enabled bool) {
+	// TODO
+}
+
+// Math functions
+
+func Random(end int16) int16 {
+	return int16(rand.Intn(int(end)))
+}
+
+func Sqr(n int16) int16 {
+	return n * n
 }
 
 func Abs(n int16) int16 {
@@ -194,6 +231,23 @@ func Erase(f *File) {
 func Seek(f *File, offset int16) {
 	_, err := f.file.Seek(int64(offset), io.SeekStart)
 	setIOResult(err)
+}
+
+type SearchRec struct {
+	Name string
+	name string // It's sometimes spelled "name" in the Pascal
+}
+
+const AnyFile = 0x3F
+
+var DosError = 0
+
+func FindFirst(pattern string, typ byte, rec interface{}) {
+	// TODO
+}
+
+func FindNext(rec interface{}) {
+	// TODO
 }
 
 // Memory functions
