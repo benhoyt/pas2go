@@ -320,7 +320,7 @@ func EditorLoop() {
 				Move(dataChar, dataPtr, 1)
 				AdvancePointer(&dataPtr, 1)
 			}
-			dataChar = '\x0d'
+			dataChar = '\r'
 			Move(dataChar, dataPtr, 1)
 			AdvancePointer(&dataPtr, 1)
 		}

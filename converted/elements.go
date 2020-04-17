@@ -1503,7 +1503,7 @@ func InitElementDefs() {
 	ElementDefs[11].EditorShortcut = 'P'
 	ElementDefs[11].Name = "Passage"
 	ElementDefs[11].ParamBoardName = "Room thru passage?"
-	ElementDefs[9].Character = '\x0a'
+	ElementDefs[9].Character = '\n'
 	ElementDefs[9].Color = COLOR_WHITE_ON_CHOICE
 	ElementDefs[9].TouchProc = ElementDoorTouch
 	ElementDefs[9].EditorCategory = CATEGORY_ITEM

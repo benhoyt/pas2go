@@ -287,19 +287,24 @@ func (c *converter) printf(format string, a ...interface{}) {
 }
 
 func (c *converter) printChar(b byte) {
-	if b == '\\' {
+	switch b {
+	case '\\':
 		c.print(`'\\'`)
-		return
+	case '\'':
+		c.print(`'\''`)
+	case '\n':
+		c.print(`'\n'`)
+	case '\r':
+		c.print(`'\r'`)
+	case '\t':
+		c.print(`'\t'`)
+	default:
+		if b < 32 || b > 126 {
+			c.printf(`'\x%02x'`, b)
+			return
+		}
+		c.printf("'%c'", b)
 	}
-	if b == '\'' {
-		c.printf(`'\''`)
-		return
-	}
-	if b < 32 || b > 126 {
-		c.printf("'\\x%02x'", b)
-		return
-	}
-	c.printf("'%c'", b)
 }
 
 func (c *converter) program(program *Program) {

@@ -2,8 +2,8 @@ package main // unit: Input
 
 const (
 	KEY_BACKSPACE = '\x08'
-	KEY_TAB       = '\x09'
-	KEY_ENTER     = '\x0d'
+	KEY_TAB       = '\t'
+	KEY_ENTER     = '\r'
 	KEY_CTRL_Y    = '\x19'
 	KEY_ESCAPE    = '\x1b'
 	KEY_ALT_P     = '\x99'
