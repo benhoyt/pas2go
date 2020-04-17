@@ -6,7 +6,6 @@ ISSUES:
   + TP implements "Cycle := (9 - P2) * 3;" as "Cycle = (9 - int16(P2)) * 3"
   + not "Cycle = int16((9 - P2) * 3)"
   + similar with: "TickTimeDuration = int16(TickSpeed * 2)" in GAME.PAS
-- why string() here? (TXTWIND.PAS): input[i] = string(UpCase(input[i]))
 - OopParseDirection and OopCheckCondition calls themselves - causes naming issue with named return value
 */
 
