@@ -11,4 +11,4 @@ go build
 ./pas2go convert orig/SOUNDS.PAS > converted/sounds.go
 ./pas2go convert orig/TXTWIND.PAS orig/INPUT.PAS > converted/txtwind.go
 ./pas2go convert orig/ZZT.PAS orig/KEYS.PAS orig/SOUNDS.PAS orig/INPUT.PAS orig/TXTWIND.PAS orig/GAMEVARS.PAS orig/ELEMENTS.PAS orig/EDITOR.PAS orig/OOP.PAS orig/GAME.PAS > converted/zzt.go
-go fmt converted/*.go
+gofmt -r '(a) -> a' -s -w converted/*.go

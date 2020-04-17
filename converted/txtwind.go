@@ -62,12 +62,12 @@ func TextWindowInitState(state *TTextWindowState) {
 
 func TextWindowDrawTitle(color int16, title string) {
 	VideoWriteText(TextWindowX+2, TextWindowY+1, byte(color), TextWindowStrInnerEmpty)
-	VideoWriteText(TextWindowX+((TextWindowWidth-Length(title))/2), TextWindowY+1, byte(color), title)
+	VideoWriteText(TextWindowX+(TextWindowWidth-Length(title))/2, TextWindowY+1, byte(color), title)
 }
 
 func TextWindowDrawOpen(state *TTextWindowState) {
 	var ix, iy int16
-	for iy = 1; iy <= (TextWindowHeight + 1); iy++ {
+	for iy = 1; iy <= TextWindowHeight+1; iy++ {
 		VideoMove(TextWindowX, iy+TextWindowY-1, TextWindowWidth, &state.ScreenCopy[iy-1], false)
 	}
 	for iy = TextWindowHeight / 2; iy >= 0; iy-- {
@@ -86,12 +86,12 @@ func TextWindowDrawClose(state *TTextWindowState) {
 		ix, iy     int16
 		unk1, unk2 int16
 	)
-	for iy = 0; iy <= (TextWindowHeight / 2); iy++ {
+	for iy = 0; iy <= TextWindowHeight/2; iy++ {
 		VideoWriteText(TextWindowX, TextWindowY+iy, 0x0F, TextWindowStrTop)
 		VideoWriteText(TextWindowX, TextWindowY+TextWindowHeight-iy, 0x0F, TextWindowStrBottom)
 		Delay(18)
-		VideoMove(TextWindowX, TextWindowY+iy, TextWindowWidth, &state.ScreenCopy[(iy+1)-1], true)
-		VideoMove(TextWindowX, TextWindowY+TextWindowHeight-iy, TextWindowWidth, &state.ScreenCopy[((TextWindowHeight-iy)+1)-1], true)
+		VideoMove(TextWindowX, TextWindowY+iy, TextWindowWidth, &state.ScreenCopy[iy+1-1], true)
+		VideoMove(TextWindowX, TextWindowY+TextWindowHeight-iy, TextWindowWidth, &state.ScreenCopy[TextWindowHeight-iy+1-1], true)
 	}
 }
 
@@ -100,13 +100,13 @@ func TextWindowDrawLine(state *TTextWindowState, lpos int16, withoutFormatting, 
 		lineY                        int16
 		textOffset, textColor, textX int16
 	)
-	lineY = ((TextWindowY + lpos) - state.LinePos) + (TextWindowHeight / 2) + 1
+	lineY = TextWindowY + lpos - state.LinePos + TextWindowHeight/2 + 1
 	if lpos == state.LinePos {
 		VideoWriteText(TextWindowX+2, lineY, 0x1C, TextWindowStrInnerArrows)
 	} else {
 		VideoWriteText(TextWindowX+2, lineY, 0x1E, TextWindowStrInnerEmpty)
 	}
-	if (lpos > 0) && (lpos <= state.LineCount) {
+	if lpos > 0 && lpos <= state.LineCount {
 		if withoutFormatting {
 			VideoWriteText(TextWindowX+4, lineY, 0x1E, *state.Lines[lpos-1])
 		} else {
@@ -126,19 +126,19 @@ func TextWindowDrawLine(state *TTextWindowState, lpos int16, withoutFormatting, 
 				case '$':
 					textOffset = 2
 					textColor = 0x1F
-					textX = (textX - 4) + ((TextWindowWidth - Length(*state.Lines[lpos-1])) / 2)
+					textX = textX - 4 + (TextWindowWidth-Length(*state.Lines[lpos-1]))/2
 				}
 			}
 			if textOffset > 0 {
 				VideoWriteText(textX, lineY, byte(textColor), Copy(*state.Lines[lpos-1], textOffset, Length(*state.Lines[lpos-1])-textOffset+1))
 			}
 		}
-	} else if (lpos == 0) || (lpos == (state.LineCount + 1)) {
+	} else if lpos == 0 || lpos == state.LineCount+1 {
 		VideoWriteText(TextWindowX+2, lineY, 0x1E, TextWindowStrInnerSep)
-	} else if (lpos == -4) && viewingFile {
+	} else if lpos == -4 && viewingFile {
 		VideoWriteText(TextWindowX+2, lineY, 0x1A, "   Use            to view text,")
 		VideoWriteText(TextWindowX+2+7, lineY, 0x1F, "\x18 \x19, Enter")
-	} else if (lpos == -3) && viewingFile {
+	} else if lpos == -3 && viewingFile {
 		VideoWriteText(TextWindowX+2+1, lineY, 0x1A, "                 to print.")
 		VideoWriteText(TextWindowX+2+12, lineY, 0x1F, "Alt-P")
 	}
@@ -150,8 +150,8 @@ func TextWindowDraw(state *TTextWindowState, withoutFormatting, viewingFile bool
 		i    int16
 		unk1 int16
 	)
-	for i = 0; i <= (TextWindowHeight - 4); i++ {
-		TextWindowDrawLine(state, state.LinePos-(TextWindowHeight/2)+i+2, withoutFormatting, viewingFile)
+	for i = 0; i <= TextWindowHeight-4; i++ {
+		TextWindowDrawLine(state, state.LinePos-TextWindowHeight/2+i+2, withoutFormatting, viewingFile)
 	}
 	TextWindowDrawTitle(0x1E, state.Title)
 }
@@ -224,9 +224,9 @@ func TextWindowSelect(state *TTextWindowState, hyperlinkAsSelect, viewingFile bo
 		newLinePos = state.LinePos
 		if InputDeltaY != 0 {
 			newLinePos += InputDeltaY
-		} else if InputShiftPressed || (InputKeyPressed == KEY_ENTER) {
+		} else if InputShiftPressed || InputKeyPressed == KEY_ENTER {
 			InputShiftAccepted = true
-			if (state.Lines[state.LinePos-1][0]) == "!" {
+			if state.Lines[state.LinePos-1][0] == "!" {
 				pointerStr = Copy(*state.Lines[state.LinePos-1], 2, Length(*state.Lines[state.LinePos-1])-1)
 				if Pos(';', pointerStr) > 0 {
 					pointerStr = Copy(pointerStr, 1, Pos(';', pointerStr)-1)
@@ -288,7 +288,7 @@ func TextWindowSelect(state *TTextWindowState, hyperlinkAsSelect, viewingFile bo
 		if newLinePos != state.LinePos {
 			state.LinePos = newLinePos
 			TextWindowDraw(state, false, viewingFile)
-			if (state.Lines[state.LinePos-1][0]) == "!" {
+			if state.Lines[state.LinePos-1][0] == "!" {
 				if hyperlinkAsSelect {
 					TextWindowDrawTitle(0x1E, "\xaePress ENTER to select this\xaf")
 				} else {
@@ -299,7 +299,7 @@ func TextWindowSelect(state *TTextWindowState, hyperlinkAsSelect, viewingFile bo
 		if InputJoystickMoved {
 			Delay(35)
 		}
-		if (InputKeyPressed == KEY_ESCAPE) || (InputKeyPressed == KEY_ENTER) || InputShiftPressed {
+		if InputKeyPressed == KEY_ESCAPE || InputKeyPressed == KEY_ENTER || InputShiftPressed {
 			break
 		}
 	}
@@ -321,7 +321,7 @@ func TextWindowEdit(state *TTextWindowState) {
 		if state.LineCount > 1 {
 			Dispose(*state.Lines[state.LinePos-1])
 			for i = state.LinePos + 1; i <= state.LineCount; i++ {
-				state.Lines[(i-1)-1] = state.Lines[i-1]
+				state.Lines[i-1-1] = state.Lines[i-1]
 			}
 			state.LineCount--
 			if state.LinePos > state.LineCount {
@@ -347,11 +347,11 @@ func TextWindowEdit(state *TTextWindowState) {
 		} else {
 			VideoWriteText(77, 14, 0x1E, "off")
 		}
-		if charPos >= (Length(*state.Lines[state.LinePos-1]) + 1) {
+		if charPos >= Length(*state.Lines[state.LinePos-1])+1 {
 			charPos = Length(*state.Lines[state.LinePos-1]) + 1
-			VideoWriteText(charPos+TextWindowX+3, TextWindowY+(TextWindowHeight/2)+1, 0x70, " ")
+			VideoWriteText(charPos+TextWindowX+3, TextWindowY+TextWindowHeight/2+1, 0x70, " ")
 		} else {
-			VideoWriteText(charPos+TextWindowX+3, TextWindowY+(TextWindowHeight/2)+1, 0x70, state.Lines[state.LinePos-1][charPos-1])
+			VideoWriteText(charPos+TextWindowX+3, TextWindowY+TextWindowHeight/2+1, 0x70, state.Lines[state.LinePos-1][charPos-1])
 		}
 		InputReadWaitKey()
 		newLinePos = state.LinePos
@@ -366,7 +366,7 @@ func TextWindowEdit(state *TTextWindowState) {
 			newLinePos = state.LinePos + TextWindowHeight - 4
 		case KEY_RIGHT:
 			charPos++
-			if charPos > (Length(*state.Lines[state.LinePos-1]) + 1) {
+			if charPos > Length(*state.Lines[state.LinePos-1])+1 {
 				charPos = 1
 				newLinePos = state.LinePos + 1
 			}
@@ -378,11 +378,11 @@ func TextWindowEdit(state *TTextWindowState) {
 			}
 		case KEY_ENTER:
 			if state.LineCount < MAX_TEXT_WINDOW_LINES {
-				for i = state.LineCount; i >= (state.LinePos + 1); i-- {
-					state.Lines[(i+1)-1] = state.Lines[i-1]
+				for i = state.LineCount; i >= state.LinePos+1; i-- {
+					state.Lines[i+1-1] = state.Lines[i-1]
 				}
-				New(*state.Lines[(state.LinePos+1)-1])
-				state.Lines[(state.LinePos+1)-1] = Copy(*state.Lines[state.LinePos-1], charPos, Length(*state.Lines[state.LinePos-1])-charPos+1)
+				New(*state.Lines[state.LinePos+1-1])
+				state.Lines[state.LinePos+1-1] = Copy(*state.Lines[state.LinePos-1], charPos, Length(*state.Lines[state.LinePos-1])-charPos+1)
 				state.Lines[state.LinePos-1] = Copy(*state.Lines[state.LinePos-1], 1, charPos-1)
 				newLinePos = state.LinePos + 1
 				charPos = 1
@@ -405,12 +405,12 @@ func TextWindowEdit(state *TTextWindowState) {
 		case KEY_CTRL_Y:
 			DeleteCurrLine()
 		default:
-			if (InputKeyPressed >= ' ') && (charPos < (TextWindowWidth - 7)) {
+			if InputKeyPressed >= ' ' && charPos < TextWindowWidth-7 {
 				if !insertMode {
 					state.Lines[state.LinePos-1] = string(Copy(*state.Lines[state.LinePos-1], 1, charPos-1) + InputKeyPressed + Copy(*state.Lines[state.LinePos-1], charPos+1, Length(*state.Lines[state.LinePos-1])-charPos))
 					charPos++
 				} else {
-					if Length(*state.Lines[state.LinePos-1]) < (TextWindowWidth - 8) {
+					if Length(*state.Lines[state.LinePos-1]) < TextWindowWidth-8 {
 						state.Lines[state.LinePos-1] = string(Copy(*state.Lines[state.LinePos-1], 1, charPos-1) + InputKeyPressed + Copy(*state.Lines[state.LinePos-1], charPos, Length(*state.Lines[state.LinePos-1])-charPos+1))
 						charPos++
 					}
@@ -451,7 +451,7 @@ func TextWindowOpenFile(filename string, state *TTextWindowState) {
 	)
 	retVal = true
 	for i = 1; i <= Length(filename); i++ {
-		retVal = retVal && (filename[i-1] != '.')
+		retVal = retVal && filename[i-1] != '.'
 	}
 	if retVal {
 		filename += ".HLP"
@@ -485,7 +485,7 @@ func TextWindowOpenFile(filename string, state *TTextWindowState) {
 	if entryPos <= 0 {
 		Assign(tf, filename)
 		Reset(tf)
-		for (IOResult() == 0) && (!Eof(tf)) {
+		for IOResult() == 0 && !Eof(tf) {
 			state.LineCount++
 			New(*state.Lines[state.LineCount-1])
 			ReadLn(tf, *state.Lines[state.LineCount-1])
@@ -497,7 +497,7 @@ func TextWindowOpenFile(filename string, state *TTextWindowState) {
 		Seek(f, ResourceDataHeader.FileOffset[entryPos-1])
 		if IOResult() == 0 {
 			retVal = true
-			for (IOResult() == 0) && retVal {
+			for IOResult() == 0 && retVal {
 				state.LineCount++
 				New(*state.Lines[state.LineCount-1])
 				BlockRead(f, *state.Lines[state.LineCount-1], 1)
@@ -558,7 +558,7 @@ func TextWindowInit(x, y, width, height int16) {
 	TextWindowHeight = height
 	TextWindowStrInnerEmpty = ""
 	TextWindowStrInnerLine = ""
-	for i = 1; i <= (TextWindowWidth - 5); i++ {
+	for i = 1; i <= TextWindowWidth-5; i++ {
 		TextWindowStrInnerEmpty += ' '
 		TextWindowStrInnerLine += '\xcd'
 	}
@@ -570,8 +570,8 @@ func TextWindowInit(x, y, width, height int16) {
 	TextWindowStrInnerArrows[0] = '\xaf'
 	TextWindowStrInnerArrows[Length(TextWindowStrInnerArrows)-1] = '\xae'
 	TextWindowStrInnerSep = TextWindowStrInnerEmpty
-	for i = 1; i <= (TextWindowWidth / 5); i++ {
-		TextWindowStrInnerSep[(i*5+((TextWindowWidth%5)/2))-1] = '\x07'
+	for i = 1; i <= TextWindowWidth/5; i++ {
+		TextWindowStrInnerSep[i*5+TextWindowWidth%5/2-1] = '\x07'
 	}
 }
 

@@ -8,8 +8,8 @@
 ./editor.go:244:21: cannot use "          Quit!" (type string) as type *string in assignment
 ./editor.go:316:11: cannot use stat.Data (type *string) as type uintptr in assignment
 ./editor.go:319:41: invalid operation: state.Lines[iLine - 1][iChar - 1] (type *string does not support indexing)
-./editor.go:732:54: cannot convert " " (type untyped string) to type byte
-./editor.go:732:54: invalid operation: " " + ElementDefs[iElem].EditorShortcut (mismatched types string and byte)
+./editor.go:732:50: cannot convert " " (type untyped string) to type byte
+./editor.go:732:50: invalid operation: " " + ElementDefs[iElem].EditorShortcut (mismatched types string and byte)
 ./game.go:69:6: cannot use IoTmpBuf (type *TIoTmpBuf) as type uintptr in assignment
 ./game.go:107:37: type TStat is not an expression
 ./game.go:358:40: cannot convert "....:...." (type untyped string) to type byte
@@ -26,7 +26,7 @@
 ./oop.go:135:40: cannot call non-function OopParseDirection (type bool)
 ./oop.go:263:10: goto FindNextStat jumps into block starting at ./oop.go:250:9
 ./oop.go:417:41: cannot call non-function OopCheckCondition (type bool)
-./oop.go:644:11: invalid operation: counterPtr + OopValue (mismatched types *int16 and int16)
+./oop.go:644:21: invalid operation: counterPtr + OopValue (mismatched types *int16 and int16)
 ./oop.go:645:20: invalid operation: counterPtr += OopValue (mismatched types *int16 and int16)
 ./oop.go:666:16: cannot use Board.Stats[labelStatId].Data (type *string) as type uintptr in assignment
 ./oop.go:675:17: cannot use Board.Stats[labelStatId].Data (type *string) as type uintptr in assignment

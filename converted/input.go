@@ -55,7 +55,7 @@ var (
 )
 
 func InputIsJoystickButtonPressed() (InputIsJoystickButtonPressed bool) {
-	InputIsJoystickButtonPressed = (Port[PORT_JOYSTICK] & 0x30) != 0x30
+	InputIsJoystickButtonPressed = Port[PORT_JOYSTICK]&0x30 != 0x30
 	return
 }
 
@@ -68,12 +68,12 @@ func InputJoystickGetCoords(x, y *int16) {
 	for {
 		*x += Port[PORT_JOYSTICK] & 1
 		*y += Port[PORT_JOYSTICK] & 2
-		if ((Port[PORT_JOYSTICK] & 3) == 0) || ((TimerTicks - startTicks) > 3) {
+		if Port[PORT_JOYSTICK]&3 == 0 || TimerTicks-startTicks > 3 {
 			break
 		}
 	}
 	*y = *y / 2
-	if (TimerTicks - startTicks) > 3 {
+	if TimerTicks-startTicks > 3 {
 		*x = -1
 		*y = -1
 	}
@@ -88,7 +88,7 @@ func InputCalibrateJoystickPosition(msg string, x, y *int16) (InputCalibrateJoys
 		if KeyPressed() {
 			charTyped = ReadKey()
 		}
-		if (charTyped == '\x1b') || (InputIsJoystickButtonPressed()) {
+		if charTyped == '\x1b' || InputIsJoystickButtonPressed() {
 			break
 		}
 	}
@@ -99,7 +99,7 @@ func InputCalibrateJoystickPosition(msg string, x, y *int16) (InputCalibrateJoys
 			if KeyPressed() {
 				charTyped = ReadKey()
 			}
-			if (!InputIsJoystickButtonPressed()) || (charTyped == '\x1b') {
+			if !InputIsJoystickButtonPressed() || charTyped == '\x1b' {
 				break
 			}
 		}
@@ -116,7 +116,7 @@ func InputCalibrateJoystickPosition(msg string, x, y *int16) (InputCalibrateJoys
 func InputInitJoystick() (InputInitJoystick bool) {
 	var joyX, joyY int16
 	InputJoystickGetCoords(&joyX, &joyY)
-	if (joyX > 0) && (joyY > 0) {
+	if joyX > 0 && joyY > 0 {
 		JoystickXInitial = joyX
 		JoystickYInitial = joyY
 		InputInitJoystick = true
@@ -147,7 +147,7 @@ CalibrationStart:
 	JoystickXMax -= JoystickXCenter
 	JoystickYMin -= JoystickYCenter
 	JoystickYMax -= JoystickYCenter
-	if (JoystickXMin < 1) && (JoystickXMax > 1) && (JoystickYMin < 1) && (JoystickYMax > 1) {
+	if JoystickXMin < 1 && JoystickXMax > 1 && JoystickYMin < 1 && JoystickYMax > 1 {
 		InputJoystickEnabled = true
 	} else {
 		Write("  Calibration failed - try again (y/N)? ")
@@ -176,7 +176,7 @@ func InputUpdate() {
 	InputJoystickMoved = false
 	for KeyPressed() {
 		InputKeyPressed = ReadKey()
-		if (InputKeyPressed == '\x00') || (InputKeyPressed == '\x01') || (InputKeyPressed == '\x02') {
+		if InputKeyPressed == '\x00' || InputKeyPressed == '\x01' || InputKeyPressed == '\x02' {
 			InputKeyBuffer += Chr(Ord(ReadKey()) | 0x80)
 		} else {
 			InputKeyBuffer += string(InputKeyPressed)
@@ -206,7 +206,7 @@ func InputUpdate() {
 	} else {
 		InputKeyPressed = '\x00'
 	}
-	if (InputDeltaX != 0) || (InputDeltaY != 0) {
+	if InputDeltaX != 0 || InputDeltaY != 0 {
 		KeysUpdateModifiers()
 		InputShiftPressed = KeysShiftHeld
 	} else if InputJoystickEnabled {
@@ -214,19 +214,19 @@ func InputUpdate() {
 		joyX = joyXraw - JoystickXCenter
 		joyY = joyYraw - JoystickYCenter
 		if Abs(joyX) > Abs(joyY) {
-			if joyX < (JoystickXMin / 2) {
+			if joyX < JoystickXMin/2 {
 				InputDeltaX = -1
 				InputJoystickMoved = true
-			} else if joyX > (JoystickXMax / 2) {
+			} else if joyX > JoystickXMax/2 {
 				InputDeltaX = 1
 				InputJoystickMoved = true
 			}
 
 		} else {
-			if joyY < (JoystickYMin / 2) {
+			if joyY < JoystickYMin/2 {
 				InputDeltaY = -1
 				InputJoystickMoved = true
-			} else if joyY > (JoystickYMax / 2) {
+			} else if joyY > JoystickYMax/2 {
 				InputDeltaY = 1
 				InputJoystickMoved = true
 			}
@@ -266,15 +266,15 @@ func InputUpdate() {
 
 		regs.AX = 0x03
 		Intr(0x33, regs)
-		if (regs.BX & 1) != 0 {
+		if regs.BX&1 != 0 {
 			if !InputShiftAccepted {
 				InputShiftPressed = true
 			}
 		} else {
 			InputShiftAccepted = false
 		}
-		if (regs.BX & 6) != 0 {
-			if (InputDeltaX != 0) || (InputDeltaY != 0) {
+		if regs.BX&6 != 0 {
+			if InputDeltaX != 0 || InputDeltaY != 0 {
 				InputMouseButtonX = InputDeltaX
 				InputMouseButtonY = InputDeltaY
 			} else {
@@ -287,7 +287,7 @@ func InputUpdate() {
 		}
 	}
 
-	if (InputDeltaX != 0) || (InputDeltaY != 0) {
+	if InputDeltaX != 0 || InputDeltaY != 0 {
 		InputLastDeltaX = InputDeltaX
 		InputLastDeltaY = InputDeltaY
 	}
@@ -327,7 +327,7 @@ func InputConfigure() (InputConfigure bool) {
 				}
 			}
 			charTyped = UpCase(ReadKey())
-			if (charTyped == 'K') || (InputJoystickEnabled && (charTyped == 'J')) || (InputMouseEnabled && (charTyped == 'M')) || (charTyped == '\x1b') {
+			if charTyped == 'K' || InputJoystickEnabled && charTyped == 'J' || InputMouseEnabled && charTyped == 'M' || charTyped == '\x1b' {
 				break
 			}
 		}

@@ -19,7 +19,7 @@ func ParseArguments() {
 			}
 		} else {
 			StartupWorldFileName = pArg
-			if (Length(StartupWorldFileName) > 4) && (StartupWorldFileName[(Length(StartupWorldFileName)-3)-1] == '.') {
+			if Length(StartupWorldFileName) > 4 && StartupWorldFileName[Length(StartupWorldFileName)-3-1] == '.' {
 				StartupWorldFileName = Copy(StartupWorldFileName, 1, Length(StartupWorldFileName)-4)
 			}
 		}

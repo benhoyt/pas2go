@@ -27,8 +27,8 @@ var (
 // implementation uses: Crt, Dos
 
 func SoundQueue(priority int16, pattern string) {
-	if !SoundBlockQueueing && (!SoundIsPlaying || (((priority >= SoundCurrentPriority) && (SoundCurrentPriority != -1)) || (priority == -1))) {
-		if (priority >= 0) || !SoundIsPlaying {
+	if !SoundBlockQueueing && (!SoundIsPlaying || (priority >= SoundCurrentPriority && SoundCurrentPriority != -1 || priority == -1)) {
+		if priority >= 0 || !SoundIsPlaying {
 			SoundCurrentPriority = priority
 			SoundBuffer = pattern
 			SoundBufferPos = 1
@@ -36,7 +36,7 @@ func SoundQueue(priority int16, pattern string) {
 		} else {
 			SoundBuffer = Copy(SoundBuffer, SoundBufferPos, Length(SoundBuffer)-SoundBufferPos+1)
 			SoundBufferPos = 1
-			if (Length(SoundBuffer) + Length(pattern)) < 255 {
+			if Length(SoundBuffer)+Length(pattern) < 255 {
 				SoundBuffer += pattern
 			}
 		}
@@ -61,7 +61,7 @@ func SoundInitFreqTable() {
 	for octave = 1; octave <= 15; octave++ {
 		noteBase = Exp(float64(octave)*ln2) * freqC1
 		for note = 0; note <= 11; note++ {
-			SoundFreqTable[(octave*16+note)-1] = uint16(Trunc(noteBase))
+			SoundFreqTable[octave*16+note-1] = uint16(Trunc(noteBase))
 			noteBase = noteBase * noteStep
 		}
 	}
@@ -78,23 +78,23 @@ func SoundInitDrumTable() {
 		SoundDrumTable[1].Data[i-1] = uint16(i*100 + 1000)
 	}
 	for i = 1; i <= 16; i++ {
-		SoundDrumTable[2].Data[i-1] = uint16((i%2)*1600 + 1600 + (i%4)*1600)
+		SoundDrumTable[2].Data[i-1] = uint16(i%2*1600 + 1600 + i%4*1600)
 	}
 	for i = 1; i <= 14; i++ {
 		SoundDrumTable[4].Data[i-1] = uint16(Random(5000) + 500)
 	}
 	for i = 1; i <= 8; i++ {
-		SoundDrumTable[5].Data[(i*2-1)-1] = 1600
-		SoundDrumTable[5].Data[(i*2)-1] = uint16(Random(1600) + 800)
+		SoundDrumTable[5].Data[i*2-1-1] = 1600
+		SoundDrumTable[5].Data[i*2-1] = uint16(Random(1600) + 800)
 	}
 	for i = 1; i <= 14; i++ {
-		SoundDrumTable[6].Data[i-1] = uint16(((i % 2) * 880) + 880 + ((i % 3) * 440))
+		SoundDrumTable[6].Data[i-1] = uint16(i%2*880 + 880 + i%3*440)
 	}
 	for i = 1; i <= 14; i++ {
-		SoundDrumTable[7].Data[i-1] = uint16(700 - (i * 12))
+		SoundDrumTable[7].Data[i-1] = uint16(700 - i*12)
 	}
 	for i = 1; i <= 14; i++ {
-		SoundDrumTable[8].Data[i-1] = uint16((i*20 + 1200) - Random(i*40))
+		SoundDrumTable[8].Data[i-1] = uint16(i*20 + 1200 - Random(i*40))
 	}
 	for i = 1; i <= 14; i++ {
 		SoundDrumTable[9].Data[i-1] = uint16(Random(440) + 220)
@@ -113,7 +113,7 @@ func SoundPlayDrum(drum *TDrumData) {
 func SoundCheckTimeIntr() {
 	var hour, minute, sec, hSec uint16
 	GetTime(&hour, &minute, &sec, &hSec)
-	if (SoundTimeCheckHsec != 0) && (int16(hSec) != SoundTimeCheckHsec) {
+	if SoundTimeCheckHsec != 0 && int16(hSec) != SoundTimeCheckHsec {
 		SoundTimeCheckCounter = 0
 		UseSystemTimeForElapsed = true
 	}
@@ -126,14 +126,14 @@ func SoundHasTimeElapsed(counter *int16, duration int16) (SoundHasTimeElapsed bo
 		hSecsDiff               uint16
 		hSecsTotal              int16
 	)
-	if (SoundTimeCheckCounter > 0) && ((SoundTimeCheckCounter % 2) == 1) {
+	if SoundTimeCheckCounter > 0 && SoundTimeCheckCounter%2 == 1 {
 		SoundTimeCheckCounter--
 		SoundCheckTimeIntr()
 	}
 	if UseSystemTimeForElapsed {
 		GetTime(&hour, &minute, &sec, &hSec)
 		hSecsTotal = int16(sec*100 + hSec)
-		hSecsDiff = uint16((hSecsTotal-*counter)+6000) % 6000
+		hSecsDiff = uint16(hSecsTotal-*counter+6000) % 6000
 	} else {
 		hSecsTotal = int16(TimerTicks * 6)
 		hSecsDiff = uint16(hSecsTotal - *counter)
@@ -149,7 +149,7 @@ func SoundHasTimeElapsed(counter *int16, duration int16) (SoundHasTimeElapsed bo
 
 func SoundTimerHandler() {
 	TimerTicks++
-	if (SoundTimeCheckCounter > 0) && ((SoundTimeCheckCounter % 2) == 0) {
+	if SoundTimeCheckCounter > 0 && SoundTimeCheckCounter%2 == 0 {
 		SoundTimeCheckCounter--
 	}
 	if !SoundEnabled {
@@ -220,7 +220,7 @@ func SoundParse(input string) (SoundParse string) {
 			noteDuration = 32
 			AdvanceInput()
 		case '.':
-			noteDuration = (noteDuration * 3) / 2
+			noteDuration = noteDuration * 3 / 2
 			AdvanceInput()
 		case '3':
 			noteDuration = noteDuration / 3
