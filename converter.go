@@ -580,7 +580,7 @@ func (c *converter) typeIdent(typ *TypeIdent) {
 	case "string":
 		s = "string"
 	case "pointer":
-		s = "uintptr" // TODO: change to *byte?
+		s = "uintptr"
 	case "word":
 		s = "uint16"
 	case "longint":
@@ -1275,7 +1275,6 @@ func (c *converter) typeSpec(spec TypeSpec) {
 		}
 		c.print("}")
 	case *FileSpec:
-		// TODO: handle spec.Of
 		c.print("*File")
 	case *PointerSpec:
 		c.print("*")
@@ -1434,7 +1433,7 @@ func (c *converter) exprKind(expr Expr) Kind {
 	case *UnaryExpr:
 		return c.exprKind(expr.Expr)
 	case *AtExpr:
-		return c.exprKind(expr.Expr) // TODO: hmmm
+		return KindUnknown
 	case *DotExpr:
 		spec, _ := c.lookupVarExprType(expr.Record)
 		if spec == nil {
@@ -1469,7 +1468,7 @@ func (c *converter) exprKind(expr Expr) Kind {
 		}
 		return c.specToKind(spec)
 	case *PointerExpr:
-		spec, _ := c.lookupVarExprType(expr.Expr) // TODO: dereference?
+		spec, _ := c.lookupVarExprType(expr.Expr)
 		return c.specToKind(spec)
 	case *WidthExpr:
 		return KindUnknown
