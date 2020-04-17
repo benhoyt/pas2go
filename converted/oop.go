@@ -73,7 +73,7 @@ func OopReadValue(statId int16, position *int16) {
 func OopSkipLine(statId int16, position *int16) {
 	for {
 		OopReadChar(statId, position)
-		if (OopChar == '\x00') || (OopChar == '\r') {
+		if (OopChar == '\x00') || (OopChar == '\x0d') {
 			break
 		}
 	}
@@ -442,7 +442,7 @@ func OopReadLineToEnd(statId int16, position *int16) (OopReadLineToEnd string) {
 	var s string
 	s = ""
 	OopReadChar(statId, position)
-	for (OopChar != '\x00') && (OopChar != '\r') {
+	for (OopChar != '\x00') && (OopChar != '\x0d') {
 		s += string(OopChar)
 		OopReadChar(statId, position)
 	}
@@ -517,7 +517,7 @@ StartParsing:
 		for OopChar == ':' {
 			for {
 				OopReadChar(statId, position)
-				if (OopChar == '\x00') || (OopChar == '\r') {
+				if (OopChar == '\x00') || (OopChar == '\x0d') {
 					break
 				}
 			}
@@ -545,7 +545,7 @@ StartParsing:
 					repeatInsNextTick = false
 				}
 				OopReadChar(statId, position)
-				if OopChar != '\r' {
+				if OopChar != '\x0d' {
 					*position--
 				}
 				stopRunning = true
@@ -771,7 +771,7 @@ StartParsing:
 			if lineFinished {
 				OopSkipLine(statId, position)
 			}
-		} else if OopChar == '\r' {
+		} else if OopChar == '\x0d' {
 			if textWindow.LineCount > 0 {
 				TextWindowAppend(&textWindow, "")
 			}

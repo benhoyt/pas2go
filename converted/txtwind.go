@@ -560,18 +560,18 @@ func TextWindowInit(x, y, width, height int16) {
 	TextWindowStrInnerLine = ""
 	for i = 1; i <= (TextWindowWidth - 5); i++ {
 		TextWindowStrInnerEmpty += ' '
-		TextWindowStrInnerLine += 'Í'
+		TextWindowStrInnerLine += '\xcd'
 	}
 	TextWindowStrTop = "\xc6\xd1" + TextWindowStrInnerLine + "\xd1" + "\xb5"
 	TextWindowStrBottom = "\xc6\xcf" + TextWindowStrInnerLine + "\xcf" + "\xb5"
 	TextWindowStrSep = " \xc6" + TextWindowStrInnerLine + "\xb5" + " "
 	TextWindowStrText = " \xb3" + TextWindowStrInnerEmpty + "\xb3" + " "
 	TextWindowStrInnerArrows = TextWindowStrInnerEmpty
-	TextWindowStrInnerArrows[0] = '¯'
-	TextWindowStrInnerArrows[Length(TextWindowStrInnerArrows)-1] = '®'
+	TextWindowStrInnerArrows[0] = '\xaf'
+	TextWindowStrInnerArrows[Length(TextWindowStrInnerArrows)-1] = '\xae'
 	TextWindowStrInnerSep = TextWindowStrInnerEmpty
 	for i = 1; i <= (TextWindowWidth / 5); i++ {
-		TextWindowStrInnerSep[(i*5+((TextWindowWidth%5)/2))-1] = '\a'
+		TextWindowStrInnerSep[(i*5+((TextWindowWidth%5)/2))-1] = '\x07'
 	}
 }
 

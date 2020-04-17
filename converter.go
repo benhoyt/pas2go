@@ -286,6 +286,22 @@ func (c *converter) printf(format string, a ...interface{}) {
 	fmt.Fprintf(c.w, format, a...)
 }
 
+func (c *converter) printChar(b byte) {
+	if b == '\\' {
+		c.print(`'\\'`)
+		return
+	}
+	if b == '\'' {
+		c.printf(`'\''`)
+		return
+	}
+	if b < 32 || b > 126 {
+		c.printf("'\\x%02x'", b)
+		return
+	}
+	c.printf("'%c'", b)
+}
+
 func (c *converter) program(program *Program) {
 	c.print("package main\n\n")
 	if program.Uses != nil {
@@ -843,8 +859,6 @@ func (c *converter) procArgs(params []*ParamGroup, args []Expr) {
 			c.print(", ")
 		}
 		if params != nil {
-			// TODO: this means builtin functions will have targetIsVar=false,
-			// but that's not true of some, eg: Dec() -- need to define these manually?
 			c.procArg(isVars[i], kinds[i], arg)
 		} else {
 			c.procArg(false, KindUnknown, arg)
@@ -993,7 +1007,7 @@ func (c *converter) expr(expr Expr) {
 		switch value := expr.Value.(type) {
 		case string:
 			if len(value) == 1 {
-				c.printf("%q", value[0]) // TODO: should be manually escaped to avoid 'Å'
+				c.printChar(value[0])
 			} else {
 				c.printf("%q", value)
 			}

@@ -320,7 +320,7 @@ func EditorLoop() {
 				Move(dataChar, dataPtr, 1)
 				AdvancePointer(&dataPtr, 1)
 			}
-			dataChar = '\r'
+			dataChar = '\x0d'
 			Move(dataChar, dataPtr, 1)
 			AdvancePointer(&dataPtr, 1)
 		}
@@ -567,7 +567,7 @@ func EditorLoop() {
 			BoardDrawTile(cursorX, cursorY)
 		}
 		if drawMode == TextEntry {
-			if (InputKeyPressed >= ' ') && (InputKeyPressed < '\u0080') {
+			if (InputKeyPressed >= ' ') && (InputKeyPressed < '\x80') {
 				if EditorPrepareModifyTile(cursorX, cursorY) {
 					Board.Tiles[cursorX][cursorY].Element = byte((cursorColor - 9) + E_TEXT_MIN)
 					Board.Tiles[cursorX][cursorY].Color = Ord(InputKeyPressed)

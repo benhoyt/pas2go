@@ -1384,7 +1384,7 @@ func InitElementDefs() {
 	ElementDefs[3].Cycle = 1
 	ElementDefs[3].TickProc = ElementMonitorTick
 	ElementDefs[3].Name = "Monitor"
-	ElementDefs[19].Character = '°'
+	ElementDefs[19].Character = '\xb0'
 	ElementDefs[19].Color = 0xF9
 	ElementDefs[19].PlaceableOnTop = true
 	ElementDefs[19].EditorCategory = CATEGORY_TERRAIN
@@ -1392,7 +1392,7 @@ func InitElementDefs() {
 	ElementDefs[19].EditorShortcut = 'W'
 	ElementDefs[19].Name = "Water"
 	ElementDefs[19].CategoryName = "Terrains:"
-	ElementDefs[20].Character = '°'
+	ElementDefs[20].Character = '\xb0'
 	ElementDefs[20].Color = 0x20
 	ElementDefs[20].Walkable = false
 	ElementDefs[20].TouchProc = ElementForestTouch
@@ -1410,7 +1410,7 @@ func InitElementDefs() {
 	ElementDefs[4].EditorShortcut = 'Z'
 	ElementDefs[4].Name = "Player"
 	ElementDefs[4].CategoryName = "Items:"
-	ElementDefs[41].Character = 'ê'
+	ElementDefs[41].Character = '\xea'
 	ElementDefs[41].Color = 0x0C
 	ElementDefs[41].Destructible = true
 	ElementDefs[41].Pushable = true
@@ -1423,7 +1423,7 @@ func InitElementDefs() {
 	ElementDefs[41].CategoryName = "Beasts:"
 	ElementDefs[41].Param1Name = "Intelligence?"
 	ElementDefs[41].ScoreValue = 1
-	ElementDefs[42].Character = 'ã'
+	ElementDefs[42].Character = '\xe3'
 	ElementDefs[42].Color = 0x0B
 	ElementDefs[42].Destructible = true
 	ElementDefs[42].Pushable = true
@@ -1437,7 +1437,7 @@ func InitElementDefs() {
 	ElementDefs[42].Param2Name = "Firing rate?"
 	ElementDefs[42].ParamBulletTypeName = "Firing type?"
 	ElementDefs[42].ScoreValue = 2
-	ElementDefs[44].Character = 'é'
+	ElementDefs[44].Character = '\xe9'
 	ElementDefs[44].Destructible = true
 	ElementDefs[44].Cycle = 2
 	ElementDefs[44].TickProc = ElementCentipedeHeadTick
@@ -1458,7 +1458,7 @@ func InitElementDefs() {
 	ElementDefs[45].EditorShortcut = 'S'
 	ElementDefs[45].Name = "Segment"
 	ElementDefs[45].ScoreValue = 3
-	ElementDefs[18].Character = 'ø'
+	ElementDefs[18].Character = '\xf8'
 	ElementDefs[18].Color = 0x0F
 	ElementDefs[18].Destructible = true
 	ElementDefs[18].Cycle = 1
@@ -1474,13 +1474,13 @@ func InitElementDefs() {
 	ElementDefs[15].HasDrawProc = true
 	ElementDefs[15].DrawProc = ElementStarDraw
 	ElementDefs[15].Name = "Star"
-	ElementDefs[8].Character = '\f'
+	ElementDefs[8].Character = '\x0c'
 	ElementDefs[8].Pushable = true
 	ElementDefs[8].TouchProc = ElementKeyTouch
 	ElementDefs[8].EditorCategory = CATEGORY_ITEM
 	ElementDefs[8].EditorShortcut = 'K'
 	ElementDefs[8].Name = "Key"
-	ElementDefs[5].Character = '\u0084'
+	ElementDefs[5].Character = '\x84'
 	ElementDefs[5].Color = 0x03
 	ElementDefs[5].Pushable = true
 	ElementDefs[5].TouchProc = ElementAmmoTouch
@@ -1494,7 +1494,7 @@ func InitElementDefs() {
 	ElementDefs[7].EditorCategory = CATEGORY_ITEM
 	ElementDefs[7].EditorShortcut = 'G'
 	ElementDefs[7].Name = "Gem"
-	ElementDefs[11].Character = 'ð'
+	ElementDefs[11].Character = '\xf0'
 	ElementDefs[11].Color = COLOR_WHITE_ON_CHOICE
 	ElementDefs[11].Cycle = 0
 	ElementDefs[11].VisibleInDark = true
@@ -1503,13 +1503,13 @@ func InitElementDefs() {
 	ElementDefs[11].EditorShortcut = 'P'
 	ElementDefs[11].Name = "Passage"
 	ElementDefs[11].ParamBoardName = "Room thru passage?"
-	ElementDefs[9].Character = '\n'
+	ElementDefs[9].Character = '\x0a'
 	ElementDefs[9].Color = COLOR_WHITE_ON_CHOICE
 	ElementDefs[9].TouchProc = ElementDoorTouch
 	ElementDefs[9].EditorCategory = CATEGORY_ITEM
 	ElementDefs[9].EditorShortcut = 'D'
 	ElementDefs[9].Name = "Door"
-	ElementDefs[10].Character = 'è'
+	ElementDefs[10].Character = '\xe8'
 	ElementDefs[10].Color = 0x0F
 	ElementDefs[10].TouchProc = ElementScrollTouch
 	ElementDefs[10].TickProc = ElementScrollTick
@@ -1519,7 +1519,7 @@ func InitElementDefs() {
 	ElementDefs[10].EditorShortcut = 'S'
 	ElementDefs[10].Name = "Scroll"
 	ElementDefs[10].ParamTextName = "Edit text of scroll"
-	ElementDefs[12].Character = 'ú'
+	ElementDefs[12].Character = '\xfa'
 	ElementDefs[12].Color = 0x0F
 	ElementDefs[12].Cycle = 2
 	ElementDefs[12].TickProc = ElementDuplicatorTick
@@ -1530,7 +1530,7 @@ func InitElementDefs() {
 	ElementDefs[12].Name = "Duplicator"
 	ElementDefs[12].ParamDirName = "Source direction?"
 	ElementDefs[12].Param2Name = "Duplication rate?;SF"
-	ElementDefs[6].Character = '\u009d'
+	ElementDefs[6].Character = '\x9d'
 	ElementDefs[6].Color = 0x06
 	ElementDefs[6].VisibleInDark = true
 	ElementDefs[6].TouchProc = ElementTorchTouch
@@ -1561,7 +1561,7 @@ func InitElementDefs() {
 	ElementDefs[35].Param1Name = "Intelligence?"
 	ElementDefs[35].Param2Name = "Resting time?"
 	ElementDefs[35].ScoreValue = 2
-	ElementDefs[34].Character = '\u0099'
+	ElementDefs[34].Character = '\x99'
 	ElementDefs[34].Color = 0x06
 	ElementDefs[34].Destructible = true
 	ElementDefs[34].Pushable = true
@@ -1610,32 +1610,32 @@ func InitElementDefs() {
 	ElementDefs[17].EditorCategory = CATEGORY_ITEM
 	ElementDefs[17].EditorShortcut = '2'
 	ElementDefs[17].Name = "Counter"
-	ElementDefs[21].Character = 'Û'
+	ElementDefs[21].Character = '\xdb'
 	ElementDefs[21].EditorCategory = CATEGORY_TERRAIN
 	ElementDefs[21].CategoryName = "Walls:"
 	ElementDefs[21].EditorShortcut = 'S'
 	ElementDefs[21].Name = "Solid"
-	ElementDefs[22].Character = '²'
+	ElementDefs[22].Character = '\xb2'
 	ElementDefs[22].EditorCategory = CATEGORY_TERRAIN
 	ElementDefs[22].EditorShortcut = 'N'
 	ElementDefs[22].Name = "Normal"
-	ElementDefs[31].Character = 'Î'
+	ElementDefs[31].Character = '\xce'
 	ElementDefs[31].HasDrawProc = true
 	ElementDefs[31].DrawProc = ElementLineDraw
 	ElementDefs[31].Name = "Line"
-	ElementDefs[43].Character = 'º'
-	ElementDefs[33].Character = 'Í'
+	ElementDefs[43].Character = '\xba'
+	ElementDefs[33].Character = '\xcd'
 	ElementDefs[32].Character = '*'
 	ElementDefs[32].Color = 0x0A
 	ElementDefs[32].EditorCategory = CATEGORY_TERRAIN
 	ElementDefs[32].EditorShortcut = 'R'
 	ElementDefs[32].Name = "Ricochet"
-	ElementDefs[23].Character = '±'
+	ElementDefs[23].Character = '\xb1'
 	ElementDefs[23].Destructible = false
 	ElementDefs[23].EditorCategory = CATEGORY_TERRAIN
 	ElementDefs[23].EditorShortcut = 'B'
 	ElementDefs[23].Name = "Breakable"
-	ElementDefs[24].Character = 'þ'
+	ElementDefs[24].Character = '\xfe'
 	ElementDefs[24].Pushable = true
 	ElementDefs[24].TouchProc = ElementPushableTouch
 	ElementDefs[24].EditorCategory = CATEGORY_TERRAIN
@@ -1651,7 +1651,7 @@ func InitElementDefs() {
 	ElementDefs[26].EditorCategory = CATEGORY_TERRAIN
 	ElementDefs[26].EditorShortcut = '2'
 	ElementDefs[26].Name = "Slider (EW)"
-	ElementDefs[30].Character = 'Å'
+	ElementDefs[30].Character = '\xc5'
 	ElementDefs[30].TouchProc = ElementTransporterTouch
 	ElementDefs[30].HasDrawProc = true
 	ElementDefs[30].DrawProc = ElementTransporterDraw
@@ -1671,7 +1671,7 @@ func InitElementDefs() {
 	ElementDefs[40].EditorShortcut = 'P'
 	ElementDefs[40].Name = "Pusher"
 	ElementDefs[40].ParamDirName = "Push direction?"
-	ElementDefs[13].Character = '\v'
+	ElementDefs[13].Character = '\x0b'
 	ElementDefs[13].HasDrawProc = true
 	ElementDefs[13].DrawProc = ElementBombDraw
 	ElementDefs[13].Pushable = true
@@ -1681,13 +1681,13 @@ func InitElementDefs() {
 	ElementDefs[13].EditorCategory = CATEGORY_ITEM
 	ElementDefs[13].EditorShortcut = 'B'
 	ElementDefs[13].Name = "Bomb"
-	ElementDefs[14].Character = '\u007f'
+	ElementDefs[14].Character = '\x7f'
 	ElementDefs[14].Color = 0x05
 	ElementDefs[14].TouchProc = ElementEnergizerTouch
 	ElementDefs[14].EditorCategory = CATEGORY_ITEM
 	ElementDefs[14].EditorShortcut = 'E'
 	ElementDefs[14].Name = "Energizer"
-	ElementDefs[29].Character = 'Î'
+	ElementDefs[29].Character = '\xce'
 	ElementDefs[29].Cycle = 1
 	ElementDefs[29].TickProc = ElementBlinkWallTick
 	ElementDefs[29].HasDrawProc = true
@@ -1698,7 +1698,7 @@ func InitElementDefs() {
 	ElementDefs[29].Param1Name = "Starting time"
 	ElementDefs[29].Param2Name = "Period"
 	ElementDefs[29].ParamDirName = "Wall direction"
-	ElementDefs[27].Character = '²'
+	ElementDefs[27].Character = '\xb2'
 	ElementDefs[27].EditorCategory = CATEGORY_TERRAIN
 	ElementDefs[27].PlaceableOnTop = true
 	ElementDefs[27].Walkable = true
@@ -1733,7 +1733,7 @@ func InitElementDefs() {
 
 func InitElementsEditor() {
 	InitElementDefs()
-	ElementDefs[28].Character = '°'
+	ElementDefs[28].Character = '\xb0'
 	ElementDefs[28].Color = COLOR_CHOICE_ON_BLACK
 	ForceDarknessOff = true
 }

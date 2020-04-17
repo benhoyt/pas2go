@@ -457,7 +457,7 @@ func PromptString(x, y, arrowColor, color, width int16, mode byte, buffer *strin
 		VideoWriteText(x+Length(*buffer), y-1, byte((arrowColor/0x10)*16+0x0F), "\x1f")
 		VideoWriteText(x, y, byte(color), *buffer)
 		InputReadWaitKey()
-		if (Length(*buffer) < width) && (InputKeyPressed >= ' ') && (InputKeyPressed < '\u0080') {
+		if (Length(*buffer) < width) && (InputKeyPressed >= ' ') && (InputKeyPressed < '\x80') {
 			if firstKeyPress {
 				*buffer = ""
 			}
@@ -721,7 +721,7 @@ func GameWorldLoad(extension string) (GameWorldLoad bool) {
 			entryName = Copy(entryName, 1, Pos(' ', entryName)-1)
 		}
 		GameWorldLoad = WorldLoad(entryName, extension, false)
-		TransitionDrawToFill('Û', 0x44)
+		TransitionDrawToFill('\xdb', 0x44)
 	}
 	TextWindowFree(&textWindow)
 	return
@@ -1127,7 +1127,7 @@ func CalcDirectionSeek(x, y int16, deltaX, deltaY *int16) {
 }
 
 func TransitionDrawBoardChange() {
-	TransitionDrawToFill('Û', 0x05)
+	TransitionDrawToFill('\xdb', 0x05)
 	TransitionDrawToBoard()
 }
 
