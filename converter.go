@@ -10,9 +10,7 @@ ISSUES:
 - OopParseDirection and OopCheckCondition calls themselves - causes naming issue with named return value
 
 NICE TO HAVES:
-- can we eliminate Chr() and Ord() seeing they're just identity functions?
 - consider changing VideoWriteText x,y params to int16 instead of byte -- fewer type conversions
-- use operator precedence rather than ParenExpr
 */
 
 package main
@@ -36,7 +34,7 @@ func Convert(file File, units []*Unit, w io.Writer) {
 	// Builtin functions (or those in VIDEO.PAS)
 	c.defineVar("Chr", &FuncSpec{
 		[]*ParamGroup{{false, []string{"x"}, &TypeIdent{"byte"}}},
-		&TypeIdent{"char"},
+		&TypeIdent{"string"},
 	})
 	c.defineVar("GetTime", &ProcSpec{[]*ParamGroup{
 		{true, []string{"h", "m", "s", "s100"}, &TypeIdent{"uint16"}},

@@ -19,8 +19,6 @@
 ./game.go:719:13: cannot use textWindow.Lines[textWindow.LinePos - 1] (type *string) as type string in assignment
 ./game.go:740:10: cannot use stat.Data (type *string) as type uintptr in assignment
 ./game.go:1187:14: cannot assign to input[i - 1]
-./game.go:1498:12: cannot convert "END" (type untyped string) to type byte
-./game.go:1498:12: invalid operation: "END" + Chr(byte(49 + Random(4))) (mismatched types string and byte)
 ./game.go:1505:41: cannot use ResourceDataHeader.FileOffset[i - 1] (type int32) as type int16 in argument to Seek
 ./oop.go:119:40: cannot call non-function OopParseDirection (type bool)
 ./oop.go:123:40: cannot call non-function OopParseDirection (type bool)
@@ -35,7 +33,6 @@
 ./oop.go:781:23: invalid operation: OopChar + OopReadLineToEnd(statId, position) (mismatched types byte and string)
 ./sounds.go:107:18: cannot use drum.Data[i - 1] (type uint16) as type int16 in argument to Sound
 ./sounds.go:169:26: cannot use SoundFreqTable[Ord(SoundBuffer[SoundBufferPos]) - 1] (type uint16) as type int16 in argument to Sound
-./sounds.go:272:11: invalid operation: output += '\u0000' + Chr(byte(noteDuration)) (mismatched types string and byte)
 ./sounds.go:274:3: duplicate case '3' (value 51) in switch
 	previous case at ./sounds.go:225:8
 ./sounds.go:298:17: cannot use &SoundTimerHandler (type *func()) as type uintptr in assignment

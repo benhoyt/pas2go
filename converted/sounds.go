@@ -267,12 +267,12 @@ func SoundParse(input string) (SoundParse string) {
 				noteTone++
 				AdvanceInput()
 			}
-			output += string(Chr(byte(noteOctave*0x10+noteTone)) + Chr(byte(noteDuration)))
+			output += Chr(byte(noteOctave*0x10+noteTone)) + Chr(byte(noteDuration))
 		case 'X':
-			output += '\x00' + Chr(byte(noteDuration))
+			output += "\x00" + Chr(byte(noteDuration))
 			AdvanceInput()
 		case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
-			output += string(Chr(Ord(input[1])+0xF0-Ord('0')) + Chr(byte(noteDuration)))
+			output += Chr(Ord(input[1])+0xF0-Ord('0')) + Chr(byte(noteDuration))
 			AdvanceInput()
 		default:
 			AdvanceInput()

@@ -99,7 +99,7 @@ func EditorLoop() {
 		} else {
 			copiedChr = Ord(ElementDefs[copiedTile.Element].Character)
 		}
-		VideoWriteText(byte(62+EditorPatternCount), 22, copiedTile.Color, string(Chr(copiedChr)))
+		VideoWriteText(byte(62+EditorPatternCount), 22, copiedTile.Color, Chr(copiedChr))
 		VideoWriteText(61, 24, 0x1F, " Mode:")
 	}
 

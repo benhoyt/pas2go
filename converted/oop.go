@@ -308,7 +308,7 @@ func OopStringToWord(input string) (OopStringToWord string) {
 		if ((input[i-1] >= 'A') && (input[i-1] <= 'Z')) || ((input[i-1] >= '0') && (input[i-1] <= '9')) {
 			output += string(input[i-1])
 		} else if (input[i-1] >= 'a') && (input[i-1] <= 'z') {
-			output += string(Chr(Ord(input[i-1]) - 0x20))
+			output += Chr(Ord(input[i-1]) - 0x20)
 		}
 
 	}
