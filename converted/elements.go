@@ -1758,6 +1758,3 @@ func InitEditorStatSettings() {
 	World.EditorStatSettings[E_OBJECT].P1 = 1
 	World.EditorStatSettings[E_BEAR].P1 = 8
 }
-
-func init() {
-}

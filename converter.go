@@ -384,9 +384,18 @@ func (c *converter) unit(unit *Unit) {
 	}
 	c.defineDecls(unit.Implementation)
 	c.decls(unit.Implementation, true)
-	c.print("func init() {\n")
-	c.stmts(unit.Init.Stmts)
-	c.print("}\n")
+
+	initEmpty := true
+	for _, stmt := range unit.Init.Stmts {
+		if _, isEmpty := stmt.(*EmptyStmt); !isEmpty {
+			initEmpty = false
+		}
+	}
+	if !initEmpty {
+		c.print("func init() {\n")
+		c.stmts(unit.Init.Stmts)
+		c.print("}\n")
+	}
 }
 
 func (c *converter) decls(decls []DeclPart, isMain bool) {

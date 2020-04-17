@@ -1007,6 +1007,3 @@ func EditorSelectBoard(title string, currentBoard int16, titleScreenIsNone bool)
 	}
 	return
 }
-
-func init() {
-}

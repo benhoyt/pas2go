@@ -1533,6 +1533,3 @@ func GamePrintRegisterMessage() {
 		}
 	}
 }
-
-func init() {
-}

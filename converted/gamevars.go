@@ -247,6 +247,3 @@ const (
 	SHOT_SOURCE_PLAYER     = 0
 	SHOT_SOURCE_ENEMY      = 1
 )
-
-func init() {
-}

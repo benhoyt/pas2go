@@ -22,6 +22,3 @@ func KeysUpdateModifiers() {
 	KeysNumLockHeld = ((regs.AL / 32) % 2) == 1
 	KeysShiftHeld = KeysRightShiftHeld || KeysLeftShiftHeld
 }
-
-func init() {
-}

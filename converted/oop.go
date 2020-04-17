@@ -823,6 +823,3 @@ StartParsing:
 		OopPlaceTile(ix, iy, &replaceTile)
 	}
 }
-
-func init() {
-}
