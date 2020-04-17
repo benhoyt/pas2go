@@ -61,8 +61,8 @@ func TextWindowInitState(state *TTextWindowState) {
 }
 
 func TextWindowDrawTitle(color int16, title string) {
-	VideoWriteText(byte(TextWindowX+2), byte(TextWindowY+1), byte(color), TextWindowStrInnerEmpty)
-	VideoWriteText(byte(TextWindowX+((TextWindowWidth-Length(title))/2)), byte(TextWindowY+1), byte(color), title)
+	VideoWriteText(TextWindowX+2, TextWindowY+1, byte(color), TextWindowStrInnerEmpty)
+	VideoWriteText(TextWindowX+((TextWindowWidth-Length(title))/2), TextWindowY+1, byte(color), title)
 }
 
 func TextWindowDrawOpen(state *TTextWindowState) {
@@ -71,13 +71,13 @@ func TextWindowDrawOpen(state *TTextWindowState) {
 		VideoMove(TextWindowX, iy+TextWindowY-1, TextWindowWidth, &state.ScreenCopy[iy-1], false)
 	}
 	for iy = TextWindowHeight / 2; iy >= 0; iy-- {
-		VideoWriteText(byte(TextWindowX), byte(TextWindowY+iy+1), 0x0F, TextWindowStrText)
-		VideoWriteText(byte(TextWindowX), byte(TextWindowY+TextWindowHeight-iy-1), 0x0F, TextWindowStrText)
-		VideoWriteText(byte(TextWindowX), byte(TextWindowY+iy), 0x0F, TextWindowStrTop)
-		VideoWriteText(byte(TextWindowX), byte(TextWindowY+TextWindowHeight-iy), 0x0F, TextWindowStrBottom)
+		VideoWriteText(TextWindowX, TextWindowY+iy+1, 0x0F, TextWindowStrText)
+		VideoWriteText(TextWindowX, TextWindowY+TextWindowHeight-iy-1, 0x0F, TextWindowStrText)
+		VideoWriteText(TextWindowX, TextWindowY+iy, 0x0F, TextWindowStrTop)
+		VideoWriteText(TextWindowX, TextWindowY+TextWindowHeight-iy, 0x0F, TextWindowStrBottom)
 		Delay(25)
 	}
-	VideoWriteText(byte(TextWindowX), byte(TextWindowY+2), 0x0F, TextWindowStrSep)
+	VideoWriteText(TextWindowX, TextWindowY+2, 0x0F, TextWindowStrSep)
 	TextWindowDrawTitle(0x1E, state.Title)
 }
 
@@ -87,8 +87,8 @@ func TextWindowDrawClose(state *TTextWindowState) {
 		unk1, unk2 int16
 	)
 	for iy = 0; iy <= (TextWindowHeight / 2); iy++ {
-		VideoWriteText(byte(TextWindowX), byte(TextWindowY+iy), 0x0F, TextWindowStrTop)
-		VideoWriteText(byte(TextWindowX), byte(TextWindowY+TextWindowHeight-iy), 0x0F, TextWindowStrBottom)
+		VideoWriteText(TextWindowX, TextWindowY+iy, 0x0F, TextWindowStrTop)
+		VideoWriteText(TextWindowX, TextWindowY+TextWindowHeight-iy, 0x0F, TextWindowStrBottom)
 		Delay(18)
 		VideoMove(TextWindowX, TextWindowY+iy, TextWindowWidth, &state.ScreenCopy[(iy+1)-1], true)
 		VideoMove(TextWindowX, TextWindowY+TextWindowHeight-iy, TextWindowWidth, &state.ScreenCopy[((TextWindowHeight-iy)+1)-1], true)
@@ -102,13 +102,13 @@ func TextWindowDrawLine(state *TTextWindowState, lpos int16, withoutFormatting, 
 	)
 	lineY = ((TextWindowY + lpos) - state.LinePos) + (TextWindowHeight / 2) + 1
 	if lpos == state.LinePos {
-		VideoWriteText(byte(TextWindowX+2), byte(lineY), 0x1C, TextWindowStrInnerArrows)
+		VideoWriteText(TextWindowX+2, lineY, 0x1C, TextWindowStrInnerArrows)
 	} else {
-		VideoWriteText(byte(TextWindowX+2), byte(lineY), 0x1E, TextWindowStrInnerEmpty)
+		VideoWriteText(TextWindowX+2, lineY, 0x1E, TextWindowStrInnerEmpty)
 	}
 	if (lpos > 0) && (lpos <= state.LineCount) {
 		if withoutFormatting {
-			VideoWriteText(byte(TextWindowX+4), byte(lineY), 0x1E, *state.Lines[lpos-1])
+			VideoWriteText(TextWindowX+4, lineY, 0x1E, *state.Lines[lpos-1])
 		} else {
 			textOffset = 1
 			textColor = 0x1E
@@ -117,7 +117,7 @@ func TextWindowDrawLine(state *TTextWindowState, lpos int16, withoutFormatting, 
 				switch state.Lines[lpos-1][0] {
 				case '!':
 					textOffset = Pos(';', *state.Lines[lpos-1]) + 1
-					VideoWriteText(byte(textX+2), byte(lineY), 0x1D, "\x10")
+					VideoWriteText(textX+2, lineY, 0x1D, "\x10")
 					textX += 5
 					textColor = 0x1F
 				case ':':
@@ -130,17 +130,17 @@ func TextWindowDrawLine(state *TTextWindowState, lpos int16, withoutFormatting, 
 				}
 			}
 			if textOffset > 0 {
-				VideoWriteText(byte(textX), byte(lineY), byte(textColor), Copy(*state.Lines[lpos-1], textOffset, Length(*state.Lines[lpos-1])-textOffset+1))
+				VideoWriteText(textX, lineY, byte(textColor), Copy(*state.Lines[lpos-1], textOffset, Length(*state.Lines[lpos-1])-textOffset+1))
 			}
 		}
 	} else if (lpos == 0) || (lpos == (state.LineCount + 1)) {
-		VideoWriteText(byte(TextWindowX+2), byte(lineY), 0x1E, TextWindowStrInnerSep)
+		VideoWriteText(TextWindowX+2, lineY, 0x1E, TextWindowStrInnerSep)
 	} else if (lpos == -4) && viewingFile {
-		VideoWriteText(byte(TextWindowX+2), byte(lineY), 0x1A, "   Use            to view text,")
-		VideoWriteText(byte(TextWindowX+2+7), byte(lineY), 0x1F, "\x18 \x19, Enter")
+		VideoWriteText(TextWindowX+2, lineY, 0x1A, "   Use            to view text,")
+		VideoWriteText(TextWindowX+2+7, lineY, 0x1F, "\x18 \x19, Enter")
 	} else if (lpos == -3) && viewingFile {
-		VideoWriteText(byte(TextWindowX+2+1), byte(lineY), 0x1A, "                 to print.")
-		VideoWriteText(byte(TextWindowX+2+12), byte(lineY), 0x1F, "Alt-P")
+		VideoWriteText(TextWindowX+2+1, lineY, 0x1A, "                 to print.")
+		VideoWriteText(TextWindowX+2+12, lineY, 0x1F, "Alt-P")
 	}
 
 }
@@ -349,9 +349,9 @@ func TextWindowEdit(state *TTextWindowState) {
 		}
 		if charPos >= (Length(*state.Lines[state.LinePos-1]) + 1) {
 			charPos = Length(*state.Lines[state.LinePos-1]) + 1
-			VideoWriteText(byte(charPos+TextWindowX+3), byte(TextWindowY+(TextWindowHeight/2)+1), 0x70, " ")
+			VideoWriteText(charPos+TextWindowX+3, TextWindowY+(TextWindowHeight/2)+1, 0x70, " ")
 		} else {
-			VideoWriteText(byte(charPos+TextWindowX+3), byte(TextWindowY+(TextWindowHeight/2)+1), 0x70, state.Lines[state.LinePos-1][charPos-1])
+			VideoWriteText(charPos+TextWindowX+3, TextWindowY+(TextWindowHeight/2)+1, 0x70, state.Lines[state.LinePos-1][charPos-1])
 		}
 		InputReadWaitKey()
 		newLinePos = state.LinePos

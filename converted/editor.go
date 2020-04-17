@@ -89,17 +89,17 @@ func EditorLoop() {
 		VideoWriteText(61, 19, 0x30, " C ")
 		VideoWriteText(64, 19, 0x1F, " Color:")
 		for i = 9; i <= 15; i++ {
-			VideoWriteText(byte(61+i), 22, byte(i), "\xdb")
+			VideoWriteText(61+i, 22, byte(i), "\xdb")
 		}
 		for i = 1; i <= EditorPatternCount; i++ {
-			VideoWriteText(byte(61+i), 22, 0x0F, string(ElementDefs[EditorPatterns[i-1]].Character))
+			VideoWriteText(61+i, 22, 0x0F, string(ElementDefs[EditorPatterns[i-1]].Character))
 		}
 		if ElementDefs[copiedTile.Element].HasDrawProc {
 			ElementDefs[copiedTile.Element].DrawProc(copiedX, copiedY, &copiedChr)
 		} else {
 			copiedChr = Ord(ElementDefs[copiedTile.Element].Character)
 		}
-		VideoWriteText(byte(62+EditorPatternCount), 22, copiedTile.Color, Chr(copiedChr))
+		VideoWriteText(62+EditorPatternCount, 22, copiedTile.Color, Chr(copiedChr))
 		VideoWriteText(61, 24, 0x1F, " Mode:")
 	}
 
@@ -125,8 +125,8 @@ func EditorLoop() {
 		}
 
 		VideoWriteText(72, 19, 0x1E, ColorNames[(cursorColor-8)-1])
-		VideoWriteText(byte(61+cursorPattern), 21, 0x1F, "\x1f")
-		VideoWriteText(byte(61+cursorColor), 21, 0x1F, "\x1f")
+		VideoWriteText(61+cursorPattern, 21, 0x1F, "\x1f")
+		VideoWriteText(61+cursorColor, 21, 0x1F, "\x1f")
 	}
 
 	EditorDrawRefresh := func() {
@@ -136,7 +136,7 @@ func EditorLoop() {
 		boardNumStr = Str(World.Info.CurrentBoard)
 		TransitionDrawToBoard()
 		if Length(Board.Name) != 0 {
-			VideoWriteText(byte((59-Length(Board.Name))/2), 0, 0x70, " "+Board.Name+" ")
+			VideoWriteText((59-Length(Board.Name))/2, 0, 0x70, " "+Board.Name+" ")
 		} else {
 			VideoWriteText(26, 0, 0x70, " Untitled ")
 		}
@@ -407,7 +407,7 @@ func EditorLoop() {
 					}
 					iy += 4
 				} else {
-					VideoWriteText(63, byte(iy), 0x1F, "Room: "+Copy(EditorGetBoardName(int16(stat.P3), true), 1, 10))
+					VideoWriteText(63, iy, 0x1F, "Room: "+Copy(EditorGetBoardName(int16(stat.P3), true), 1, 10))
 				}
 			}
 		}
@@ -560,7 +560,7 @@ func EditorLoop() {
 			if cursorBlinker == 0 {
 				BoardDrawTile(cursorX, cursorY)
 			} else {
-				VideoWriteText(byte(cursorX-1), byte(cursorY-1), 0x0F, "\xc5")
+				VideoWriteText(cursorX-1, cursorY-1, 0x0F, "\xc5")
 			}
 			EditorUpdateSidebar()
 		} else {
@@ -611,7 +611,7 @@ func EditorLoop() {
 			if cursorY > BOARD_HEIGHT {
 				cursorY = BOARD_HEIGHT
 			}
-			VideoWriteText(byte(cursorX-1), byte(cursorY-1), 0x0F, "\xc5")
+			VideoWriteText(cursorX-1, cursorY-1, 0x0F, "\xc5")
 			if (InputKeyPressed == '\x00') && InputJoystickEnabled {
 				Delay(70)
 			}
@@ -709,7 +709,7 @@ func EditorLoop() {
 				drawMode = DrawingOff
 			}
 		case KEY_F1, KEY_F2, KEY_F3:
-			VideoWriteText(byte(cursorX-1), byte(cursorY-1), 0x0F, "\xc5")
+			VideoWriteText(cursorX-1, cursorY-1, 0x0F, "\xc5")
 			for i = 3; i <= 20; i++ {
 				SidebarClearLine(i)
 			}
@@ -726,11 +726,11 @@ func EditorLoop() {
 				if ElementDefs[iElem].EditorCategory == selectedCategory {
 					if Length(ElementDefs[iElem].CategoryName) != 0 {
 						i++
-						VideoWriteText(65, byte(i), 0x1E, ElementDefs[iElem].CategoryName)
+						VideoWriteText(65, i, 0x1E, ElementDefs[iElem].CategoryName)
 						i++
 					}
-					VideoWriteText(61, byte(i), byte(((i%2)<<6)+0x30), " "+ElementDefs[iElem].EditorShortcut+' ')
-					VideoWriteText(65, byte(i), 0x1F, ElementDefs[iElem].Name)
+					VideoWriteText(61, i, byte(((i%2)<<6)+0x30), " "+ElementDefs[iElem].EditorShortcut+' ')
+					VideoWriteText(65, i, 0x1F, ElementDefs[iElem].Name)
 					if ElementDefs[iElem].Color == COLOR_CHOICE_ON_BLACK {
 						elemMenuColor = (cursorColor % 0x10) + 0x10
 					} else if ElementDefs[iElem].Color == COLOR_WHITE_ON_CHOICE {
@@ -743,7 +743,7 @@ func EditorLoop() {
 						elemMenuColor = int16(ElementDefs[iElem].Color)
 					}
 
-					VideoWriteText(78, byte(i), byte(elemMenuColor), string(ElementDefs[iElem].Character))
+					VideoWriteText(78, i, byte(elemMenuColor), string(ElementDefs[iElem].Character))
 					i++
 				}
 			}

@@ -8,12 +8,12 @@
 ./editor.go:244:21: cannot use "          Quit!" (type string) as type *string in assignment
 ./editor.go:316:11: cannot use stat.Data (type *string) as type uintptr in assignment
 ./editor.go:319:41: invalid operation: state.Lines[iLine - 1][iChar - 1] (type *string does not support indexing)
-./editor.go:732:60: cannot convert " " (type untyped string) to type byte
-./editor.go:732:60: invalid operation: " " + ElementDefs[iElem].EditorShortcut (mismatched types string and byte)
+./editor.go:732:54: cannot convert " " (type untyped string) to type byte
+./editor.go:732:54: invalid operation: " " + ElementDefs[iElem].EditorShortcut (mismatched types string and byte)
 ./game.go:69:6: cannot use IoTmpBuf (type *TIoTmpBuf) as type uintptr in assignment
 ./game.go:107:37: type TStat is not an expression
-./game.go:358:52: cannot convert "....:...." (type untyped string) to type byte
-./game.go:358:52: invalid operation: startChar + "....:...." (mismatched types byte and string)
+./game.go:358:40: cannot convert "....:...." (type untyped string) to type byte
+./game.go:358:40: invalid operation: startChar + "....:...." (mismatched types byte and string)
 ./game.go:589:8: cannot use IoTmpBuf (type *TIoTmpBuf) as type uintptr in assignment
 ./game.go:639:7: cannot use IoTmpBuf (type *TIoTmpBuf) as type uintptr in assignment
 ./game.go:719:13: cannot use textWindow.Lines[textWindow.LinePos - 1] (type *string) as type string in assignment

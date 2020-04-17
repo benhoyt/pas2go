@@ -8,9 +8,6 @@ ISSUES:
   + similar with: "TickTimeDuration = int16(TickSpeed * 2)" in GAME.PAS
 - why string() here? (TXTWIND.PAS): input[i] = string(UpCase(input[i]))
 - OopParseDirection and OopCheckCondition calls themselves - causes naming issue with named return value
-
-NICE TO HAVES:
-- consider changing VideoWriteText x,y params to int16 instead of byte -- fewer type conversions
 */
 
 package main
@@ -82,7 +79,8 @@ func Convert(file File, units []*Unit, w io.Writer) {
 		{false, []string{"toVideo"}, &TypeIdent{"boolean"}},
 	}})
 	c.defineVar("VideoWriteText", &ProcSpec{[]*ParamGroup{
-		{false, []string{"x", "y", "color"}, &TypeIdent{"byte"}},
+		{false, []string{"x", "y"}, &TypeIdent{"integer"}},
+		{false, []string{"color"}, &TypeIdent{"byte"}},
 		{false, []string{"text"}, &TypeIdent{"string"}},
 	}})
 

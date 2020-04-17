@@ -91,7 +91,7 @@ func GetTime(h, m, s, s100 *uint16) {
 
 var Time int16 // TODO
 
-func VideoWriteText(x, y, color byte, text string) {
+func VideoWriteText(x, y int16, color byte, text string) {
 	// TODO
 }
 
