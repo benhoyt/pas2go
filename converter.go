@@ -1,13 +1,5 @@
 // (Try to!) convert a Turbo Pascal AST into Go code
 
-/*
-ISSUES:
-- why no '*' here (oop.go):
-	if counterPtr+OopValue >= 0 {
-		counterPtr += OopValue
-- OopParseDirection and OopCheckCondition calls themselves - causes naming issue with named return value
-*/
-
 package main
 
 import (
