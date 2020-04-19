@@ -1338,7 +1338,7 @@ func operatorStr(op Token) string {
 
 func isMathOp(op Token) bool {
 	switch op {
-	case PLUS, MINUS, OR, XOR, STAR, SLASH, DIV, MOD, AND:
+	case PLUS, MINUS, OR, XOR, STAR, SLASH, DIV, MOD, AND, SHL, SHR:
 		return true
 	}
 	return false
@@ -1414,7 +1414,7 @@ func (c *converter) exprKind(expr Expr) Kind {
 				return KindString
 			}
 			fallthrough
-		case MINUS, OR, XOR, STAR, SLASH, DIV, MOD, AND:
+		case MINUS, OR, XOR, STAR, SLASH, DIV, MOD, AND, SHL, SHR:
 			lk := c.exprKind(expr.Left)
 			rk := c.exprKind(expr.Right)
 			switch {
@@ -1429,8 +1429,6 @@ func (c *converter) exprKind(expr Expr) Kind {
 				}
 			}
 			return KindNumber
-		case SHL, SHR:
-			return c.exprKind(expr.Left) // TODO: are these isMathOp for the above?
 		default:
 			return KindUnknown
 		}
