@@ -342,11 +342,11 @@ ColorFound:
 
 func GetColorForTileMatch(tile *TTile) (GetColorForTileMatch byte) {
 	if ElementDefs[tile.Element].Color < COLOR_SPECIAL_MIN {
-		GetColorForTileMatch = ElementDefs[tile.Element].Color & 0x07
+		GetColorForTileMatch = byte(int16(ElementDefs[tile.Element].Color) & 0x07)
 	} else if ElementDefs[tile.Element].Color == COLOR_WHITE_ON_CHOICE {
-		GetColorForTileMatch = tile.Color>>4&0x0F + 8
+		GetColorForTileMatch = byte(int16(tile.Color>>4)&0x0F + 8)
 	} else {
-		GetColorForTileMatch = tile.Color & 0x0F
+		GetColorForTileMatch = byte(int16(tile.Color) & 0x0F)
 	}
 
 	return
@@ -387,7 +387,7 @@ func OopPlaceTile(x, y int16, tile *TTile) {
 				color = 0x0F
 			}
 			if ElementDefs[tile.Element].Color == COLOR_WHITE_ON_CHOICE {
-				color = (color-8)*0x10 + 0x0F
+				color = byte((int16(color)-8)*0x10 + 0x0F)
 			}
 		}
 		if Board.Tiles[x][y].Element == tile.Element {
@@ -418,7 +418,7 @@ func OopCheckCondition(statId int16, position *int16) (OopCheckCondition bool) {
 	} else if OopWord == "ALLIGNED" {
 		OopCheckCondition = stat.X == Board.Stats[0].X || stat.Y == Board.Stats[0].Y
 	} else if OopWord == "CONTACT" {
-		OopCheckCondition = Sqr(int16(stat.X-Board.Stats[0].X))+Sqr(int16(stat.Y-Board.Stats[0].Y)) == 1
+		OopCheckCondition = Sqr(int16(stat.X)-int16(Board.Stats[0].X))+Sqr(int16(stat.Y)-int16(Board.Stats[0].Y)) == 1
 	} else if OopWord == "BLOCKED" {
 		OopReadDirection(statId, position, &deltaX, &deltaY)
 		OopCheckCondition = !ElementDefs[Board.Tiles[int16(stat.X)+deltaX][int16(stat.Y)+deltaY].Element].Walkable

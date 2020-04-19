@@ -364,19 +364,19 @@ func EditorLoop() {
 				}
 			}
 			if InputKeyPressed != KEY_ESCAPE && Length(ElementDefs[element].Param2Name) != 0 {
-				promptByte = stat.P2 % 0x80
+				promptByte = byte(int16(stat.P2) % 0x80)
 				SidebarPromptSlider(selected, 63, iy, ElementDefs[element].Param2Name, &promptByte)
 				if selected {
-					stat.P2 = stat.P2&0x80 + promptByte
+					stat.P2 = byte(int16(stat.P2)&0x80 + int16(promptByte))
 					World.EditorStatSettings[element].P2 = stat.P2
 				}
 				iy += 4
 			}
 			if InputKeyPressed != KEY_ESCAPE && Length(ElementDefs[element].ParamBulletTypeName) != 0 {
-				promptByte = stat.P2 / 0x80
+				promptByte = byte(int16(stat.P2) / 0x80)
 				SidebarPromptChoice(selected, iy, ElementDefs[element].ParamBulletTypeName, "Bullets Stars", &promptByte)
 				if selected {
-					stat.P2 = stat.P2%0x80 + promptByte*0x80
+					stat.P2 = byte(int16(stat.P2)%0x80 + int16(promptByte)*0x80)
 					World.EditorStatSettings[element].P2 = stat.P2
 				}
 				iy += 4
@@ -737,8 +737,8 @@ func EditorLoop() {
 						elemMenuColor = cursorColor*0x10 - 0x71
 					} else if ElementDefs[iElem].Color == COLOR_CHOICE_ON_CHOICE {
 						elemMenuColor = (cursorColor-8)*0x11 + 8
-					} else if ElementDefs[iElem].Color&0x70 == 0x00 {
-						elemMenuColor = int16(ElementDefs[iElem].Color%0x10 + 0x10)
+					} else if int16(ElementDefs[iElem].Color)&0x70 == 0x00 {
+						elemMenuColor = int16(ElementDefs[iElem].Color)%0x10 + 0x10
 					} else {
 						elemMenuColor = int16(ElementDefs[iElem].Color)
 					}

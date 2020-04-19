@@ -2,10 +2,9 @@
 
 /*
 ISSUES:
-- bad things are going to happen here, eg in ELEMENTS.PAS:
-  + TP implements "Cycle := (9 - P2) * 3;" as "Cycle = (9 - int16(P2)) * 3"
-  + not "Cycle = int16((9 - P2) * 3)"
-  + similar with: "TickTimeDuration = int16(TickSpeed * 2)" in GAME.PAS
+- why no '*' here (oop.go):
+	if counterPtr+OopValue >= 0 {
+		counterPtr += OopValue
 - OopParseDirection and OopCheckCondition calls themselves - causes naming issue with named return value
 */
 
@@ -882,7 +881,7 @@ func (c *converter) procArgs(params []*ParamGroup, args []Expr) {
 
 func (c *converter) convertKind(kind, targetKind Kind) Kind {
 	if kind != KindUnknown && targetKind != KindUnknown && kind != targetKind {
-		if kind == KindNumber && targetKind.IsNumber() {
+		if kind == KindNumber && targetKind.IsSizedNum() {
 			return KindUnknown
 		}
 		return targetKind
@@ -976,6 +975,12 @@ func (c *converter) exprs(exprs []Expr) {
 	}
 }
 
+func isLogical(expr *BinaryExpr) bool {
+	// This is cheating; should really use types, but this works with most code
+	_, rightIsConst := expr.Right.(*ConstExpr)
+	return !rightIsConst && (expr.Op == AND || expr.Op == OR || expr.Op == XOR)
+}
+
 func (c *converter) expr(expr Expr) {
 	switch expr := expr.(type) {
 	case *BinaryExpr:
@@ -983,28 +988,38 @@ func (c *converter) expr(expr Expr) {
 			c.inExpr(expr)
 			return
 		}
-		if expr.Op == AND || expr.Op == OR || expr.Op == XOR {
-			// This is cheating; should really use types, but this works with most code
+		if isLogical(expr) {
 			c.expr(expr.Left)
-			_, isConst := expr.Right.(*ConstExpr)
-			if isConst {
-				c.printf(" %s ", bitwiseOperatorStr(expr.Op))
-			} else {
-				c.printf(" %s ", operatorStr(expr.Op))
-			}
+			c.printf(" %s ", logicalOperatorStr(expr.Op))
 			c.expr(expr.Right)
 			return
 		}
-
 		opStr := operatorStr(expr.Op)
 		lk := c.exprKind(expr.Left)
 		rk := c.exprKind(expr.Right)
+		// TODO: need other "cast up" types here, other than KindByte?
 		switch {
-		case lk.IsNumber() && rk.IsNumber() && lk > rk:
+		case isMathOp(expr.Op) && lk == KindByte && (rk == KindByte || rk == KindNumber):
+			c.typeConversion(expr.Left, "int16")
+			c.printf(" %s ", opStr)
+			if rk == KindByte {
+				c.typeConversion(expr.Right, "int16")
+			} else {
+				c.expr(expr.Right)
+			}
+		case isMathOp(expr.Op) && (lk == KindByte || lk == KindNumber) && rk == KindByte:
+			if lk == KindByte {
+				c.typeConversion(expr.Left, "int16")
+			} else {
+				c.expr(expr.Left)
+			}
+			c.printf(" %s ", opStr)
+			c.typeConversion(expr.Right, "int16")
+		case lk.IsSizedNum() && rk.IsSizedNum() && lk > rk:
 			c.expr(expr.Left)
 			c.printf(" %s ", opStr)
 			c.typeConversion(expr.Right, lk.String())
-		case lk.IsNumber() && rk.IsNumber() && rk > lk:
+		case lk.IsSizedNum() && rk.IsSizedNum() && rk > lk:
 			c.typeConversion(expr.Left, rk.String())
 			c.printf(" %s ", opStr)
 			c.expr(expr.Right)
@@ -1300,15 +1315,15 @@ func operatorStr(op Token) string {
 	case NOT_EQUALS:
 		return "!="
 	case OR:
-		return "||"
+		return "|"
 	case XOR:
-		return "!="
+		return "^"
 	case DIV:
 		return "/"
 	case MOD:
 		return "%"
 	case AND:
-		return "&&"
+		return "&"
 	case SHL:
 		return "<<"
 	case SHR:
@@ -1321,14 +1336,22 @@ func operatorStr(op Token) string {
 	}
 }
 
-func bitwiseOperatorStr(op Token) string {
+func isMathOp(op Token) bool {
+	switch op {
+	case PLUS, MINUS, OR, XOR, STAR, SLASH, DIV, MOD, AND:
+		return true
+	}
+	return false
+}
+
+func logicalOperatorStr(op Token) string {
 	switch op {
 	case AND:
-		return "&"
+		return "&&"
 	case OR:
-		return "|"
+		return "||"
 	case XOR:
-		return "^"
+		return "!="
 	default:
 		panic(fmt.Sprintf("unexpected operator: %s", op))
 	}
@@ -1347,7 +1370,7 @@ const (
 	KindString
 )
 
-func (k Kind) IsNumber() bool {
+func (k Kind) IsSizedNum() bool {
 	if k == KindByte || k == KindInteger || k == KindUnsigned || k == KindReal {
 		return true
 	}
@@ -1378,6 +1401,9 @@ func (k Kind) String() string {
 func (c *converter) exprKind(expr Expr) Kind {
 	switch expr := expr.(type) {
 	case *BinaryExpr:
+		if isLogical(expr) {
+			return KindBoolean
+		}
 		switch expr.Op {
 		case EQUALS, NOT_EQUALS, LESS, LTE, GREATER, GTE, IN:
 			return KindBoolean
@@ -1389,16 +1415,22 @@ func (c *converter) exprKind(expr Expr) Kind {
 			}
 			fallthrough
 		case MINUS, OR, XOR, STAR, SLASH, DIV, MOD, AND:
-			left := c.exprKind(expr.Left)
-			right := c.exprKind(expr.Right)
+			lk := c.exprKind(expr.Left)
+			rk := c.exprKind(expr.Right)
+			switch {
+			case isMathOp(expr.Op) && lk == KindByte && (rk == KindByte || rk == KindNumber):
+				return KindInteger
+			case isMathOp(expr.Op) && (lk == KindByte || lk == KindNumber) && rk == KindByte:
+				return KindInteger
+			}
 			for _, kind := range []Kind{KindReal, KindUnsigned, KindInteger, KindByte, KindBoolean} {
-				if left == kind || right == kind {
+				if lk == kind || rk == kind {
 					return kind
 				}
 			}
 			return KindNumber
 		case SHL, SHR:
-			return c.exprKind(expr.Left)
+			return c.exprKind(expr.Left) // TODO: are these isMathOp for the above?
 		default:
 			return KindUnknown
 		}

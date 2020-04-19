@@ -24,7 +24,7 @@ func ElementMessageTimerTick(statId int16) {
 	stat := &Board.Stats[statId]
 	switch stat.X {
 	case 0:
-		VideoWriteText((60-Length(Board.Info.Message))/2, 24, 9+stat.P2%7, " "+Board.Info.Message+" ")
+		VideoWriteText((60-Length(Board.Info.Message))/2, 24, byte(9+int16(stat.P2)%7), " "+Board.Info.Message+" ")
 		stat.P2--
 		if stat.P2 <= 0 {
 			RemoveStat(statId)
@@ -65,15 +65,15 @@ func ElementTigerTick(statId int16) {
 	if stat.P2 >= 0x80 {
 		element = E_STAR
 	}
-	if Random(10)*3 <= int16(stat.P2%0x80) {
+	if Random(10)*3 <= int16(stat.P2)%0x80 {
 		if Difference(int16(stat.X), int16(Board.Stats[0].X)) <= 2 {
-			shot = BoardShoot(element, int16(stat.X), int16(stat.Y), 0, Signum(int16(Board.Stats[0].Y-stat.Y)), SHOT_SOURCE_ENEMY)
+			shot = BoardShoot(element, int16(stat.X), int16(stat.Y), 0, Signum(int16(Board.Stats[0].Y)-int16(stat.Y)), SHOT_SOURCE_ENEMY)
 		} else {
 			shot = false
 		}
 		if !shot {
 			if Difference(int16(stat.Y), int16(Board.Stats[0].Y)) <= 2 {
-				shot = BoardShoot(element, int16(stat.X), int16(stat.Y), Signum(int16(Board.Stats[0].X-stat.X)), 0, SHOT_SOURCE_ENEMY)
+				shot = BoardShoot(element, int16(stat.X), int16(stat.Y), Signum(int16(Board.Stats[0].X)-int16(stat.X)), 0, SHOT_SOURCE_ENEMY)
 			}
 		}
 	}
@@ -83,7 +83,7 @@ func ElementTigerTick(statId int16) {
 func ElementRuffianTick(statId int16) {
 	stat := &Board.Stats[statId]
 	if stat.StepX == 0 && stat.StepY == 0 {
-		if int16(stat.P2+8) <= Random(17) {
+		if int16(stat.P2)+8 <= Random(17) {
 			if int16(stat.P1) >= Random(9) {
 				CalcDirectionSeek(int16(stat.X), int16(stat.Y), &stat.StepX, &stat.StepY)
 			} else {
@@ -99,7 +99,7 @@ func ElementRuffianTick(statId int16) {
 			BoardAttack(statId, int16(stat.X)+stat.StepX, int16(stat.Y)+stat.StepY)
 		} else if ElementDefs[tile.Element].Walkable {
 			MoveStat(statId, int16(stat.X)+stat.StepX, int16(stat.Y)+stat.StepY)
-			if int16(stat.P2+8) <= Random(17) {
+			if int16(stat.P2)+8 <= Random(17) {
 				stat.StepX = 0
 				stat.StepY = 0
 			}
@@ -115,14 +115,14 @@ func ElementBearTick(statId int16) {
 	var deltaX, deltaY int16
 	stat := &Board.Stats[statId]
 	if stat.X != Board.Stats[0].X {
-		if Difference(int16(stat.Y), int16(Board.Stats[0].Y)) <= int16(8-stat.P1) {
-			deltaX = Signum(int16(Board.Stats[0].X - stat.X))
+		if Difference(int16(stat.Y), int16(Board.Stats[0].Y)) <= 8-int16(stat.P1) {
+			deltaX = Signum(int16(Board.Stats[0].X) - int16(stat.X))
 			deltaY = 0
 			goto Movement
 		}
 	}
-	if Difference(int16(stat.X), int16(Board.Stats[0].X)) <= int16(8-stat.P1) {
-		deltaY = Signum(int16(Board.Stats[0].Y - stat.Y))
+	if Difference(int16(stat.X), int16(Board.Stats[0].X)) <= 8-int16(stat.P1) {
+		deltaY = Signum(int16(Board.Stats[0].Y) - int16(stat.Y))
 		deltaX = 0
 	} else {
 		deltaX = 0
@@ -146,10 +146,10 @@ func ElementCentipedeHeadTick(statId int16) {
 	)
 	stat := &Board.Stats[statId]
 	if stat.X == Board.Stats[0].X && Random(10) < int16(stat.P1) {
-		stat.StepY = Signum(int16(Board.Stats[0].Y - stat.Y))
+		stat.StepY = Signum(int16(Board.Stats[0].Y) - int16(stat.Y))
 		stat.StepX = 0
 	} else if stat.Y == Board.Stats[0].Y && Random(10) < int16(stat.P1) {
-		stat.StepX = Signum(int16(Board.Stats[0].X - stat.X))
+		stat.StepX = Signum(int16(Board.Stats[0].X) - int16(stat.X))
 		stat.StepY = 0
 	} else if Random(10)*4 < int16(stat.P2) || stat.StepX == 0 && stat.StepY == 0 {
 		CalcDirectionRnd(&stat.StepX, &stat.StepY)
@@ -344,16 +344,16 @@ func ElementSpinningGunTick(statId int16) {
 	if stat.P2 >= 0x80 {
 		element = E_STAR
 	}
-	if Random(9) < int16(stat.P2%0x80) {
+	if Random(9) < int16(stat.P2)%0x80 {
 		if Random(9) <= int16(stat.P1) {
 			if Difference(int16(stat.X), int16(Board.Stats[0].X)) <= 2 {
-				shot = BoardShoot(element, int16(stat.X), int16(stat.Y), 0, Signum(int16(Board.Stats[0].Y-stat.Y)), SHOT_SOURCE_ENEMY)
+				shot = BoardShoot(element, int16(stat.X), int16(stat.Y), 0, Signum(int16(Board.Stats[0].Y)-int16(stat.Y)), SHOT_SOURCE_ENEMY)
 			} else {
 				shot = false
 			}
 			if !shot {
 				if Difference(int16(stat.Y), int16(Board.Stats[0].Y)) <= 2 {
-					shot = BoardShoot(element, int16(stat.X), int16(stat.Y), Signum(int16(Board.Stats[0].X-stat.X)), 0, SHOT_SOURCE_ENEMY)
+					shot = BoardShoot(element, int16(stat.X), int16(stat.Y), Signum(int16(Board.Stats[0].X)-int16(stat.X)), 0, SHOT_SOURCE_ENEMY)
 				}
 			}
 		} else {
@@ -477,7 +477,7 @@ func ElementBombDraw(x, y int16, ch *byte) {
 	if stat.P1 <= 1 {
 		*ch = 11
 	} else {
-		*ch = 48 + stat.P1
+		*ch = byte(48 + int16(stat.P1))
 	}
 }
 
@@ -496,7 +496,7 @@ func ElementBombTick(statId int16) {
 			RemoveStat(statId)
 			DrawPlayerSurroundings(oldX, oldY, 2)
 		} else {
-			if stat.P1%2 == 0 {
+			if int16(stat.P1)%2 == 0 {
 				SoundQueue(1, "\xf8\x01")
 			} else {
 				SoundQueue(1, "\xf5\x01")
@@ -603,7 +603,7 @@ func ElementStarTick(statId int16) {
 	stat.P2--
 	if stat.P2 <= 0 {
 		RemoveStat(statId)
-	} else if stat.P2%2 == 0 {
+	} else if int16(stat.P2)%2 == 0 {
 		CalcDirectionSeek(int16(stat.X), int16(stat.Y), &stat.StepX, &stat.StepY)
 		tile := &Board.Tiles[int16(stat.X)+stat.StepX][int16(stat.Y)+stat.StepY]
 		if tile.Element == E_PLAYER || tile.Element == E_BREAKABLE {
@@ -712,7 +712,7 @@ func ElementBlinkWallTick(statId int16) {
 	)
 	stat := &Board.Stats[statId]
 	if stat.P3 == 0 {
-		stat.P3 = stat.P1 + 1
+		stat.P3 = byte(int16(stat.P1) + 1)
 	}
 	if stat.P3 == 1 {
 		ix = int16(stat.X) + stat.StepX
@@ -727,7 +727,7 @@ func ElementBlinkWallTick(statId int16) {
 			BoardDrawTile(ix, iy)
 			ix += stat.StepX
 			iy += stat.StepY
-			stat.P3 = stat.P2*2 + 1
+			stat.P3 = byte(int16(stat.P2)*2 + 1)
 		}
 		if int16(stat.X)+stat.StepX == ix && int16(stat.Y)+stat.StepY == iy {
 			hitBoundary = false
@@ -772,7 +772,7 @@ func ElementBlinkWallTick(statId int16) {
 					break
 				}
 			}
-			stat.P3 = stat.P2*2 + 1
+			stat.P3 = byte(int16(stat.P2)*2 + 1)
 		}
 	} else {
 		stat.P3--
@@ -891,7 +891,7 @@ func ElementDuplicatorTick(statId int16) {
 		stat.P1 = 0
 		BoardDrawTile(int16(stat.X), int16(stat.Y))
 	}
-	stat.Cycle = int16((9 - stat.P2) * 3)
+	stat.Cycle = (9 - int16(stat.P2)) * 3
 }
 
 func ElementScrollTick(statId int16) {
@@ -921,7 +921,7 @@ func ElementScrollTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16) {
 
 func ElementKeyTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16) {
 	var key int16
-	key = int16(Board.Tiles[x][y].Color % 8)
+	key = int16(Board.Tiles[x][y].Color) % 8
 	if World.Info.Keys[key-1] {
 		DisplayMessage(200, "You already have a "+ColorNames[key-1]+" key!")
 		SoundQueue(2, "0\x02 \x02")
@@ -966,7 +966,7 @@ func ElementPassageTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16) 
 
 func ElementDoorTouch(x, y int16, sourceStatId int16, deltaX, deltaY *int16) {
 	var key int16
-	key = int16(Board.Tiles[x][y].Color / 16 % 8)
+	key = int16(Board.Tiles[x][y].Color) / 16 % 8
 	if World.Info.Keys[key-1] {
 		Board.Tiles[x][y].Element = E_EMPTY
 		BoardDrawTile(x, y)
