@@ -1,41 +1,34 @@
 # _/Users/ben.hoyt/Home/zzt/pas2go/converted
-./editor.go:234:19: cannot use "         Title: " + Board.Name (type string) as type *string in assignment
-./editor.go:236:19: cannot use "      Can fire: " + numStr + " shots." (type string) as type *string in assignment
-./editor.go:237:19: cannot use " Board is dark: " + BoolToString(Board.Info.IsDark) (type string) as type *string in assignment
-./editor.go:239:22: cannot use NeighborBoardStrs[i - 4] + ": " + EditorGetBoardName(int16(Board.Info.NeighborBoards[i - 4]), true) (type string) as type *string in assignment
-./editor.go:241:19: cannot use "Re-enter when zapped: " + BoolToString(Board.Info.ReenterWhenZapped) (type string) as type *string in assignment
-./editor.go:243:19: cannot use "  Time limit, 0=None: " + numStr + " sec." (type string) as type *string in assignment
-./editor.go:244:21: cannot use "          Quit!" (type string) as type *string in assignment
-./editor.go:316:11: cannot use stat.Data (type *string) as type uintptr in assignment
-./editor.go:319:41: invalid operation: state.Lines[iLine - 1][iChar - 1] (type *string does not support indexing)
+./editor.go:316:11: cannot use stat.Data (type *string) as type *uintptr in assignment
+./editor.go:319:42: invalid operation: state.Lines[iLine - 1][iChar - 1] (type *string does not support indexing)
 ./editor.go:732:50: cannot convert " " (type untyped string) to type byte
 ./editor.go:732:50: invalid operation: " " + ElementDefs[iElem].EditorShortcut (mismatched types string and byte)
-./game.go:69:6: cannot use IoTmpBuf (type *TIoTmpBuf) as type uintptr in assignment
-./game.go:107:37: type TStat is not an expression
+./game.go:60:11: cannot use Ptr(Seg(* (*address)), Ofs(* (*address)) + count) (type uintptr) as type *uintptr in assignment
+./game.go:69:6: cannot use IoTmpBuf (type *TIoTmpBuf) as type *uintptr in assignment
+./game.go:107:38: type TStat is not an expression
 ./game.go:358:40: cannot convert "....:...." (type untyped string) to type byte
 ./game.go:358:40: invalid operation: startChar + "....:...." (mismatched types byte and string)
-./game.go:589:8: cannot use IoTmpBuf (type *TIoTmpBuf) as type uintptr in assignment
-./game.go:639:7: cannot use IoTmpBuf (type *TIoTmpBuf) as type uintptr in assignment
-./game.go:719:13: cannot use textWindow.Lines[textWindow.LinePos - 1] (type *string) as type string in assignment
-./game.go:740:10: cannot use stat.Data (type *string) as type uintptr in assignment
+./game.go:589:8: cannot use IoTmpBuf (type *TIoTmpBuf) as type *uintptr in assignment
+./game.go:639:7: cannot use IoTmpBuf (type *TIoTmpBuf) as type *uintptr in assignment
+./game.go:740:10: cannot use stat.Data (type *string) as type *uintptr in assignment
 ./game.go:1187:14: cannot assign to input[i - 1]
 ./game.go:1505:41: cannot use ResourceDataHeader.FileOffset[i - 1] (type int32) as type int16 in argument to Seek
+./game.go:1509:12: cannot use Ptr(Seg(s), Ofs(s) + 1) (type uintptr) as type *uintptr in assignment
+./oop.go:17:8: invalid indirect of Ptr(Seg(*stat.Data), Ofs(*stat.Data) + *position) (type uintptr)
 ./oop.go:119:40: cannot call non-function OopParseDirection (type bool)
 ./oop.go:123:40: cannot call non-function OopParseDirection (type bool)
 ./oop.go:127:40: cannot call non-function OopParseDirection (type bool)
 ./oop.go:135:40: cannot call non-function OopParseDirection (type bool)
 ./oop.go:263:10: goto FindNextStat jumps into block starting at ./oop.go:250:9
 ./oop.go:417:41: cannot call non-function OopCheckCondition (type bool)
-./oop.go:644:21: invalid operation: counterPtr + OopValue (mismatched types *int16 and int16)
-./oop.go:645:20: invalid operation: counterPtr += OopValue (mismatched types *int16 and int16)
-./oop.go:666:16: cannot use Board.Stats[labelStatId].Data (type *string) as type uintptr in assignment
-./oop.go:675:17: cannot use Board.Stats[labelStatId].Data (type *string) as type uintptr in assignment
+./oop.go:666:16: cannot use Board.Stats[labelStatId].Data (type *string) as type *uintptr in assignment
+./oop.go:675:17: cannot use Board.Stats[labelStatId].Data (type *string) as type *uintptr in assignment
 ./oop.go:781:23: invalid operation: OopChar + OopReadLineToEnd(statId, position) (mismatched types byte and string)
 ./sounds.go:107:18: cannot use drum.Data[i - 1] (type uint16) as type int16 in argument to Sound
 ./sounds.go:169:26: cannot use SoundFreqTable[Ord(SoundBuffer[SoundBufferPos]) - 1] (type uint16) as type int16 in argument to Sound
 ./sounds.go:274:3: duplicate case '3' (value 51) in switch
 	previous case at ./sounds.go:225:8
-./sounds.go:298:17: cannot use &SoundTimerHandler (type *func()) as type uintptr in assignment
+./sounds.go:298:17: cannot use &SoundTimerHandler (type *func()) as type *uintptr in assignment
 ./sounds.go:298:19: cannot take the address of SoundTimerHandler
 ./txtwind.go:51:12: cannot assign to input[i]
-./txtwind.go:117:31: invalid operation: state.Lines[lpos - 1][0] (type *string does not support indexing)
+./txtwind.go:117:32: invalid operation: state.Lines[lpos - 1][0] (type *string does not support indexing)

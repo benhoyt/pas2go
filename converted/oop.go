@@ -14,7 +14,7 @@ func OopError(statId int16, message string) {
 func OopReadChar(statId int16, position *int16) {
 	stat := &Board.Stats[statId]
 	if *position >= 0 && *position < stat.DataLen {
-		Move(Ptr(Seg(*stat.Data), Ofs(*stat.Data)+*position), OopChar, 1)
+		Move(*Ptr(Seg(*stat.Data), Ofs(*stat.Data)+*position), OopChar, 1)
 		*position++
 	} else {
 		OopChar = '\x00'
@@ -488,7 +488,7 @@ func OopExecute(statId int16, position *int16, name string) {
 		lastPosition      int16
 		repeatInsNextTick bool
 		lineFinished      bool
-		labelPtr          uintptr
+		labelPtr          *uintptr
 		labelDataPos      int16
 		labelStatId       int16
 		counterPtr        *int16
@@ -641,8 +641,8 @@ StartParsing:
 							if counterSubtract {
 								OopValue = -OopValue
 							}
-							if counterPtr+OopValue >= 0 {
-								counterPtr += OopValue
+							if *counterPtr+OopValue >= 0 {
+								*counterPtr += OopValue
 							} else {
 								goto ReadCommand
 							}
@@ -665,7 +665,7 @@ StartParsing:
 					for OopFindLabel(statId, OopWord, &labelStatId, &labelDataPos, "\r:") {
 						labelPtr = Board.Stats[labelStatId].Data
 						AdvancePointer(&labelPtr, labelDataPos+1)
-						labelPtr = '\''
+						*labelPtr = '\''
 					}
 				} else if OopWord == "RESTORE" {
 					OopReadWord(statId, position)
@@ -674,7 +674,7 @@ StartParsing:
 						for {
 							labelPtr = Board.Stats[labelStatId].Data
 							AdvancePointer(&labelPtr, labelDataPos+1)
-							labelPtr = ':'
+							*labelPtr = ':'
 							labelDataPos = OopFindString(labelStatId, "\r'"+OopWord+"\r")
 							if labelDataPos <= 0 {
 								break

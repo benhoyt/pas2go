@@ -56,18 +56,18 @@ func GenerateTransitionTable() {
 	}
 }
 
-func AdvancePointer(address *uintptr, count int16) {
-	*address = Ptr(Seg(*address), Ofs(*address)+count)
+func AdvancePointer(address **uintptr, count int16) {
+	*address = Ptr(Seg(**address), Ofs(**address)+count)
 }
 
 func BoardClose() {
 	var (
 		ix, iy int16
-		ptr    uintptr
+		ptr    *uintptr
 		rle    TRleTile
 	)
 	ptr = IoTmpBuf
-	Move(Board.Name, ptr, SizeOf(Board.Name))
+	Move(Board.Name, *ptr, SizeOf(Board.Name))
 	AdvancePointer(&ptr, SizeOf(Board.Name))
 	ix = 1
 	iy = 1
@@ -82,7 +82,7 @@ func BoardClose() {
 		if Board.Tiles[ix][iy].Color == rle.Tile.Color && Board.Tiles[ix][iy].Element == rle.Tile.Element && rle.Count < 255 && iy <= BOARD_HEIGHT {
 			rle.Count++
 		} else {
-			Move(rle, ptr, SizeOf(rle))
+			Move(rle, *ptr, SizeOf(rle))
 			AdvancePointer(&ptr, SizeOf(rle))
 			rle.Tile = Board.Tiles[ix][iy]
 			rle.Count = 1
@@ -91,9 +91,9 @@ func BoardClose() {
 			break
 		}
 	}
-	Move(Board.Info, ptr, SizeOf(Board.Info))
+	Move(Board.Info, *ptr, SizeOf(Board.Info))
 	AdvancePointer(&ptr, SizeOf(Board.Info))
-	Move(Board.StatCount, ptr, SizeOf(Board.StatCount))
+	Move(Board.StatCount, *ptr, SizeOf(Board.StatCount))
 	AdvancePointer(&ptr, SizeOf(Board.StatCount))
 	for ix = 0; ix <= Board.StatCount; ix++ {
 		stat := &Board.Stats[ix]
@@ -104,23 +104,23 @@ func BoardClose() {
 				}
 			}
 		}
-		Move(Board.Stats[ix], ptr, SizeOf(TStat))
+		Move(Board.Stats[ix], *ptr, SizeOf(TStat))
 		AdvancePointer(&ptr, SizeOf(TStat))
 		if stat.DataLen > 0 {
-			Move(*stat.Data, ptr, stat.DataLen)
+			Move(*stat.Data, *ptr, stat.DataLen)
 			FreeMem(stat.Data, stat.DataLen)
 			AdvancePointer(&ptr, stat.DataLen)
 		}
 	}
 	FreeMem(World.BoardData[World.Info.CurrentBoard], World.BoardLen[World.Info.CurrentBoard])
-	World.BoardLen[World.Info.CurrentBoard] = Ofs(ptr) - Ofs(*IoTmpBuf)
+	World.BoardLen[World.Info.CurrentBoard] = Ofs(*ptr) - Ofs(*IoTmpBuf)
 	GetMem(World.BoardData[World.Info.CurrentBoard], World.BoardLen[World.Info.CurrentBoard])
-	Move(*IoTmpBuf, World.BoardData[World.Info.CurrentBoard], World.BoardLen[World.Info.CurrentBoard])
+	Move(*IoTmpBuf, *World.BoardData[World.Info.CurrentBoard], World.BoardLen[World.Info.CurrentBoard])
 }
 
 func BoardOpen(boardId int16) {
 	var (
-		ptr    uintptr
+		ptr    *uintptr
 		ix, iy int16
 		rle    TRleTile
 	)
@@ -128,14 +128,14 @@ func BoardOpen(boardId int16) {
 		boardId = World.Info.CurrentBoard
 	}
 	ptr = World.BoardData[boardId]
-	Move(ptr, Board.Name, SizeOf(Board.Name))
+	Move(*ptr, Board.Name, SizeOf(Board.Name))
 	AdvancePointer(&ptr, SizeOf(Board.Name))
 	ix = 1
 	iy = 1
 	rle.Count = 0
 	for {
 		if rle.Count <= 0 {
-			Move(ptr, rle, SizeOf(rle))
+			Move(*ptr, rle, SizeOf(rle))
 			AdvancePointer(&ptr, SizeOf(rle))
 		}
 		Board.Tiles[ix][iy] = rle.Tile
@@ -149,17 +149,17 @@ func BoardOpen(boardId int16) {
 			break
 		}
 	}
-	Move(ptr, Board.Info, SizeOf(Board.Info))
+	Move(*ptr, Board.Info, SizeOf(Board.Info))
 	AdvancePointer(&ptr, SizeOf(Board.Info))
-	Move(ptr, Board.StatCount, SizeOf(Board.StatCount))
+	Move(*ptr, Board.StatCount, SizeOf(Board.StatCount))
 	AdvancePointer(&ptr, SizeOf(Board.StatCount))
 	for ix = 0; ix <= Board.StatCount; ix++ {
 		stat := &Board.Stats[ix]
-		Move(ptr, Board.Stats[ix], SizeOf(TStat))
+		Move(*ptr, Board.Stats[ix], SizeOf(TStat))
 		AdvancePointer(&ptr, SizeOf(TStat))
 		if stat.DataLen > 0 {
 			GetMem(stat.Data, stat.DataLen)
-			Move(ptr, *stat.Data, stat.DataLen)
+			Move(*ptr, *stat.Data, stat.DataLen)
 			AdvancePointer(&ptr, stat.DataLen)
 		} else if stat.DataLen < 0 {
 			stat.Data = Board.Stats[-stat.DataLen].Data
@@ -565,7 +565,7 @@ func WorldUnload() {
 func WorldLoad(filename, extension string, titleOnly bool) (WorldLoad bool) {
 	var (
 		f            *File
-		ptr          uintptr
+		ptr          *uintptr
 		boardId      int16
 		loadProgress int16
 	)
@@ -587,7 +587,7 @@ func WorldLoad(filename, extension string, titleOnly bool) (WorldLoad bool) {
 		BlockRead(f, *IoTmpBuf, 512)
 		if !DisplayIOError() {
 			ptr = IoTmpBuf
-			Move(ptr, World.BoardCount, SizeOf(World.BoardCount))
+			Move(*ptr, World.BoardCount, SizeOf(World.BoardCount))
 			AdvancePointer(&ptr, SizeOf(World.BoardCount))
 			if World.BoardCount < 0 {
 				if World.BoardCount != -1 {
@@ -595,11 +595,11 @@ func WorldLoad(filename, extension string, titleOnly bool) (WorldLoad bool) {
 					VideoWriteText(63, 6, 0x1E, " version of ZZT!")
 					return
 				} else {
-					Move(ptr, World.BoardCount, SizeOf(World.BoardCount))
+					Move(*ptr, World.BoardCount, SizeOf(World.BoardCount))
 					AdvancePointer(&ptr, SizeOf(World.BoardCount))
 				}
 			}
-			Move(ptr, World.Info, SizeOf(World.Info))
+			Move(*ptr, World.Info, SizeOf(World.Info))
 			AdvancePointer(&ptr, SizeOf(World.Info))
 			if titleOnly {
 				World.BoardCount = 0
@@ -610,7 +610,7 @@ func WorldLoad(filename, extension string, titleOnly bool) (WorldLoad bool) {
 				SidebarAnimateLoading()
 				BlockRead(f, World.BoardLen[boardId], 2)
 				GetMem(World.BoardData[boardId], World.BoardLen[boardId])
-				BlockRead(f, World.BoardData[boardId], World.BoardLen[boardId])
+				BlockRead(f, *World.BoardData[boardId], World.BoardLen[boardId])
 			}
 			Close(f)
 			BoardOpen(World.Info.CurrentBoard)
@@ -628,7 +628,7 @@ func WorldSave(filename, extension string) {
 		f       *File
 		i       int16
 		unk1    int16
-		ptr     uintptr
+		ptr     *uintptr
 		version int16
 	)
 	BoardClose()
@@ -639,11 +639,11 @@ func WorldSave(filename, extension string) {
 		ptr = IoTmpBuf
 		FillChar(*IoTmpBuf, 512, 0)
 		version = -1
-		Move(version, ptr, SizeOf(version))
+		Move(version, *ptr, SizeOf(version))
 		AdvancePointer(&ptr, SizeOf(version))
-		Move(World.BoardCount, ptr, SizeOf(World.BoardCount))
+		Move(World.BoardCount, *ptr, SizeOf(World.BoardCount))
 		AdvancePointer(&ptr, SizeOf(World.BoardCount))
-		Move(World.Info, ptr, SizeOf(World.Info))
+		Move(World.Info, *ptr, SizeOf(World.Info))
 		AdvancePointer(&ptr, SizeOf(World.Info))
 		BlockWrite(f, *IoTmpBuf, 512)
 		if DisplayIOError() {
@@ -654,7 +654,7 @@ func WorldSave(filename, extension string) {
 			if DisplayIOError() {
 				goto OnError
 			}
-			BlockWrite(f, World.BoardData[i], World.BoardLen[i])
+			BlockWrite(f, *World.BoardData[i], World.BoardLen[i])
 			if DisplayIOError() {
 				goto OnError
 			}
@@ -716,7 +716,7 @@ func GameWorldLoad(extension string) (GameWorldLoad bool) {
 	TextWindowSelect(&textWindow, false, false)
 	TextWindowDrawClose(&textWindow)
 	if textWindow.LinePos < textWindow.LineCount && !TextWindowRejected {
-		entryName = textWindow.Lines[textWindow.LinePos-1]
+		entryName = *textWindow.Lines[textWindow.LinePos-1]
 		if Pos(' ', entryName) != 0 {
 			entryName = Copy(entryName, 1, Pos(' ', entryName)-1)
 		}
@@ -730,7 +730,7 @@ func GameWorldLoad(extension string) (GameWorldLoad bool) {
 func CopyStatDataToTextWindow(statId int16, state *TTextWindowState) {
 	var (
 		dataStr string
-		dataPtr uintptr
+		dataPtr *uintptr
 		dataChr byte
 		i       int16
 	)
@@ -739,7 +739,7 @@ func CopyStatDataToTextWindow(statId int16, state *TTextWindowState) {
 	dataStr = ""
 	dataPtr = stat.Data
 	for i = 0; i <= stat.DataLen; i++ {
-		Move(dataPtr, dataChr, 1)
+		Move(*dataPtr, dataChr, 1)
 		if dataChr == KEY_ENTER {
 			TextWindowAppend(state, dataStr)
 			dataStr = ""
@@ -761,7 +761,7 @@ func AddStat(tx, ty int16, element byte, color, tcycle int16, template TStat) {
 		stat.Under = Board.Tiles[tx][ty]
 		stat.DataPos = 0
 		if template.Data != nil {
-			GetMem(*Board.Stats[Board.StatCount].Data, template.DataLen)
+			GetMem(Board.Stats[Board.StatCount].Data, template.DataLen)
 			Move(*template.Data, *Board.Stats[Board.StatCount].Data, template.DataLen)
 		}
 		if ElementDefs[Board.Tiles[tx][ty].Element].PlaceableOnTop {
@@ -1492,7 +1492,7 @@ func GamePrintRegisterMessage() {
 		ix, iy    int16
 		color     int16
 		isReading bool
-		strPtr    uintptr
+		strPtr    *uintptr
 	)
 	SetCBreak(false)
 	s = "END" + Chr(byte(49+Random(4))) + ".MSG"
@@ -1510,7 +1510,7 @@ func GamePrintRegisterMessage() {
 				if Length(s) == 0 {
 					color--
 				} else {
-					BlockRead(f, strPtr, Length(s))
+					BlockRead(f, *strPtr, Length(s))
 					if s != "@" {
 						VideoWriteText(0, iy, byte(color), s)
 					} else {

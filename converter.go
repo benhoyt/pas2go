@@ -588,7 +588,7 @@ func (c *converter) typeIdent(typ *TypeIdent) {
 	case "string":
 		s = "string"
 	case "pointer":
-		s = "uintptr"
+		s = "*uintptr"
 	case "word":
 		s = "uint16"
 	case "longint":
@@ -908,16 +908,8 @@ func (c *converter) procArg(targetIsVar bool, targetKind Kind, arg Expr) {
 			c.expr(arg)
 		}
 	case *AtExpr, *DotExpr, *IndexExpr, *PointerExpr, *FuncExpr:
-		spec, _ := c.lookupVarExprType(arg)
-		switch spec.(type) {
-		case *PointerSpec:
-			if !targetIsVar {
-				c.print("*")
-			}
-		default:
-			if targetIsVar {
-				c.print("&")
-			}
+		if targetIsVar {
+			c.print("&")
 		}
 		c.expr(arg)
 	case *ConstExpr:
@@ -997,7 +989,6 @@ func (c *converter) expr(expr Expr) {
 		opStr := operatorStr(expr.Op)
 		lk := c.exprKind(expr.Left)
 		rk := c.exprKind(expr.Right)
-		// TODO: need other "cast up" types here, other than KindByte?
 		switch {
 		case isMathOp(expr.Op) && lk == KindByte && (rk == KindByte || rk == KindNumber):
 			c.typeConversion(expr.Left, "int16")
@@ -1220,7 +1211,7 @@ func (c *converter) varExpr(expr Expr, suppressStar bool) {
 		}
 		c.print("]")
 	case *PointerExpr:
-		if isVar && !suppressStar {
+		if !isVar && !suppressStar {
 			c.print("*")
 		}
 		c.varExpr(expr.Expr, suppressStar)

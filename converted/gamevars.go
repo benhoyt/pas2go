@@ -63,7 +63,7 @@ type (
 		Data         *string
 		DataPos      int16
 		DataLen      int16
-		unk1, unk2   uintptr
+		unk1, unk2   *uintptr
 	}
 	TRleTile struct {
 		Count byte
@@ -111,7 +111,7 @@ type (
 	}
 	TWorld struct {
 		BoardCount         int16
-		BoardData          [MAX_BOARD + 1]uintptr
+		BoardData          [MAX_BOARD + 1]*uintptr
 		BoardLen           [MAX_BOARD + 1]int16
 		Info               TWorldInfo
 		EditorStatSettings [MAX_ELEMENT + 1]TEditorStatSetting

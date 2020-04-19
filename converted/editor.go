@@ -223,25 +223,25 @@ func EditorLoop() {
 		state.Selectable = true
 		exitRequested = false
 		for i = 1; i <= state.LineCount; i++ {
-			New(*state.Lines[i-1])
+			New(state.Lines[i-1])
 		}
 		for {
 			state.Selectable = true
 			state.LineCount = 10
 			for i = 1; i <= state.LineCount; i++ {
-				New(*state.Lines[i-1])
+				New(state.Lines[i-1])
 			}
-			state.Lines[0] = "         Title: " + Board.Name
+			*state.Lines[0] = "         Title: " + Board.Name
 			numStr = Str(int16(Board.Info.MaxShots))
-			state.Lines[1] = "      Can fire: " + numStr + " shots."
-			state.Lines[2] = " Board is dark: " + BoolToString(Board.Info.IsDark)
+			*state.Lines[1] = "      Can fire: " + numStr + " shots."
+			*state.Lines[2] = " Board is dark: " + BoolToString(Board.Info.IsDark)
 			for i = 4; i <= 7; i++ {
-				state.Lines[i-1] = NeighborBoardStrs[i-4] + ": " + EditorGetBoardName(int16(Board.Info.NeighborBoards[i-4]), true)
+				*state.Lines[i-1] = NeighborBoardStrs[i-4] + ": " + EditorGetBoardName(int16(Board.Info.NeighborBoards[i-4]), true)
 			}
-			state.Lines[7] = "Re-enter when zapped: " + BoolToString(Board.Info.ReenterWhenZapped)
+			*state.Lines[7] = "Re-enter when zapped: " + BoolToString(Board.Info.ReenterWhenZapped)
 			numStr = Str(Board.Info.TimeLimitSec)
-			state.Lines[8] = "  Time limit, 0=None: " + numStr + " sec."
-			state.Lines[9] = "          Quit!"
+			*state.Lines[8] = "  Time limit, 0=None: " + numStr + " sec."
+			*state.Lines[9] = "          Quit!"
 			TextWindowSelect(&state, false, false)
 			if InputKeyPressed == KEY_ENTER && state.LinePos >= 1 && state.LinePos <= 8 {
 				wasModified = true
@@ -297,7 +297,7 @@ func EditorLoop() {
 			iLine, iChar int16
 			unk1         [52]byte
 			dataChar     byte
-			dataPtr      uintptr
+			dataPtr      *uintptr
 		)
 		stat := &Board.Stats[statId]
 		state.Title = prompt
@@ -316,12 +316,12 @@ func EditorLoop() {
 		dataPtr = stat.Data
 		for iLine = 1; iLine <= state.LineCount; iLine++ {
 			for iChar = 1; iChar <= Length(*state.Lines[iLine-1]); iChar++ {
-				dataChar = byte(state.Lines[iLine-1][iChar-1])
-				Move(dataChar, dataPtr, 1)
+				dataChar = byte(*state.Lines[iLine-1][iChar-1])
+				Move(dataChar, *dataPtr, 1)
 				AdvancePointer(&dataPtr, 1)
 			}
 			dataChar = '\r'
-			Move(dataChar, dataPtr, 1)
+			Move(dataChar, *dataPtr, 1)
 			AdvancePointer(&dataPtr, 1)
 		}
 		TextWindowFree(&state)
@@ -456,7 +456,7 @@ func EditorLoop() {
 					BlockRead(f, World.BoardLen[World.Info.CurrentBoard], 2)
 					if !DisplayIOError() {
 						GetMem(World.BoardData[World.Info.CurrentBoard], World.BoardLen[World.Info.CurrentBoard])
-						BlockRead(f, World.BoardData[World.Info.CurrentBoard], World.BoardLen[World.Info.CurrentBoard])
+						BlockRead(f, *World.BoardData[World.Info.CurrentBoard], World.BoardLen[World.Info.CurrentBoard])
 					}
 					if DisplayIOError() {
 						World.BoardLen[World.Info.CurrentBoard] = 0
@@ -480,7 +480,7 @@ func EditorLoop() {
 					}
 					BoardClose()
 					BlockWrite(f, World.BoardLen[World.Info.CurrentBoard], 2)
-					BlockWrite(f, World.BoardData[World.Info.CurrentBoard], World.BoardLen[World.Info.CurrentBoard])
+					BlockWrite(f, *World.BoardData[World.Info.CurrentBoard], World.BoardLen[World.Info.CurrentBoard])
 					BoardOpen(World.Info.CurrentBoard)
 					if DisplayIOError() {
 					} else {
@@ -965,7 +965,7 @@ func HighScoresAdd(score int16) {
 
 func EditorGetBoardName(boardId int16, titleScreenIsNone bool) (EditorGetBoardName string) {
 	var (
-		boardData  uintptr
+		boardData  *uintptr
 		copiedName string
 	)
 	if boardId == 0 && titleScreenIsNone {
@@ -974,7 +974,7 @@ func EditorGetBoardName(boardId int16, titleScreenIsNone bool) (EditorGetBoardNa
 		EditorGetBoardName = Board.Name
 	} else {
 		boardData = World.BoardData[boardId]
-		Move(boardData, copiedName, SizeOf(copiedName))
+		Move(*boardData, copiedName, SizeOf(copiedName))
 		EditorGetBoardName = copiedName
 	}
 

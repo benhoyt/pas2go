@@ -13,8 +13,8 @@ var (
 	SoundDurationMultiplier byte
 	SoundDurationCounter    byte
 	SoundBuffer             string
-	SoundNewVector          uintptr
-	SoundOldVector          uintptr
+	SoundNewVector          *uintptr
+	SoundOldVector          *uintptr
 	SoundBufferPos          int16
 	SoundIsPlaying          bool
 	SoundTimeCheckCounter   int16
