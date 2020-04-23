@@ -9,8 +9,8 @@ func ParseArguments() {
 	)
 	for i = 1; i <= ParamCount; i++ {
 		pArg = ParamStr(i)
-		if pArg[1] == '/' {
-			switch UpCase(pArg[2]) {
+		if pArg[0] == '/' {
+			switch UpCase(pArg[1]) {
 			case 'T':
 				SoundTimeCheckCounter = 0
 				UseSystemTimeForElapsed = false

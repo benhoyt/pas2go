@@ -1181,6 +1181,10 @@ func (c *converter) varExpr(expr Expr, suppressStar bool) {
 			min = spec.Min.(*ConstExpr).Value.(int)
 		case *StringSpec:
 			min = 1
+		case *IdentSpec:
+			if strings.ToLower(spec.Type.Name) == "string" {
+				min = 1
+			}
 		}
 
 		c.print("[")

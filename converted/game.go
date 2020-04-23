@@ -343,9 +343,9 @@ func SidebarPromptSlider(editable bool, x, y int16, prompt string, value *byte) 
 		newValue           int16
 		startChar, endChar byte
 	)
-	if prompt[Length(prompt)-2] == ';' {
-		startChar = prompt[Length(prompt)-1]
-		endChar = prompt[Length(prompt)]
+	if prompt[Length(prompt)-2-1] == ';' {
+		startChar = prompt[Length(prompt)-1-1]
+		endChar = prompt[Length(prompt)-1]
 		prompt = Copy(prompt, 1, Length(prompt)-3)
 	} else {
 		startChar = '1'
@@ -393,7 +393,7 @@ func SidebarPromptChoice(editable bool, y int16, prompt, choiceStr string, resul
 	VideoWriteText(63, y+2, 0x1E, choiceStr)
 	choiceCount = 1
 	for i = 1; i <= Length(choiceStr); i++ {
-		if choiceStr[i] == ' ' {
+		if choiceStr[i-1] == ' ' {
 			choiceCount++
 		}
 	}
@@ -401,7 +401,7 @@ func SidebarPromptChoice(editable bool, y int16, prompt, choiceStr string, resul
 		j = 0
 		i = 1
 		for j < int16(*result) && i < Length(choiceStr) {
-			if choiceStr[i] == ' ' {
+			if choiceStr[i-1] == ' ' {
 				j++
 			}
 			i++

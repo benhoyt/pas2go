@@ -160,7 +160,7 @@ func OopFindString(statId int16, s string) (OopFindString int16) {
 		cmpPos = pos
 		for {
 			OopReadChar(statId, &cmpPos)
-			if UpCase(s[wordPos]) != UpCase(OopChar) {
+			if UpCase(s[wordPos-1]) != UpCase(OopChar) {
 				goto NoMatch
 			}
 			wordPos++

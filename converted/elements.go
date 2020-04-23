@@ -584,14 +584,14 @@ func ElementTransporterTick(statId int16) {
 func ElementTransporterDraw(x, y int16, ch *byte) {
 	stat := &Board.Stats[GetStatIdAt(x, y)]
 	if stat.StepX == 0 {
-		*ch = Ord(TransporterNSChars[stat.StepY*2+3+CurrentTick/stat.Cycle%4])
+		*ch = Ord(TransporterNSChars[stat.StepY*2+3+CurrentTick/stat.Cycle%4-1])
 	} else {
-		*ch = Ord(TransporterEWChars[stat.StepX*2+3+CurrentTick/stat.Cycle%4])
+		*ch = Ord(TransporterEWChars[stat.StepX*2+3+CurrentTick/stat.Cycle%4-1])
 	}
 }
 
 func ElementStarDraw(x, y int16, ch *byte) {
-	*ch = Ord(StarAnimChars[CurrentTick%4+1])
+	*ch = Ord(StarAnimChars[CurrentTick%4+1-1])
 	Board.Tiles[x][y].Color++
 	if Board.Tiles[x][y].Color > 15 {
 		Board.Tiles[x][y].Color = 9

@@ -48,7 +48,7 @@ var (
 func UpCaseString(input string) (UpCaseString string) {
 	var i int16
 	for i = 1; i <= Length(input); i++ {
-		input[i] = string(UpCase(input[i]))
+		input[i-1] = string(UpCase(input[i-1]))
 	}
 	UpCaseString = input
 	return
@@ -179,7 +179,7 @@ func TextWindowPrint(state *TTextWindowState) {
 	for iLine = 1; iLine <= state.LineCount; iLine++ {
 		line = *state.Lines[iLine-1]
 		if Length(line) > 0 {
-			switch line[1] {
+			switch line[0] {
 			case '$':
 				line = Delete(line, 1, 1)
 				for iChar = (80 - Length(line)) / 2; iChar >= 1; iChar-- {

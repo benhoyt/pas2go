@@ -25,10 +25,10 @@
 ./oop.go:675:17: cannot use Board.Stats[labelStatId].Data (type *string) as type *uintptr in assignment
 ./oop.go:781:23: invalid operation: OopChar + OopReadLineToEnd(statId, position) (mismatched types byte and string)
 ./sounds.go:107:18: cannot use drum.Data[i - 1] (type uint16) as type int16 in argument to Sound
-./sounds.go:169:26: cannot use SoundFreqTable[Ord(SoundBuffer[SoundBufferPos]) - 1] (type uint16) as type int16 in argument to Sound
+./sounds.go:169:26: cannot use SoundFreqTable[Ord(SoundBuffer[SoundBufferPos - 1]) - 1] (type uint16) as type int16 in argument to Sound
 ./sounds.go:274:3: duplicate case '3' (value 51) in switch
 	previous case at ./sounds.go:225:8
 ./sounds.go:298:17: cannot use &SoundTimerHandler (type *func()) as type *uintptr in assignment
 ./sounds.go:298:19: cannot take the address of SoundTimerHandler
-./txtwind.go:51:12: cannot assign to input[i]
+./txtwind.go:51:14: cannot assign to input[i - 1]
 ./txtwind.go:117:32: invalid operation: state.Lines[lpos - 1][0] (type *string does not support indexing)

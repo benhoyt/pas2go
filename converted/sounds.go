@@ -163,16 +163,16 @@ func SoundTimerHandler() {
 				NoSound()
 				SoundIsPlaying = false
 			} else {
-				if SoundBuffer[SoundBufferPos] == '\x00' {
+				if SoundBuffer[SoundBufferPos-1] == '\x00' {
 					NoSound()
-				} else if SoundBuffer[SoundBufferPos] < '\xf0' {
-					Sound(SoundFreqTable[Ord(SoundBuffer[SoundBufferPos])-1])
+				} else if SoundBuffer[SoundBufferPos-1] < '\xf0' {
+					Sound(SoundFreqTable[Ord(SoundBuffer[SoundBufferPos-1])-1])
 				} else {
-					SoundPlayDrum(&SoundDrumTable[Ord(SoundBuffer[SoundBufferPos])-240])
+					SoundPlayDrum(&SoundDrumTable[Ord(SoundBuffer[SoundBufferPos-1])-240])
 				}
 
 				SoundBufferPos++
-				SoundDurationCounter = SoundDurationMultiplier * Ord(SoundBuffer[SoundBufferPos])
+				SoundDurationCounter = SoundDurationMultiplier * Ord(SoundBuffer[SoundBufferPos-1])
 				SoundBufferPos++
 			}
 		}
@@ -200,7 +200,7 @@ func SoundParse(input string) (SoundParse string) {
 	noteDuration = 1
 	for Length(input) != 0 {
 		noteTone = -1
-		switch UpCase(input[1]) {
+		switch UpCase(input[0]) {
 		case 'T':
 			noteDuration = 1
 			AdvanceInput()
@@ -236,7 +236,7 @@ func SoundParse(input string) (SoundParse string) {
 			}
 			AdvanceInput()
 		case 'A', 'B', 'C', 'D', 'E', 'F', 'G':
-			switch UpCase(input[1]) {
+			switch UpCase(input[0]) {
 			case 'C':
 				noteTone = 0
 				AdvanceInput()
@@ -259,7 +259,7 @@ func SoundParse(input string) (SoundParse string) {
 				noteTone = 11
 				AdvanceInput()
 			}
-			switch UpCase(input[1]) {
+			switch UpCase(input[0]) {
 			case '!':
 				noteTone--
 				AdvanceInput()
@@ -272,7 +272,7 @@ func SoundParse(input string) (SoundParse string) {
 			output += "\x00" + Chr(byte(noteDuration))
 			AdvanceInput()
 		case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
-			output += Chr(Ord(input[1])+0xF0-Ord('0')) + Chr(byte(noteDuration))
+			output += Chr(Ord(input[0])+0xF0-Ord('0')) + Chr(byte(noteDuration))
 			AdvanceInput()
 		default:
 			AdvanceInput()
