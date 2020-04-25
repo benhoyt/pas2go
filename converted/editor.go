@@ -92,7 +92,7 @@ func EditorLoop() {
 			VideoWriteText(61+i, 22, byte(i), "\xdb")
 		}
 		for i = 1; i <= EditorPatternCount; i++ {
-			VideoWriteText(61+i, 22, 0x0F, string(ElementDefs[EditorPatterns[i-1]].Character))
+			VideoWriteText(61+i, 22, 0x0F, string([]byte{ElementDefs[EditorPatterns[i-1]].Character}))
 		}
 		if ElementDefs[copiedTile.Element].HasDrawProc {
 			ElementDefs[copiedTile.Element].DrawProc(copiedX, copiedY, &copiedChr)
@@ -743,7 +743,7 @@ func EditorLoop() {
 						elemMenuColor = int16(ElementDefs[iElem].Color)
 					}
 
-					VideoWriteText(78, i, byte(elemMenuColor), string(ElementDefs[iElem].Character))
+					VideoWriteText(78, i, byte(elemMenuColor), string([]byte{ElementDefs[iElem].Character}))
 					i++
 				}
 			}

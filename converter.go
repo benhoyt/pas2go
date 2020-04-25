@@ -23,6 +23,13 @@ func Convert(file File, units []*Unit, w io.Writer) {
 		[]*ParamGroup{{false, []string{"x"}, &TypeIdent{"byte"}}},
 		&TypeIdent{"string"},
 	})
+	c.defineVar("Copy", &FuncSpec{
+		[]*ParamGroup{
+			{false, []string{"s"}, &TypeIdent{"string"}},
+			{false, []string{"index", "count"}, &TypeIdent{"integer"}},
+		},
+		&TypeIdent{"string"},
+	})
 	c.defineVar("GetTime", &ProcSpec{[]*ParamGroup{
 		{true, []string{"h", "m", "s", "s100"}, &TypeIdent{"uint16"}},
 	}})
@@ -819,34 +826,38 @@ func (c *converter) assignRhs(left Expr, right Expr) {
 	kind := c.exprKind(right)
 	spec, _ := c.lookupVarExprType(left)
 	targetKind := c.specToKind(spec)
-	converted := c.startConvertExpr(kind, targetKind, right)
+	end := c.startConvertExpr(kind, targetKind, right)
 
 	if parenExpr, isParen := right.(*ParenExpr); isParen {
 		right = parenExpr.Expr
 	}
 	c.expr(right)
 
-	if converted {
-		c.print(")")
+	if end != "" {
+		c.print(end)
 	}
 }
 
-func (c *converter) startConvertExpr(kind, targetKind Kind, expr Expr) bool {
+func (c *converter) startConvertExpr(kind, targetKind Kind, expr Expr) string {
 	if targetKind == KindByte && kind == KindString {
 		constExpr, isConst := expr.(*ConstExpr)
 		if isConst {
 			str, isStr := constExpr.Value.(string)
 			if isStr && len(str) == 1 {
-				return false
+				return ""
 			}
 		}
 	}
 	convertKind := c.convertKind(kind, targetKind)
+	if convertKind == KindString && kind == KindByte {
+		c.print("string([]byte{")
+		return "})"
+	}
 	if convertKind != KindUnknown {
 		c.print(convertKind, "(")
-		return true
+		return ")"
 	}
-	return false
+	return ""
 }
 
 func (c *converter) procArgs(params []*ParamGroup, args []Expr) {
@@ -883,7 +894,7 @@ func (c *converter) convertKind(kind, targetKind Kind) Kind {
 
 func (c *converter) procArg(targetIsVar bool, targetKind Kind, arg Expr) {
 	kind := c.exprKind(arg)
-	converted := c.startConvertExpr(kind, targetKind, arg)
+	end := c.startConvertExpr(kind, targetKind, arg)
 	switch arg := arg.(type) {
 	case *IdentExpr:
 		isVar := c.isVarParam(arg.Name)
@@ -914,8 +925,8 @@ func (c *converter) procArg(targetIsVar bool, targetKind Kind, arg Expr) {
 	default:
 		c.expr(arg)
 	}
-	if converted {
-		c.print(")")
+	if end != "" {
+		c.print(end)
 	}
 }
 

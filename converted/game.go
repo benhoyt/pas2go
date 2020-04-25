@@ -256,7 +256,7 @@ func WorldCreate() {
 func TransitionDrawToFill(chr byte, color int16) {
 	var i int16
 	for i = 1; i <= TransitionTableSize; i++ {
-		VideoWriteText(TransitionTable[i-1].X-1, TransitionTable[i-1].Y-1, byte(color), string(chr))
+		VideoWriteText(TransitionTable[i-1].X-1, TransitionTable[i-1].Y-1, byte(color), string([]byte{chr}))
 	}
 }
 
@@ -270,7 +270,7 @@ func BoardDrawTile(x, y int16) {
 			ElementDefs[tile.Element].DrawProc(x, y, &ch)
 			VideoWriteText(x-1, y-1, tile.Color, Chr(ch))
 		} else if tile.Element < E_TEXT_MIN {
-			VideoWriteText(x-1, y-1, tile.Color, string(ElementDefs[tile.Element].Character))
+			VideoWriteText(x-1, y-1, tile.Color, string([]byte{ElementDefs[tile.Element].Character}))
 		} else {
 			if tile.Element == E_TEXT_WHITE {
 				VideoWriteText(x-1, y-1, 0x0F, Chr(Board.Tiles[x][y].Color))
@@ -464,13 +464,13 @@ func PromptString(x, y, arrowColor, color, width int16, mode byte, buffer *strin
 			switch mode {
 			case PROMPT_NUMERIC:
 				if InputKeyPressed >= '0' && InputKeyPressed <= '9' {
-					*buffer += string(InputKeyPressed)
+					*buffer += string([]byte{InputKeyPressed})
 				}
 			case PROMPT_ANY:
-				*buffer += string(InputKeyPressed)
+				*buffer += string([]byte{InputKeyPressed})
 			case PROMPT_ALPHANUM:
 				if UpCase(InputKeyPressed) >= 'A' && UpCase(InputKeyPressed) <= 'Z' || InputKeyPressed >= '0' && InputKeyPressed <= '9' || InputKeyPressed == '-' {
-					*buffer += string(UpCase(InputKeyPressed))
+					*buffer += string([]byte{UpCase(InputKeyPressed)})
 				}
 			}
 		} else if InputKeyPressed == KEY_LEFT || InputKeyPressed == KEY_BACKSPACE {
@@ -744,7 +744,7 @@ func CopyStatDataToTextWindow(statId int16, state *TTextWindowState) {
 			TextWindowAppend(state, dataStr)
 			dataStr = ""
 		} else {
-			dataStr += string(dataChr)
+			dataStr += string([]byte{dataChr})
 		}
 		AdvancePointer(&dataPtr, 1)
 	}
@@ -983,7 +983,7 @@ func GameUpdateSidebar() {
 		}
 		for i = 1; i <= 7; i++ {
 			if World.Info.Keys[i-1] {
-				VideoWriteText(71+i, 12, byte(0x18+i), string(ElementDefs[E_KEY].Character))
+				VideoWriteText(71+i, 12, byte(0x18+i), string([]byte{ElementDefs[E_KEY].Character}))
 			} else {
 				VideoWriteText(71+i, 12, 0x1F, " ")
 			}
@@ -1184,7 +1184,7 @@ func GameDebugPrompt() {
 	SidebarClearLine(5)
 	PromptString(63, 5, 0x1E, 0x0F, 11, PROMPT_ANY, &input)
 	for i = 1; i <= Length(input); i++ {
-		input[i-1] = string(UpCase(input[i-1]))
+		input[i-1] = string([]byte{UpCase(input[i-1])})
 	}
 	toggle = true
 	if input[0] == '+' || input[0] == '-' {
@@ -1254,11 +1254,11 @@ func GamePlayLoop(boardChanged bool) {
 			VideoWriteText(64, 10, 0x1E, "   Gems:")
 			VideoWriteText(64, 11, 0x1E, "  Score:")
 			VideoWriteText(64, 12, 0x1E, "   Keys:")
-			VideoWriteText(62, 7, 0x1F, string(ElementDefs[E_PLAYER].Character))
-			VideoWriteText(62, 8, 0x1B, string(ElementDefs[E_AMMO].Character))
-			VideoWriteText(62, 9, 0x16, string(ElementDefs[E_TORCH].Character))
-			VideoWriteText(62, 10, 0x1B, string(ElementDefs[E_GEM].Character))
-			VideoWriteText(62, 12, 0x1F, string(ElementDefs[E_KEY].Character))
+			VideoWriteText(62, 7, 0x1F, string([]byte{ElementDefs[E_PLAYER].Character}))
+			VideoWriteText(62, 8, 0x1B, string([]byte{ElementDefs[E_AMMO].Character}))
+			VideoWriteText(62, 9, 0x16, string([]byte{ElementDefs[E_TORCH].Character}))
+			VideoWriteText(62, 10, 0x1B, string([]byte{ElementDefs[E_GEM].Character}))
+			VideoWriteText(62, 12, 0x1F, string([]byte{ElementDefs[E_KEY].Character}))
 			VideoWriteText(62, 14, 0x70, " T ")
 			VideoWriteText(65, 14, 0x1F, " Torch")
 			VideoWriteText(62, 15, 0x30, " B ")
@@ -1337,7 +1337,7 @@ func GamePlayLoop(boardChanged bool) {
 				pauseBlink = !pauseBlink
 			}
 			if pauseBlink {
-				VideoWriteText(int16(Board.Stats[0].X)-1, int16(Board.Stats[0].Y)-1, ElementDefs[E_PLAYER].Color, string(ElementDefs[E_PLAYER].Character))
+				VideoWriteText(int16(Board.Stats[0].X)-1, int16(Board.Stats[0].Y)-1, ElementDefs[E_PLAYER].Color, string([]byte{ElementDefs[E_PLAYER].Character}))
 			} else {
 				if Board.Tiles[Board.Stats[0].X][Board.Stats[0].Y].Element == E_PLAYER {
 					VideoWriteText(int16(Board.Stats[0].X)-1, int16(Board.Stats[0].Y)-1, 0x0F, " ")

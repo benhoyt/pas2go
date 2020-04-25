@@ -179,7 +179,7 @@ func InputUpdate() {
 		if InputKeyPressed == '\x00' || InputKeyPressed == '\x01' || InputKeyPressed == '\x02' {
 			InputKeyBuffer += Chr(Ord(ReadKey()) | 0x80)
 		} else {
-			InputKeyBuffer += string(InputKeyPressed)
+			InputKeyBuffer += string([]byte{InputKeyPressed})
 		}
 	}
 	if Length(InputKeyBuffer) != 0 {
