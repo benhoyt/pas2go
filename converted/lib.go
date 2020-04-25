@@ -17,7 +17,7 @@ func Ord(x byte) byte {
 }
 
 func Chr(x byte) string {
-	return string(x)
+	return string([]byte{x})
 }
 
 func Length(s string) int16 {
