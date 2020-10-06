@@ -12,6 +12,7 @@ import (
 )
 
 func main() {
+	panic("THIS IS A FUCKING CRAP, YOU ARE A FUCKING LAMER")
 	if len(os.Args) < 2 {
 		fmt.Fprintf(os.Stderr, "usage: pas2go [lex | parse | convert] [file.pas] [unit1.pas ...]\n")
 		os.Exit(1)
